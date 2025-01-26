@@ -1,0 +1,502 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap");
+body {
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f5f5f7;
+    color: #1d1d1f;
+    line-height: 1.6;
+}
+
+.journey-pal-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.navbar {
+    position: sticky;
+    top: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px; /* Reduced padding */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 15px;
+    margin: 10px;
+}
+
+.navbar-logo {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1d1d1f;
+    margin: 0; /* Remove default margin */
+}
+
+.navbar-links {
+    list-style: none;
+    display: flex;
+    gap: 15px; /* Reduced gap */
+    margin: 0;
+    padding: 0;
+    margin-left: 20px; /* Move links closer to the logo */
+}
+
+.navbar-links li {
+    display: inline;
+}
+
+.navbar-links a {
+    color: #1d1d1f;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.navbar-links a:hover {
+    color: #ff6f61;
+}
+
+.navbar-search input {
+    padding: 8px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 25px;
+    font-size: 1rem;
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.navbar-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.navbar-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.navbar-buttons .login {
+    background-color: transparent;
+    color: #1d1d1f;
+}
+
+.navbar-buttons .login:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.navbar-buttons .signup {
+    background-color: #530700;
+    color: white;
+}
+
+.navbar-buttons .signup:hover {
+    background-color: #813c37;
+}
+
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(245, 245, 247, 0.9), rgba(255, 255, 255, 0.9));
+}
+
+.hero-content {
+    max-width: 600px;
+    margin-top: 20px; 
+}
+
+.hero-slogan {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #1d1d1f;
+}
+
+.hero-description {
+    font-size: 1.2rem;
+    color: #6e6e73;
+    margin-bottom: 10px;
+}
+
+.hero-description strong {
+    color: #1d1d1f;
+    font-weight: 600;
+}
+
+.hero-button {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 30px;
+    background-color: #530700;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(255, 111, 97, 0.3);
+}
+
+.google-maps {
+    width: 100%;
+    margin-top: 40px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.press-recommendations {
+    margin-top: 60px;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.recommendation-container {
+    display: flex;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    gap: 20px;
+}
+
+.press-card {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    flex: 0 0 calc(100% - 40px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.press-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.press-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #1d1d1f;
+}
+
+.press-card blockquote {
+    font-size: 1rem;
+    font-style: italic;
+    margin-bottom: 10px;
+    color: #6e6e73;
+}
+
+.scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease;
+    z-index: 1001;
+}
+
+.scroll-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.scroll-arrow.left {
+    left: -20px;
+}
+
+.scroll-arrow.right {
+    right: -20px;
+}
+
+.recommendation-container {
+    display: flex;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    gap: 20px;
+}
+
+.press-card {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    flex: 0 0 calc(100% - 40px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.press-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.press-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #1d1d1f;
+}
+
+.press-card blockquote {
+    font-size: 1rem;
+    font-style: italic;
+    margin-bottom: 10px;
+    color: #6e6e73;
+}
+
+.press-card p {
+    font-size: 0.9rem;
+    color: #6e6e73;
+}
+
+.scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease;
+}
+
+.scroll-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.scroll-arrow.left {
+    left: -20px;
+}
+
+.scroll-arrow.right {
+    right: -20px;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+.stat {
+    text-align: center;
+    color:#530700;
+}
+
+.stat h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #a1190d;
+}
+
+.stat p {
+    font-size: 1rem;
+    color: #6e6e73;
+}
+
+.travel-inspiration {
+    margin-top: 60px;
+    margin-bottom: 40px;
+}
+
+.travel-inspiration h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #1d1d1f;
+}
+
+.travel-inspiration .destinations {
+    display: flex;
+    gap: 20px;
+}
+
+.travel-inspiration .destination {
+    flex: 1;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.travel-inspiration .destination:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.travel-inspiration .destination img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.travel-inspiration .destination h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #1d1d1f;
+}
+
+.travel-inspiration .destination p {
+    font-size: 1rem;
+    color: #6e6e73;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    margin-top: 40px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.footer p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6e6e73;
+}
+
+.recommended-by-experts{
+    color: #530700;
+}
+.checklist {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.checklist h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1d1d1f;
+    margin-bottom: 20px;
+}
+
+.add-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-item input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.add-item button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #1a73e8;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-item button:hover {
+    background-color: #1557b0;
+}
+
+.items-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 1rem;
+    color: #1d1d1f;
+    transition: background-color 0.3s ease;
+}
+
+.item.packed span.item-text {
+    text-decoration: line-through;
+    color: #6e6e73;
+}
+
+.item span {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.item button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff6f61;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.item button:hover {
+    background-color: #e65a50;
+}
