@@ -100,7 +100,7 @@ Felhasználó: A felhasználók főként az utazási élményeikre, programjaikr
 
 
 
-
+-----------------------------------------------------------------------------------------------
 1. Csomaglista Készítő (Packing List Creator)
 Leírás:
 A Csomaglista Készítő szerepkör az utazók számára lehetőséget biztosít arra, hogy összeállítsák a szükséges csomagokat a tervezett utazásukhoz. A funkció célja, hogy segítséget nyújtson a felhasználóknak abban, hogy semmit ne hagyjanak ki a csomagolás során, és biztosítsák, hogy minden szükséges eszköz, ruházat és egyéb kellék kéznél legyen az utazás alatt.
