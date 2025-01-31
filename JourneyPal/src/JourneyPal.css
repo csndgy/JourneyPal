@@ -98,6 +98,10 @@ body {
 .navbar-buttons .signup {
     background-color: #530700;
     color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    
 }
 
 .navbar-buttons .signup:hover {
