@@ -1,0 +1,36 @@
+/* Light mode változók */
+:root {
+    --background-color: #ffffff;
+    --text-color: #000000;
+    --navbar-background: #f8f9fa;
+    --switch-background: #E0E0E0;
+    --switch-handle: #ffffff;
+  }
+  
+  /* Dark mode változók */
+  .dark-mode {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --navbar-background: #1f1f1f;
+    --switch-background: #151515;
+    --switch-handle: #3c3c3c;
+  }
+  
+  /* Alkalmazás stílusai */
+  body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .navbar {
+    background-color: var(--navbar-background);
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner {
+    background: var(--switch-background);
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+    background: var(--switch-handle);
+  }

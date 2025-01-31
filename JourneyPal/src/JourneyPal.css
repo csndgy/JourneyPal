@@ -407,7 +407,7 @@ body {
 }
 
 .recommended-by-experts{
-    color: #530700;
+    color: #af544c;
 }
 .checklist {
     max-width: 600px;
@@ -499,4 +499,212 @@ body {
 
 .item button:hover {
     background-color: #e65a50;
+}
+
+
+/*------------------------------DARK MODE------------------------------*/
+
+/* Light mode változók */
+/* Light mode változók */
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --navbar-background: #f8f9fa;
+  --switch-background: #E0E0E0;
+  --switch-handle: #ffffff;
+  --button-background: #007bff;
+  --button-text-color: #ffffff;
+  --card-background: #ffffff;
+  --card-border-color: #e0e0e0;
+  --input-background: #ffffff;
+  --input-border-color: #ced4da;
+  --input-text-color: #495057;
+}
+
+/* Dark mode változók */
+.dark-mode {
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --navbar-background: #302d2d;
+  --switch-background: #151515;
+  --switch-handle: #3c3c3c;
+  --button-background: #1e90ff;
+  --button-text-color: #ffffff;
+  --card-background: #1f1f1f;
+  --card-border-color: #333333;
+  --input-background: #333333;
+  --input-border-color: #555555;
+  --input-text-color: #ffffff;
+}
+  
+  /* Alkalmazás stílusai */
+  body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .navbar {
+    background-color: var(--navbar-background);
+    color: #ffffff;
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner {
+    background: var(--switch-background);
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+    background: var(--switch-handle);
+  }
+/* Navbar */
+
+  
+  .navbar-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .navbar a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar a:hover {
+    color: var(--button-background);
+  }
+  
+  .navbar button {
+    background-color: var(--button-background);
+    color: var(--button-text-color);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .navbar button:hover {
+    opacity: 0.9;
+  }
+
+  .navbar-logo {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0; /* Remove default margin */
+}
+
+  /*-------------------------------------DARK MODE------------------------------*/
+  /*------------------------------HERO SECTION------------------------------*/
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+    text-align: center;
+    background: linear-gradient(135deg, 
+        var(--hero-gradient-start, rgba(245, 245, 247, 0.9)), 
+        var(--hero-gradient-end, rgba(255, 255, 255, 0.9)));
+    transition: background 0.3s ease;
+}
+
+.hero-slogan {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.hero-description {
+    font-size: 1.2rem;
+    color: var(--secondary-text-color);
+    margin-bottom: 10px;
+}
+
+.hero-description strong {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.hero-button {
+    background-color: var(--primary-color);
+    color: var(--button-text-color);
+    transition: all 0.3s ease;
+}
+
+.hero-button:hover {
+    background-color: var(--primary-hover-color);
+    box-shadow: 0 4px 15px var(--primary-shadow-color);
+}
+
+/*------------------------------RECOMMENDATIONS------------------------------*/
+.press-card {
+    background-color: var(--card-background);
+    color: var(--text-color);
+    box-shadow: 0 4px 10px var(--card-shadow-color);
+}
+
+.press-card h3 {
+    color: var(--text-color);
+}
+
+.press-card blockquote {
+    color: var(--secondary-text-color);
+}
+
+.scroll-arrow {
+    background-color: var(--card-background);
+    box-shadow: 0 2px 10px var(--card-shadow-color);
+}
+
+/*------------------------------DARK MODE VARIABLES------------------------------*/
+:root {
+    --primary-color: #530700;
+    --primary-hover-color: #813c37;
+    --primary-shadow-color: rgba(255, 111, 97, 0.3);
+    --secondary-text-color: #6e6e73;
+    --card-shadow-color: rgba(0, 0, 0, 0.05);
+    --hero-gradient-start: rgba(245, 245, 247, 0.9);
+    --hero-gradient-end: rgba(255, 255, 255, 0.9);
+}
+
+.dark-mode {
+    --primary-color: #ff6f61;
+    --primary-hover-color: #ff8a7a;
+    --primary-shadow-color: rgba(255, 111, 97, 0.2);
+    --secondary-text-color: #a8a8a8;
+    --card-shadow-color: rgba(255, 255, 255, 0.05);
+    --hero-gradient-start: rgba(18, 18, 18, 0.9);
+    --hero-gradient-end: rgba(31, 31, 31, 0.9);
+}
+
+/*------------------------------COMMON STYLES------------------------------*/
+.stats {
+    background-color: var(--card-background);
+    box-shadow: 0 4px 10px var(--card-shadow-color);
+}
+
+.stat h2 {
+    color: var(--primary-color);
+}
+
+.travel-inspiration .destination {
+    background-color: var(--card-background);
+    box-shadow: 0 4px 10px var(--card-shadow-color);
+}
+
+.checklist {
+    background-color: var(--card-background);
+    box-shadow: 0 4px 10px var(--card-shadow-color);
+}
+
+.footer {
+    background-color: var(--card-background);
+    box-shadow: 0 4px 10px var(--card-shadow-color);
 }
