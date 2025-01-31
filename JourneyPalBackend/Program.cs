@@ -54,13 +54,10 @@ namespace JourneyPalBackend
                 app.UseSwaggerUI();
             }
 
+            app.UseAuthentication();
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
-
             app.Run();
         }
     }

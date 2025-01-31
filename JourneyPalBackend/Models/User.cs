@@ -11,6 +11,8 @@ namespace JourneyPalBackend.Models
         public bool EmailConfirmed { get; set; }
         public bool TwoFactorEnabled { get; set; }
         public string TwoFactorSecretKey { get; set; }
+        public string RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiryTime { get; set; }
         public List<string> RecoveryCodes { get; set; } = new List<string>();
 
         public void SetPassword(string password)
