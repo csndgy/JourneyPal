@@ -1,5 +1,7 @@
-﻿using IdentityModel.Client;
+﻿using Google.Apis.Auth;
+using IdentityModel.Client;
 using JourneyPalBackend.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +16,7 @@ namespace JourneyPalBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("AllowAll")]
     public class AuthController : ControllerBase
     {
         private readonly JourneyPalDbContext _ctx;
@@ -28,8 +31,8 @@ namespace JourneyPalBackend.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] User user)
         {
-            if (user == null || string.IsNullOrEmpty(user.Username) 
-                || string.IsNullOrEmpty(user.Email) 
+            if (user == null || string.IsNullOrEmpty(user.Username)
+                || string.IsNullOrEmpty(user.Email)
                 || string.IsNullOrEmpty(user.PasswordHash))
             {
                 return BadRequest("Invalid user data.");
@@ -75,7 +78,7 @@ namespace JourneyPalBackend.Controllers
             {
                 return StatusCode(500, "An error occurred while processing your request.");
             }
-            
+
         }
 
         [HttpPost("refresh")]
@@ -90,10 +93,10 @@ namespace JourneyPalBackend.Controllers
             var username = principal.Identity.Name;
             var user = _ctx.Users.FirstOrDefault(u => u.Username == username);
 
-            if (user.RefreshToken != refreshToken 
+            if (user.RefreshToken != refreshToken
                 || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
                 return BadRequest("Invalid refresh token.");
-            
+
             if (user is null)
             {
                 return BadRequest("User not found.");
@@ -128,7 +131,75 @@ namespace JourneyPalBackend.Controllers
             await _ctx.SaveChangesAsync();
 
             return Ok(new { Message = "Logged out successfully." });
-              
+
+        }
+
+        [HttpPost("register-google")]
+        public async Task<IActionResult> RegisterWithGoogle([FromBody] GoogleAuthRequest requst)
+        {
+            var payload = await ValidateGoogleToken(requst.IdToken);
+
+            if (payload == null)
+                return BadRequest("Invalid Google token.");
+
+            var email = payload.Email;
+            var name = payload.Name;
+            var providerUserId = payload.Subject;
+
+            var existinUser = await _ctx.Users.FirstOrDefaultAsync
+                (u => u.ProviderUserId == providerUserId && u.Provider == "Google");
+
+            if (existinUser == null)
+                return BadRequest("An account is already registered with this Google account.");
+
+            var user = new User
+            {
+                Email = email,
+                Username = email,
+                Provider = "Google",
+                ProviderUserId = providerUserId,
+                EmailConfirmed = true
+            };
+
+            _ctx.Users.Add(user);
+
+            await _ctx.SaveChangesAsync();
+
+            var token = GenerateToken(user);
+            var refreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
+
+            await _ctx.SaveChangesAsync();
+
+            return Ok(new { Token = token, RefreshToken = refreshToken });
+        }
+
+        [HttpPost("login-google")]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] GoogleAuthRequest request)
+        {
+            var payload = await ValidateGoogleToken(request.IdToken);
+            if (payload == null)
+                return BadRequest("Invalid Google token.");
+
+            var providerUserId = payload.Subject;
+
+            var user = await _ctx.Users.FirstOrDefaultAsync
+                (u => u.ProviderUserId == providerUserId && u.Provider == "Google");
+
+            if (user == null)
+                return BadRequest("No account is associated with this Google account.");
+
+            var token = GenerateToken(user);
+            var refreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
+
+            await _ctx.SaveChangesAsync();
+
+            return Ok(new { Token = token, RefreshToken = refreshToken });
         }
 
         private string GenerateToken(User user)
@@ -142,7 +213,7 @@ namespace JourneyPalBackend.Controllers
                     new Claim(ClaimTypes.Name, user.Username)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(int.Parse(_conf["Jwt:AccessTokenExpiryMinutes"])),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), 
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature),
                 Issuer = _conf["Jwt:Issuer"],
                 Audience = _conf["Jwt:Audience"]
@@ -150,7 +221,22 @@ namespace JourneyPalBackend.Controllers
 
             return tokenHandler.CreateToken(tokenDescriptor);
         }
+        private async Task<GoogleJsonWebSignature.Payload> ValidateGoogleToken(string idToken)
+        {
+            try
+            {
+                var settings = new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[] { _conf["Authentication:Google:ClientId"] }
+                };
 
+                return await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+            }
+            catch
+            {
+                return null;
+            }
+        }
         private string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -175,16 +261,21 @@ namespace JourneyPalBackend.Controllers
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, 
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters,
                 out var securityToken);
 
-            if (securityToken is not JwtSecurityToken jwtSecurityToken || 
+            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
                 !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature, StringComparison.InvariantCultureIgnoreCase))
             {
-                return null; //Ebből még fix lesz baj
+                return null;
             }
 
             return principal;
         }
+    }
+
+    public class GoogleAuthRequest
+    {
+        public string IdToken { get; set; }
     }
 }

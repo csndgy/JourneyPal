@@ -14,6 +14,8 @@ namespace JourneyPalBackend.Models
         public string RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
         public List<string> RecoveryCodes { get; set; } = new List<string>();
+        public string Provider { get; set; } 
+        public string ProviderUserId { get; set; }
 
         public void SetPassword(string password)
         {
