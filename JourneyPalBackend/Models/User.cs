@@ -1,6 +1,4 @@
-﻿using BCrypt.Net;
-
-namespace JourneyPalBackend.Models
+﻿namespace JourneyPalBackend.Models
 {
     public class User
     {

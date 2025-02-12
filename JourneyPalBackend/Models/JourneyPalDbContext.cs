@@ -12,5 +12,7 @@ namespace JourneyPalBackend.Models
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Trip> Trips { get; set; }
+        public DbSet<Event> Events { get; set; }
     }
 }

@@ -1,8 +1,6 @@
 
 using JourneyPalBackend.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -17,8 +15,7 @@ namespace JourneyPalBackend
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            builder.Services.AddDbContext<JourneyPalDbContext>(options => options.UseSqlite(connectionString));
+            builder.Services.AddDbContext<JourneyPalDbContext>(options => options.UseSqlite(connectionString: "Data Source = JourneyPal.db"));
             // Add services to the container.
             var jwtSettings = builder.Configuration.GetSection("Jwt");
 
