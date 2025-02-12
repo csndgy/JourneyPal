@@ -1,7 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 const PressRecommendations: React.FC = () => {
     const recommendationContainerRef = useRef<HTMLDivElement>(null);
+    const [isLeftDisabled, setIsLeftDisabled] = useState(false);
+    const [isRightDisabled, setIsRightDisabled] = useState(false);
 
     const recommendations = [
         {
@@ -27,18 +29,30 @@ const PressRecommendations: React.FC = () => {
     ];
 
     const scrollLeft = () => {
-        if (recommendationContainerRef.current) {
+        if (recommendationContainerRef.current && !isLeftDisabled) {
             const cardWidth = recommendationContainerRef.current.children[0].clientWidth;
             const gap = 20; // Gap between cards
             recommendationContainerRef.current.scrollBy({ left: -(cardWidth + gap), behavior: 'smooth' });
+
+            // Disable the button for 1 second
+            setIsLeftDisabled(true);
+            setTimeout(() => {
+                setIsLeftDisabled(false);
+            }, 1000);
         }
     };
 
     const scrollRight = () => {
-        if (recommendationContainerRef.current) {
+        if (recommendationContainerRef.current && !isRightDisabled) {
             const cardWidth = recommendationContainerRef.current.children[0].clientWidth;
             const gap = 20; // Gap between cards
             recommendationContainerRef.current.scrollBy({ left: cardWidth + gap, behavior: 'smooth' });
+
+            // Disable the button for 1 second
+            setIsRightDisabled(true);
+            setTimeout(() => {
+                setIsRightDisabled(false);
+            }, 1000);
         }
     };
 
@@ -55,8 +69,8 @@ const PressRecommendations: React.FC = () => {
                     </div>
                 ))}
             </div>
-            <button className="scroll-arrow left" onClick={scrollLeft}>←</button>
-            <button className="scroll-arrow right" onClick={scrollRight}>→</button>
+            <button className="scroll-arrow left" onClick={scrollLeft} disabled={isLeftDisabled}>←</button>
+            <button className="scroll-arrow right" onClick={scrollRight} disabled={isRightDisabled}>→</button>
         </section>
     );
 };
