@@ -1,4 +1,6 @@
-
+:root{
+    --button-color: #012A4A;
+}
 .login-container {
     width: 100%;
     max-width: 400px;
@@ -36,7 +38,7 @@
 .login-button {
     width: 100%;
     padding: 10px;
-    background: #ff6f61;
+    background: var(--button-color);
     border: none;
     color: white;
     font-size: 16px;
@@ -103,7 +105,7 @@
 .signup-button {
     width: 100%;
     padding: 10px;
-    background: #ff6f61;
+    background: var(--button-color);
     border: none;
     color: white;
     font-size: 16px;
@@ -142,20 +144,9 @@
 
 /*Dark Mode*/
 
-.dark-mode {
-    --background-color: #121212;
-    --text-color: #ffffff;
-    --navbar-background: #302d2d;
-    --switch-background: #151515;
-    --switch-handle: #3c3c3c;
-    --button-background: #1e90ff;
-    --button-text-color: #ffffff;
-    --card-background: #1f1f1f;
-    --card-border-color: #333333;
-    --input-background: #333333;
-    --input-border-color: #555555;
-    --input-text-color: #ffffff;
-  }
+body.dark-mode{
+    --button-color: #1c3294;
+}
 
 .login-container {
     background: var(--card-background);

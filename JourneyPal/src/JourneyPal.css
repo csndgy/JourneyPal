@@ -1,6 +1,61 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap");
 
+:root {
+    /* Light mode defaults */
+    --background-color: #f8f8f8;
+    --text-color: #333333;
+    --navbar-background: rgba(231, 222, 222, 0.8);
+    --button-background: #013A63;
+    --card-background: rgb(233, 233, 233);
+    --input-background: rgba(255, 255, 255, 0.8);
+    --primary-color: #2C7DA0;
+    --secondary-text-color: #6e6e73;
+    --card-shadow-color: rgba(0, 0, 0, 0.05);
+    --primary-final-color: #014F86;
+    --button-color: #012A4A;
+    --button-background-icon: #0c3f50;
+    --button-moon-color: #2a5372;
+    --button-moon-spark-color: #88adb9;
+}
 
+/* Dark mode overrides */
+body.dark-mode {
+    --background-color: #1a1a1a; /* Sötétebb háttér */
+    --text-color: #e0e0e0; /* Világosabb szöveg */
+    --navbar-background: #2a2a2a; /* Sötét, de nem fekete */
+    --button-background: #01497c; /* Világosabb kék */
+    --card-background: #2c2c2c; /* Sötét kártya háttér */
+    --input-background: #333333; /* Sötét input mezők */
+
+    --secondary-text-color: #b0b0b0;
+    --card-shadow-color: rgba(255, 255, 255, 0.05);
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --navbar-background: #302d2d;
+    --switch-background: #151515;
+    --switch-handle: #3c3c3c;
+    --button-text-color: #ffffff;
+    --card-background: #1f1f1f;
+    --card-border-color: #333333;
+    --input-background: #333333;
+    --input-border-color: #555555;
+    --input-text-color: #ffffff;
+
+    --primary-color: #2a9df4;
+    --primary-hover-color: #ff8a7a;
+    --primary-shadow-color: rgba(255, 111, 97, 0.2);
+    --secondary-text-color: #a8a8a8;
+    --card-shadow-color: rgba(0, 0, 0, 0.1);
+    --hero-gradient-start: rgba(18, 18, 18, 0.9);
+    --hero-gradient-end: rgba(31, 31, 31, 0.9);
+    --primary-final-color: #1c6ea4;
+    --button-background-icon: #7ba5b3;
+    --button-moon-color: #698fac;
+    --button-moon-spark-color: #97b9c4;
+
+    --button-color: #013a63;
+    
+}
 
 body {
     margin: 0;
@@ -15,6 +70,16 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+}
+
+.sun-icon-color{
+    color: var(--button-background-icon);
+}
+.moon-spark-icon{
+color: var(--button-moon-spark-color);
+}
+.moon-icon{
+    color: var(--button-moon-color) ;
 }
 
 
@@ -107,14 +172,14 @@ body {
 }
 
 .navbar-buttons .login:hover {
-    background-color: rgb(233, 228, 228);
-    color: rgb(87, 6, 6);
+    background-color: var(--button-moon-spark-color);
+    color: var(--button-color);
     border-color: white;
 }
 
 
 .navbar-buttons .signup {
-    background-color: #530700;
+    background-color: var(--button-background);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -132,7 +197,10 @@ body {
 }
 
 .navbar-buttons .signup:hover {
-    background-color: #813c37;
+    background-color: var(--button-background);
+    transform: translateY(-3px);
+    box-shadow: var(--button-moon-color);
+
 }
 
 
@@ -157,7 +225,7 @@ body {
 
 .hero-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 15px rgba(255, 111, 97, 0.3);
+    box-shadow: 0 4px 15px var(--button-background);
 }
 
 .google-maps {
@@ -169,7 +237,7 @@ body {
 }
 
 .hero-button {
-    background-color: #530700;
+    background-color: var(--button-background);
     color: white;
     transition: all 0.3s ease;
 }
@@ -263,7 +331,6 @@ body {
 .stats {
     display: flex;
     justify-content: space-around;
-    background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
     padding: 20px;
     border-radius: 15px;
@@ -273,7 +340,7 @@ body {
 
 .stat {
     text-align: center;
-    color: #fff;
+    color: #ff6f61;
 }
 
 .stat h2 {
@@ -306,7 +373,7 @@ body {
 }
 
 .recommended-by-experts {
-    color: #d14b3f;
+    color: var(--primary-final-color);
 }
 
 .checklist {
@@ -369,7 +436,7 @@ body {
     padding: 10px;
     border-bottom: 1px solid #e0e0e0;
     font-size: 1rem;
-    color: #1d1d1f;
+    color: var(--text-color);
     transition: background-color 0.3s ease;
 }
 
@@ -384,6 +451,8 @@ body {
     align-items: center;
     gap: 10px;
 }
+
+
 
 /*BUTTON*/
 
@@ -406,27 +475,7 @@ body {
 /*------------------------------DARK MODE------------------------------*/
 
 /* Dark mode változók */
-.dark-mode {
-    --background-color: #121212;
-    --text-color: #ffffff;
-    --navbar-background: #302d2d;
-    --switch-background: #151515;
-    --switch-handle: #3c3c3c;
-    --button-background: #1e90ff;
-    --button-text-color: #ffffff;
-    --card-background: #1f1f1f;
-    --card-border-color: #333333;
-    --input-background: #333333;
-    --input-border-color: #555555;
-    --input-text-color: #ffffff;
-    --primary-color: #ff6f61;
-    --primary-hover-color: #ff8a7a;
-    --primary-shadow-color: rgba(255, 111, 97, 0.2);
-    --secondary-text-color: #a8a8a8;
-    --card-shadow-color: rgba(255, 255, 255, 0.05);
-    --hero-gradient-start: rgba(18, 18, 18, 0.9);
-    --hero-gradient-end: rgba(31, 31, 31, 0.9);
-}
+
 body {
     background-color: var(--background-color);
     color: var(--text-color);
@@ -445,6 +494,7 @@ body {
 .btn-color-mode-switch>label.btn-color-mode-switch-inner:after {
     background: var(--switch-handle);
 }
+
 .navbar-content {
     display: flex;
     align-items: center;
@@ -459,7 +509,7 @@ body {
 }
 
 .navbar a:hover {
-    color: rgb(206, 129, 129);
+    color: rgb(91, 109, 148);
 }
 
 .navbar button {
@@ -483,6 +533,11 @@ body {
     color: var(--text-color);
     margin: 0;
 }
+
+.checklist h2 {
+    color: var(--button-text-color);
+}
+
 .hero-section {
     display: flex;
     flex-direction: column;
@@ -538,6 +593,7 @@ body {
     background-color: var(--card-background);
     box-shadow: 0 2px 10px var(--card-shadow-color);
 }
+
 .stats {
     background-color: var(--card-background);
     box-shadow: 0 4px 10px var(--card-shadow-color);
