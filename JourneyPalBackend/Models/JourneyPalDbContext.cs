@@ -1,15 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace JourneyPalBackend.Models
 {
-    public class JourneyPalDbContext : DbContext
+    public class JourneyPalDbContext : IdentityDbContext
     {
         public JourneyPalDbContext(DbContextOptions<JourneyPalDbContext> options) : base(options) { }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<User>().ToTable("Users");
-        }
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<User>().ToTable("Users");
+        //}
 
         public DbSet<User> Users { get; set; }
         public DbSet<Trip> Trips { get; set; }

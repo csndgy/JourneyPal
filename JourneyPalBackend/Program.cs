@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
+using Google.Apis.Auth.AspNetCore3;
+using Microsoft.AspNetCore.Identity;
 
 namespace JourneyPalBackend
 {
@@ -40,19 +41,33 @@ namespace JourneyPalBackend
 
             builder.Services.AddAuthentication(options =>
             {
+                options.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
             }).AddCookie()
-            .AddGoogle(options =>
+            .AddGoogleOpenIdConnect(options =>
             {
-                options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-                options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+                options.ClientId = "13684633292-hv8dlbubct2ujgmpl65btbb45551k6i4.apps.googleusercontent.com";
+                options.ClientSecret = "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";
+            });
+
+            builder.Services.AddCors(o =>
+            {
+                o.AddPolicy("AllowAll", builder =>
+                {
+                    builder.WithOrigins("http://localhost:5173")
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
             });
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<JourneyPalDbContext>()
+                .AddDefaultTokenProviders();
 
             var app = builder.Build();
 
@@ -63,16 +78,11 @@ namespace JourneyPalBackend
                 app.UseSwaggerUI();
             }
 
-            app.UseCors(options =>
-            {
-                options.AllowAnyOrigin();
-                options.AllowAnyMethod();
-                options.AllowAnyHeader();
-            });
-
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseAuthorization();
+            app.UseAuthentication();
             app.MapControllers();
             app.Run();
         }

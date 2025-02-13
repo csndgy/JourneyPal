@@ -2,15 +2,17 @@
 using IdentityModel.Client;
 using JourneyPalBackend.Models;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using MimeKit;
 
 namespace JourneyPalBackend.Controllers
 {
@@ -21,24 +23,27 @@ namespace JourneyPalBackend.Controllers
     {
         private readonly JourneyPalDbContext _ctx;
         private readonly IConfiguration _conf;
+        private readonly UserManager<User> _userManager;
 
-        public AuthController(JourneyPalDbContext context, IConfiguration configuration)
+        public AuthController(JourneyPalDbContext context, IConfiguration configuration, UserManager<User> userManager)
         {
             _ctx = context;
             _conf = configuration;
+            _userManager = userManager;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] User user)
+        public async Task<IActionResult> Register([FromBody] UserDTO user)
         {
-            if (user == null || string.IsNullOrEmpty(user.Username)
+            Console.WriteLine($"API request received: {user.UserName}");
+            if (user == null || string.IsNullOrEmpty(user.UserName)
                 || string.IsNullOrEmpty(user.Email)
-                || string.IsNullOrEmpty(user.PasswordHash))
+                || string.IsNullOrEmpty(user.Password))
             {
                 return BadRequest("Invalid user data.");
             }
 
-            if (await _ctx.Users.AnyAsync(u => u.Username == user.Username))
+            if (await _ctx.Users.AnyAsync(u => u.UserName == user.UserName))
             {
                 return BadRequest("Username is already taken!");
             }
@@ -48,10 +53,18 @@ namespace JourneyPalBackend.Controllers
                 return BadRequest("An account is already registered with this Email address!");
             }
 
-            user.SetPassword(user.PasswordHash);
-            _ctx.Users.Add(user);
+            //user.SetPassword(user.Password);
+            //_ctx.Users.Add(user);
+            Console.WriteLine($"User added to context: {user.UserName}");
+            var newUser = new User
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                EmailConfirmed = true
+            };
             await _ctx.SaveChangesAsync();
-
+            Console.WriteLine($"Database saved");
+            await _userManager.CreateAsync(newUser, user.Password);
             return Ok(new { Message = "Successful registration!" });
         }
 
@@ -60,7 +73,7 @@ namespace JourneyPalBackend.Controllers
         {
             try
             {
-                var existingUser = await _ctx.Users.FirstOrDefaultAsync(u => u.Username == user.Username || u.Email == user.Email);
+                var existingUser = await _ctx.Users.FirstOrDefaultAsync(u => u.UserName == user.UserName || u.Email == user.Email);
 
                 if (existingUser == null || !existingUser.VerifyPassword(user.PasswordHash))
                     return Unauthorized("Invalid username/email or password!");
@@ -91,7 +104,7 @@ namespace JourneyPalBackend.Controllers
                 return BadRequest("Invalid refresh token.");
 
             var username = principal.Identity.Name;
-            var user = _ctx.Users.FirstOrDefault(u => u.Username == username);
+            var user = _ctx.Users.FirstOrDefault(u => u.UserName == username);
 
             if (user.RefreshToken != refreshToken
                 || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
@@ -120,7 +133,7 @@ namespace JourneyPalBackend.Controllers
         public async Task<IActionResult> Logout()
         {
             var username = User.Identity.Name;
-            var user = await _ctx.Users.FirstOrDefaultAsync(u => u.Username == username);
+            var user = await _ctx.Users.FirstOrDefaultAsync(u => u.UserName == username);
 
             if (user == null)
                 return BadRequest("User not found.");
@@ -134,11 +147,10 @@ namespace JourneyPalBackend.Controllers
 
         }
 
-        [HttpPost("register-google")]
-        public async Task<IActionResult> RegisterWithGoogle([FromBody] GoogleAuthRequest requst)
+        [HttpPost("signin-google")]
+        public async Task<IActionResult> RegisterOrLoginWithGoogle([FromBody] GoogleAuthRequest request)
         {
-            var payload = await ValidateGoogleToken(requst.IdToken);
-
+            var payload = await ValidateGoogleToken(request.IdToken);
             if (payload == null)
                 return BadRequest("Invalid Google token.");
 
@@ -146,60 +158,83 @@ namespace JourneyPalBackend.Controllers
             var name = payload.Name;
             var providerUserId = payload.Subject;
 
-            var existinUser = await _ctx.Users.FirstOrDefaultAsync
-                (u => u.ProviderUserId == providerUserId && u.Provider == "Google");
+            var existingUser = await _ctx.Users.FirstOrDefaultAsync(u => u.ProviderUserId == providerUserId && u.Provider == "Google");
 
-            if (existinUser == null)
-                return BadRequest("An account is already registered with this Google account.");
-
-            var user = new User
+            if (existingUser == null)
             {
-                Email = email,
-                Username = email,
-                Provider = "Google",
-                ProviderUserId = providerUserId,
-                EmailConfirmed = true
-            };
+                var user = new User
+                {
+                    Email = email,
+                    UserName = email,
+                    Provider = "Google",
+                    ProviderUserId = providerUserId,
+                    EmailConfirmed = true
+                };
 
-            _ctx.Users.Add(user);
+                _ctx.Users.Add(user);
+                await _ctx.SaveChangesAsync();
 
-            await _ctx.SaveChangesAsync();
+                existingUser = user;
+            }
 
-            var token = GenerateToken(user);
+            var token = GenerateToken(existingUser);
             var refreshToken = GenerateRefreshToken();
 
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
+            existingUser.RefreshToken = refreshToken;
+            existingUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
 
             await _ctx.SaveChangesAsync();
 
             return Ok(new { Token = token, RefreshToken = refreshToken });
         }
-
-        [HttpPost("login-google")]
-        public async Task<IActionResult> LoginWithGoogle([FromBody] GoogleAuthRequest request)
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
         {
-            var payload = await ValidateGoogleToken(request.IdToken);
-            if (payload == null)
-                return BadRequest("Invalid Google token.");
-
-            var providerUserId = payload.Subject;
-
-            var user = await _ctx.Users.FirstOrDefaultAsync
-                (u => u.ProviderUserId == providerUserId && u.Provider == "Google");
-
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
-                return BadRequest("No account is associated with this Google account.");
+                return Ok("If the email is registered, you will receive a password reset link.");
 
-            var token = GenerateToken(user);
-            var refreshToken = GenerateRefreshToken();
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
+            var resetLink = $"https://localhost:5173/reset-password?token={WebUtility.UrlEncode(token)}&email={WebUtility.UrlEncode(request.Email)}";
 
-            await _ctx.SaveChangesAsync();
+            await SendPasswordResetEmailAsync(request.Email, resetLink);
 
-            return Ok(new { Token = token, RefreshToken = refreshToken });
+            return Ok("Password reset link has been sent to your email.");
+        }
+
+        private async Task SendPasswordResetEmailAsync(string email, string resetLink)
+        {
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress("JourneyPal", "noreply@journeypal.com"));
+            emailMessage.To.Add(new MailboxAddress("", email));
+            emailMessage.Subject = "Password Reset Request";
+            emailMessage.Body = new TextPart("plain")
+            {
+                Text = $"Click the link below to reset your password:\n{resetLink}"
+            };
+
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                await client.ConnectAsync("localhost", 25, false);
+                await client.SendAsync(emailMessage);
+                await client.DisconnectAsync(true);
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+                return BadRequest("Invalid request.");
+
+            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+
+            if (result.Succeeded)
+                return Ok("Password reset successful.");
+
+            return BadRequest("Password reset failed.");
         }
 
         private string GenerateToken(User user)
@@ -210,7 +245,7 @@ namespace JourneyPalBackend.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Username)
+                    new Claim(ClaimTypes.Name, user.UserName)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(int.Parse(_conf["Jwt:AccessTokenExpiryMinutes"])),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
@@ -272,10 +307,35 @@ namespace JourneyPalBackend.Controllers
 
             return principal;
         }
+        
     }
 
     public class GoogleAuthRequest
     {
         public string IdToken { get; set; }
     }
+    public class ForgotPasswordRequest
+    {
+        public string Email { get; set; }
+    }
+
+    public class ResetPasswordRequest
+    {
+        public string Email { get; set; }
+        public string Token { get; set; }
+        public string NewPassword { get; set; }
+    }
+
+    public class UserDTO
+    { 
+        public string UserName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+    
+    public class LoginDTO
+    {
+        public string UserName { get; set; }
+        public string Password { get; set; }
+    } 
 }
