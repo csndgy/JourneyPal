@@ -16,11 +16,6 @@
     font-weight: 500;
   }
   
-  .btn-color-mode-switch {
-    display: inline-block;
-    margin: 0px;
-    position: relative;
-  }
   
   .btn-color-mode-switch > label.btn-color-mode-switch-inner {
     margin: 0px;
@@ -58,12 +53,6 @@
     padding: 5px 0px;
   }
   
-  .btn-color-mode-switch > .alert {
-    display: none;
-    background: #FF9800;
-    border: none;
-    color: #fff;
-  }
   
   .btn-color-mode-switch input[type="checkbox"] {
     cursor: pointer;
@@ -92,67 +81,4 @@
     right: auto;
     left: 20px;
   }
-  
-  .btn-color-mode-switch input[type="checkbox"]:checked ~ .alert {
-    display: block;
-  }
-  
-  .dark-preview {
-    background: #0d0d0d;
-  }
-  
-  .white-preview {
-    background: #fff;
-  }
 
-  /* Navbar login gomb */
-.navbar-buttons .login {
-    background-color: transparent;
-    color: var(--text-color);
-    border: none;
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-.navbar-buttons .login:hover {
-    background-color: var(--button-hover-background);
-    color: var(--button-text-color);
-    border-color: var(--button-background);
-}
-:root {
-    --button-hover-background: rgba(0, 0, 0, 0.05);
-    --button-hover-text-color: #1d1d1f;
-  }
-  
-  .dark-mode {
-    --button-hover-background: rgba(255, 255, 255, 0.1);
-    --button-hover-text-color: #ffffff;
-  }
-
- /* Navbar signup gomb */
-.navbar-buttons .signup {
-    background-color: var(--primary-color);
-    color: var(--button-text-color);
-    border: none;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.navbar-buttons .signup:hover {
-    background-color: var(--primary-hover-color);
-    transform: translateY(-3px);
-    box-shadow: 0 4px 15px var(--primary-shadow-color);
-}:root {
-    --primary-color: #530700;
-    --primary-hover-color: #813c37;
-    --primary-shadow-color: rgba(255, 111, 97, 0.3);
-  }
-  
-  .dark-mode {
-    --primary-color: #ff6f61;
-    --primary-hover-color: #ff8a7a;
-    --primary-shadow-color: rgba(255, 111, 97, 0.2);
-  }
