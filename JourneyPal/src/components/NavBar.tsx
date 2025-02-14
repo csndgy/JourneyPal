@@ -34,9 +34,9 @@ const NavBar: React.FC<NavBarProps> = ({ isDarkMode, toggleDarkMode }) => {
         <li>
           <Link to="/">Home</Link>
         </li>
-        <li>
+        {/* <li>
           <Link to="/checklist">Checklist</Link>
-        </li>
+        </li> */}
       </ul>
       <div className="navbar-search">
         <input type="text" placeholder="Search..." />
