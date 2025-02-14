@@ -2,41 +2,60 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../SingUpLogin.css';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp: React.FC = () => {
-    const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+        return;
+      }
+
+    const jsonObject = {
+        "userName": username,
+        "email": email,
+        "password": password
+    }
+
+    try {
+        console.log(JSON.stringify(jsonObject)); 
+        const response = await fetch('https://localhost:7193/api/Auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(jsonObject),
         });
-    };
+  
+        if (response) {
+          console.log('Registration successful:', response);
+        } else {
+            console.error('Registration failed:', response);
+        }
+      } catch (err) {
+        console.error('Registration failed:', err);
+      }
+  };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Itt lehetne validáció és backend API hívás
-        console.log('Sign Up Data:', formData);
-    };
-
-    return (
-        <div className="signup-container">
-            <h2>Sign Up</h2>
-            <form onSubmit={handleSubmit} className="signup-form">
-                <input type="text" name="username" placeholder="Username" value={formData.username} onChange={handleChange} required className='signup-input'/>
-                <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required className='signup-input' />
-                <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required className='signup-input'/>
-                <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} required className='signup-input'/>
-                <button type="submit" className="signup-button">Sign Up</button>
-            </form>
-            <p>Already have an account? <Link to="/login">Log In</Link></p>
-        </div>
-    );
+  return (
+    <div className="signup-container">
+      <h2>Sign Up</h2>
+      <form onSubmit={handleSignup} className="signup-form">
+        <input type="text" name="username" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required className='signup-input'/>
+        <input type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className='signup-input'/>
+        <input type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className='signup-input'/>
+        <input type="password" name="confirmPassword" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className='signup-input'/>
+        <button type="submit" className='signup-button'>Sign Up</button>
+      </form>
+      <p>Already have an account? <Link to="/login" className='signup-link'>Log In</Link></p>
+    </div>
+  );
 };
 
 export default SignUp;
