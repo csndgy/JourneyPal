@@ -21,6 +21,7 @@ namespace JourneyPalBackend.Controllers
     [EnableCors("AllowAll")]
     public class AuthController : ControllerBase
     {
+        #region Variables and Constructor
         private readonly JourneyPalDbContext _ctx;
         private readonly IConfiguration _conf;
         private readonly UserManager<User> _userManager;
@@ -31,11 +32,11 @@ namespace JourneyPalBackend.Controllers
             _conf = configuration;
             _userManager = userManager;
         }
+        #endregion
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserDTO user)
         {
-            Console.WriteLine($"API request received: {user.UserName}");
             if (user == null || string.IsNullOrEmpty(user.UserName)
                 || string.IsNullOrEmpty(user.Email)
                 || string.IsNullOrEmpty(user.Password))
@@ -53,9 +54,6 @@ namespace JourneyPalBackend.Controllers
                 return BadRequest("An account is already registered with this Email address!");
             }
 
-            //user.SetPassword(user.Password);
-            //_ctx.Users.Add(user);
-            Console.WriteLine($"User added to context: {user.UserName}");
             var newUser = new User
             {
                 UserName = user.UserName,
@@ -63,26 +61,59 @@ namespace JourneyPalBackend.Controllers
                 EmailConfirmed = true
             };
             await _ctx.SaveChangesAsync();
-            Console.WriteLine($"Database saved");
             await _userManager.CreateAsync(newUser, user.Password);
             return Ok(new { Message = "Successful registration!" });
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] User user)
+        public async Task<IActionResult> Login([FromBody] LoginDTO user)
         {
             try
             {
-                var existingUser = await _ctx.Users.FirstOrDefaultAsync(u => u.UserName == user.UserName || u.Email == user.Email);
+                User userExistsByEmail = null;
+                User userExistsByName = null;
+                byte signal = 2;
 
-                if (existingUser == null || !existingUser.VerifyPassword(user.PasswordHash))
-                    return Unauthorized("Invalid username/email or password!");
+                if (!String.IsNullOrEmpty(user.Email))
+                {
+                    userExistsByEmail = await _userManager.FindByEmailAsync(user.Email);
+                    if (userExistsByEmail == null)
+                    {
+                        return BadRequest("A user with this email does not exist.");
+                    }
+                    else
+                    {
+                        if (!await _userManager.CheckPasswordAsync(userExistsByEmail, user.Password))
+                            return Unauthorized("Invalid credentials.");
+                        signal = 0;
+                    }
+                }
+                else if (!String.IsNullOrEmpty(user.UserName))
+                {
+                    userExistsByName = await _userManager.FindByNameAsync(user.UserName);
+                    if (userExistsByName == null)
+                    {
+                        return BadRequest("A user with this username does not exist.");
+                    }
+                    else
+                    {
+                        if (!await _userManager.CheckPasswordAsync(userExistsByName, user.Password))
+                            return Unauthorized("Invalid credentials.");
+                        signal = 1;
+                    }
+                }
+                else
+                {
+                    return BadRequest("Email or Username must be provided.");
+                }
 
-                var token = GenerateToken(existingUser);
+                var theChosenOne = signal == 0 ? userExistsByEmail : userExistsByName;
+
+                var token = GenerateToken(theChosenOne);
                 var refreshToken = GenerateRefreshToken();
 
-                existingUser.RefreshToken = refreshToken;
-                existingUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
+                theChosenOne.RefreshToken = refreshToken;
+                theChosenOne.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
                 await _ctx.SaveChangesAsync();
 
                 return Ok(new { Token = token, RefreshToken = refreshToken });
@@ -91,8 +122,9 @@ namespace JourneyPalBackend.Controllers
             {
                 return StatusCode(500, "An error occurred while processing your request.");
             }
-
         }
+
+        
 
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
@@ -202,7 +234,34 @@ namespace JourneyPalBackend.Controllers
 
             return Ok("Password reset link has been sent to your email.");
         }
+        
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+                return BadRequest("Invalid request.");
 
+            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+
+            if (result.Succeeded)
+                return Ok("Password reset successful.");
+
+            return BadRequest("Password reset failed.");
+        }
+        #region Funny
+        [HttpPost("meow")]
+        public async Task<IActionResult> Meow()
+        {
+            return Ok("Meow!");
+        }
+        [HttpPost("I'm a teapot")]
+        public async Task<IActionResult> ImATeapot()
+        {
+            return StatusCode(418, "I'm a teapot!");
+        }
+        #endregion
+        #region Helper functions    
         private async Task SendPasswordResetEmailAsync(string email, string resetLink)
         {
             var emailMessage = new MimeMessage();
@@ -221,22 +280,6 @@ namespace JourneyPalBackend.Controllers
                 await client.DisconnectAsync(true);
             }
         }
-
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
-        {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null)
-                return BadRequest("Invalid request.");
-
-            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
-
-            if (result.Succeeded)
-                return Ok("Password reset successful.");
-
-            return BadRequest("Password reset failed.");
-        }
-
         private string GenerateToken(User user)
         {
             var tokenHandler = new JsonWebTokenHandler();
@@ -307,9 +350,10 @@ namespace JourneyPalBackend.Controllers
 
             return principal;
         }
-        
-    }
+        #endregion
 
+    }
+    #region DTO/Helper Classes
     public class GoogleAuthRequest
     {
         public string IdToken { get; set; }
@@ -336,6 +380,8 @@ namespace JourneyPalBackend.Controllers
     public class LoginDTO
     {
         public string UserName { get; set; }
+        public string Email { get; set; }
         public string Password { get; set; }
-    } 
+    }
+    #endregion
 }

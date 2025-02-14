@@ -61,6 +61,20 @@ namespace JourneyPalBackend
                 });
             });
 
+            builder.Services.Configure<IdentityOptions>(o =>
+            {
+                o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                o.Lockout.MaxFailedAccessAttempts = 5;
+                o.Lockout.AllowedForNewUsers = false;
+                o.Password.RequireDigit = true;
+                o.Password.RequiredLength = 8;
+                o.Password.RequireLowercase = true;
+                o.Password.RequireNonAlphanumeric = true;
+                o.Password.RequireUppercase = true;
+                o.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._";
+                o.User.RequireUniqueEmail = true;
+            });
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
