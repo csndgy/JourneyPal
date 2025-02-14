@@ -3,28 +3,28 @@ import React from 'react';
 import '../JourneyPal.css';
 
 const PopularDestinations: React.FC = () => {
-  const destinations = [
-    {
-      title: 'Tokyo',
-      description: 'Experience the perfect blend of tradition and innovation',
-      image: '/images/tokyo.jpeg'  // You'll need to add your images to the public folder
-    },
-    {
-      title: 'Kyoto',
-      description: 'Discover ancient temples and beautiful gardens',
-      image: '/images/kyoto.jpg'
-    },
-    {
-      title: 'Mount Fuji',
-      description: 'Japans iconic mountain and natural wonder',
-      image: '/images/mount-fuji.jpg'
-    },
-    {
-      title: 'Osaka',
-      description: 'Known for amazing street food and vibrant culture',
-      image: '/images/osaka.jpg'
-    }
-  ];
+    const destinations = [
+        {
+          title: 'Tokyo',
+          description: 'Experience the perfect blend of tradition and innovation',
+          image: '/images/tokyo.jpeg'
+        },
+        {
+          title: 'Faroe Islands',
+          description: 'A remote archipelago with stunning cliffs, waterfalls, and untouched landscapes',
+          image: '/images/faroe-islands.jpg'
+        },
+        {
+          title: 'Plitvice Lakes',
+          description: 'A UNESCO World Heritage Site with cascading lakes and lush forests',
+          image: '/images/plitvice-lakes.jpg'
+        },
+        {
+          title: 'Siwa Oasis',
+          description: 'A serene desert oasis with natural springs, palm groves, and ancient ruins',
+          image: '/images/siwa-oasis.jpg'
+        }
+      ];
 
   return (
     <section className="destinations-section">

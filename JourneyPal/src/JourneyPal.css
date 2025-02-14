@@ -133,6 +133,7 @@ body {
 .navbar-buttons {
     display: flex;
     gap: 10px;
+    margin-bottom: 10px;
 }
 
 .navbar-buttons button {
