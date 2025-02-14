@@ -9,6 +9,8 @@ import Checklist from './components/Checklist';
 import SignUp from './components/SignUp';
 import './JourneyPal.css';
 import Login from './components/Login';
+import PopularDestinations from './components/PopularDestinations';
+
 
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -28,6 +30,7 @@ const App: React.FC = () => {
             element={
               <>
                 <HeroSection />
+                <PopularDestinations/>
                 <PressRecommendations />
                 <Stats />
                 <Footer />
