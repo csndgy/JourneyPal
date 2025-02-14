@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../SingUpLogin.css';
+import api from '../services/Interceptor';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('')

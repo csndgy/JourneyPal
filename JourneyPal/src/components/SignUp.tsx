@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../SingUpLogin.css';
-import { useNavigate } from 'react-router-dom';
 
 const SignUp: React.FC = () => {
 
@@ -10,7 +9,6 @@ const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
