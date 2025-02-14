@@ -1,4 +1,6 @@
-
+:root{
+    --button-color: #012A4A;
+}
 .login-container {
     width: 100%;
     max-width: 400px;
@@ -8,6 +10,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     margin-left: 33%;
+    margin-top: 10%;
 
 }
 
@@ -35,7 +38,7 @@
 .login-button {
     width: 100%;
     padding: 10px;
-    background: #ff6f61;
+    background: var(--button-color);
     border: none;
     color: white;
     font-size: 16px;
@@ -50,7 +53,7 @@
 
 /* Alternatív opció szöveg */
 .login-text {
-    margin-top: 10px;
+    margin-top: 30px;
     color: black;
 }
 
@@ -64,19 +67,108 @@
 }
 
 
+/* Regisztrációs doboz */
+.signup-container {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-left: 33%;
+    margin-top: 10%;
+}
+
+/* Cím */
+.signup-title {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Input mezők */
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.signup-input {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Gomb */
+.signup-button {
+    width: 100%;
+    padding: 10px;
+    background: var(--button-color);
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.signup-button:hover {
+    background-color: #e65a50;
+}
+
+/* Alternatív opció szöveg */
+.signup-text {
+    margin-top: 10px;
+}
+
+.login-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
+
+
+
+
+
+
+
+
+
+
+
 /*Dark Mode*/
 
-.dark-mode {
-    --background-color: #121212;
-    --text-color: #ffffff;
-    --navbar-background: #302d2d;
-    --switch-background: #151515;
-    --switch-handle: #3c3c3c;
-    --button-background: #1e90ff;
-    --button-text-color: #ffffff;
-    --card-background: #1f1f1f;
-    --card-border-color: #333333;
-    --input-background: #333333;
-    --input-border-color: #555555;
-    --input-text-color: #ffffff;
-  }
+body.dark-mode{
+    --button-color: #1c3294;
+}
+
+.login-container {
+    background: var(--card-background);
+}
+
+.login-title {
+    color: var(--input-text-color);
+}
+.login-text {
+    color: var(--input-text-color);
+}
+
+/*dark mode sign upra*/
+
+
+.signup-container {
+    background: var(--card-background);
+}
+
+.signup-title {
+    color: var(--input-text-color);
+}
+.signup-text {
+    color: var(--input-text-color);
+}

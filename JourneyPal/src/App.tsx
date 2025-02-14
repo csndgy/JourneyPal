@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import HeroSection from './components/HeroSection';
@@ -11,29 +11,36 @@ import './JourneyPal.css';
 import Login from './components/Login';
 
 const App: React.FC = () => {
-    return (
-        <Router>
-            <div className="journey-pal-container">
-                <NavBar />
-                <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            <>
-                                <HeroSection />
-                                <PressRecommendations />
-                                <Stats />
-                                <Footer />
-                            </>
-                        }
-                    />
-                    <Route path="/checklist" element={<Checklist />} />
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/login" element={<Login />} />
-                </Routes>
-            </div>
-        </Router>
-    );
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.body.classList.toggle('dark-mode', !isDarkMode);
+  };
+
+  return (
+    <Router>
+      <div className={`journey-pal-container ${isDarkMode ? 'dark-mode' : ''}`}>
+        <NavBar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <HeroSection />
+                <PressRecommendations />
+                <Stats />
+                <Footer />
+              </>
+            }
+          />
+          <Route path="/checklist" element={<Checklist />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
+    </Router>
+  );
 };
 
 export default App;
