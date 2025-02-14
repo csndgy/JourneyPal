@@ -1,6 +1,6 @@
 :root {
     /* Light mode defaults */
-    --background-color: #f8f8f8;
+    --background-color: #92a0be65;
     --text-color: #333333;
     --navbar-background: rgba(231, 222, 222, 0.8);
     --button-background: #013A63;
@@ -15,8 +15,12 @@
     --button-moon-color: #2a5372;
     --button-moon-spark-color: #88adb9;
 
---star-color: rgb(70, 190, 211);
+--star-color:#536999;
 }
+
+
+
+/*536999 - hatter szin ami tetszett*/ 
 
 /* Dark mode overrides */
 body.dark-mode {
@@ -85,6 +89,7 @@ button {
     filter: drop-shadow(0 0 0 white);
     z-index: -5;
     transition: all 1s cubic-bezier(0.05, 0.83, 0.43, 0.96);
+    
   }
   
   .star-2 {

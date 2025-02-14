@@ -23,9 +23,10 @@
     --border-color: #e0e0e0;
     --button-hover-shadow: 0 4px 15px var(--button-background);
     --card-hover-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    --destination-card-background: #ffffff;
+    --destination-card-background: #8eafb965;
     --destination-title-color: #333;
     --destination-description-color: #666;
+    --visited-places-color: #7b8baa75;
 }
 
 body.dark-mode {
@@ -53,6 +54,7 @@ body.dark-mode {
     --destination-card-background: #2a2a2a;
     --destination-title-color: #ffffff;
     --destination-description-color: #cccccc;
+    --visited-places-color:#1f1f1f3d;
 }
 
 body {
@@ -178,6 +180,7 @@ body {
     text-align: center;
     background: linear-gradient(135deg, var(--hero-gradient-start), var(--hero-gradient-end));
     transition: background 0.3s ease;
+    border-radius: 30px;
 }
 
 .hero-content {
@@ -368,19 +371,26 @@ body {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.4s ease;
   cursor: pointer;
   height: 450px;
 }
 
-.destination-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+/* Új hover effektek hozzáadva */
+.destinations-grid:hover > .destination-card:not(:hover) {
+  filter: blur(4px);
+  transform: scale(0.98);
 }
 
+.destination-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  z-index: 1;
+}
+
+/* Eredeti stílusok változatlanul */
 .card-image {
   width: 100%;
-  height: 250px; /* Increased image height */
+  height: 250px;
   overflow: hidden;
 }
 
@@ -397,6 +407,7 @@ body {
 
 .card-content {
   padding: 1.5rem;
+  background-color: var(--visited-places-color);
 }
 
 .card-title {
@@ -412,7 +423,7 @@ body {
   line-height: 1.5;
 }
 
-/* Dark mode styles */
+/* Dark mode styles változatlanok */
 .dark-mode .destinations-section {
   background-color: #1a1a1a;
 }
@@ -433,7 +444,7 @@ body {
   color: #cccccc;
 }
 
-/* Responsive styles */
+/* Responsive styles változatlanok */
 @media (min-width: 768px) {
   .destinations-grid {
     grid-template-columns: repeat(2, 1fr);

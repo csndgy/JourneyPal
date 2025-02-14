@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import HeroSection from './components/HeroSection';
@@ -11,14 +11,30 @@ import './JourneyPal.css';
 import Login from './components/Login';
 import PopularDestinations from './components/PopularDestinations';
 
-
 const App: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Alapértelmezett érték: light mode, kivéve ha a localStorage-ban dark mode van
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    return savedMode === 'true'; // Ha 'true', akkor dark mode, különben light mode
+  });
 
+  // Dark mode váltó függvény
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.body.classList.toggle('dark-mode', !isDarkMode);
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('darkMode', newMode.toString()); 
+    document.body.classList.toggle('dark-mode', newMode); 
   };
+
+  
+  useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode === 'true') {
+      document.body.classList.add('dark-mode'); 
+    } else {
+      document.body.classList.remove('dark-mode'); 
+    }
+  }, []);
 
   return (
     <Router>

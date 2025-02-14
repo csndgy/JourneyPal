@@ -6,22 +6,22 @@ const PopularDestinations: React.FC = () => {
     const destinations = [
         {
           title: 'Tokyo',
-          description: 'Experience the perfect blend of tradition and innovation',
+          description: 'Experience the perfect blend of tradition and innovation in one.',
           image: '/images/tokyo.jpeg'
         },
         {
           title: 'Faroe Islands',
-          description: 'A remote archipelago with stunning cliffs, waterfalls, and untouched landscapes',
+          description: 'A remote archipelago with stunning cliffs, waterfalls, and untouched landscapes.',
           image: '/images/faroe-islands.jpg'
         },
         {
           title: 'Plitvice Lakes',
-          description: 'A UNESCO World Heritage Site with cascading lakes and lush forests',
+          description: 'A UNESCO World Heritage Site with cascading lakes and lush forests.',
           image: '/images/plitvice-lakes.jpg'
         },
         {
           title: 'Siwa Oasis',
-          description: 'A serene desert oasis with natural springs, palm groves, and ancient ruins',
+          description: 'A serene desert oasis with natural springs, palm groves, and ancient ruins.',
           image: '/images/siwa-oasis.jpg'
         }
       ];
