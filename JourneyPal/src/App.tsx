@@ -7,8 +7,9 @@ import Stats from './components/Stats';
 import Footer from './components/Footer';
 import Checklist from './components/Checklist';
 import SignUp from './components/SignUp';
-import './JourneyPal.css';
 import Login from './components/Login';
+import ForgotPassword from './components/ForgotPassword';
+import './JourneyPal.css';
 
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -37,6 +38,7 @@ const App: React.FC = () => {
           <Route path="/checklist" element={<Checklist />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
       </div>
     </Router>

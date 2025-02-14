@@ -1,45 +1,56 @@
-// src/pages/ForgotPassword.tsx
 import React, { useState } from 'react';
-import api from '../services/Interceptor';
+import '../ForgotPassword.css';
 
-const ForgotPassword: React.FC = () => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setIsLoading(true);
+    
     try {
-      const response = await api.post('/auth/forgot-password', { email });
-      setMessage(response.data.message); 
-      setError('');
-    } catch (err) {
-      setError('Failed to send password reset link. Please try again.');
-      setMessage('');
+      const response = await fetch('https://localhost:7193/api/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.text();
+      setMessage(data);
+    } catch (error) {
+      setMessage('An error occurred. Please try again later.');
+      console.error('Forgot password request failed:', error);
     }
+    setIsLoading(false);
   };
 
   return (
-    <div>
-      <h1>Forgot Password</h1>
-      <form onSubmit={handleForgotPassword}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        {message && <p style={{ color: 'green' }}>{message}</p>}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit">Send Reset Link</button>
+    <div className="forgot-password-container">
+      <h2 className="forgot-password-title">Forgot Password</h2>
+      <form onSubmit={handleSubmit} className="forgot-password-form">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="forgot-password-input"
+          placeholder="Email Address"
+          required
+        />
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="forgot-password-button"
+        >
+          {isLoading ? 'Sending...' : 'Reset Password'}
+        </button>
       </form>
-      <p>
-        Remember your password? <a href="/login">Login</a>
-      </p>
+      {message && (
+        <div className="forgot-password-message">
+          {message}
+        </div>
+      )}
     </div>
   );
 };

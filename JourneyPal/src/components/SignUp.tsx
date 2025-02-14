@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../SingUpLogin.css';
-import { useNavigate } from 'react-router-dom';
 
 const SignUp: React.FC = () => {
 
@@ -10,7 +9,6 @@ const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,11 +45,11 @@ const SignUp: React.FC = () => {
     <div className="signup-container">
       <h2>Sign Up</h2>
       <form onSubmit={handleSignup} className="signup-form">
-        <input type="text" name="username" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-        <input type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <input type="password" name="confirmPassword" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-        <button type="submit">Sign Up</button>
+        <input type="text" name="username" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required className='signup-input'/>
+        <input type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className='signup-input'/>
+        <input type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className='signup-input'/>
+        <input type="password" name="confirmPassword" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className='signup-input'/>
+        <button type="submit" className='signup-button'>Sign Up</button>
       </form>
       <p>Already have an account? <Link to="/login">Log In</Link></p>
     </div>

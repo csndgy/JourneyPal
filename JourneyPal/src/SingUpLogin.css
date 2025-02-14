@@ -132,16 +132,6 @@
     text-decoration: underline;
 }
 
-
-
-
-
-
-
-
-
-
-
 /*Dark Mode*/
 
 body.dark-mode{
@@ -160,7 +150,6 @@ body.dark-mode{
 }
 
 /*dark mode sign upra*/
-
 
 .signup-container {
     background: var(--card-background);

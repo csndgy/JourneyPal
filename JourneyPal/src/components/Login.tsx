@@ -1,34 +1,44 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../SingUpLogin.css';
-import api from '../services/Interceptor';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const navigate = useNavigate()
+    const [username, setUsername] = useState('')
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
-        try {
-            const response = await api.post('/auth/login', { email, password })
-            const { token, refreshToken } = response.data
 
-            localStorage.setItem('token', token)
-            localStorage.setItem('refreshToken', refreshToken)
-            navigate('/home')
-        } catch (error) {
-            console.error('Invalid email or password')
+        const jsonObject = {
+            "email": email,
+            "username": username,
+            "password": password
         }
+        try {
+            console.log(JSON.stringify(jsonObject)); 
+            const response = await fetch('https://localhost:7193/api/Auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(jsonObject),
+            });
+      
+            if (response) {
+              console.log('Registration successful:', response);
+            } else {
+                console.error('Registration failed:', response);
+            }
+          } catch (err) {
+            console.error('Registration failed:', err);
+          }
     }
 
     return (
         <div className="login-container">
     <h2 className="login-title">Log In</h2>
     <form onSubmit={handleLogin} className="login-form">
-        <input type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="login-input" />
+        <input type="email" name="email" placeholder="Email" value={email} onChange={(e) => e.target.value.includes("@") ? setEmail(e.target.value) : setUsername(e.target.value)} required className="login-input" />
         <input type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="login-input" />
         <button type="submit" className="login-button">Log In</button>
     </form>
@@ -36,7 +46,7 @@ const Login: React.FC = () => {
         Don't have an account? <Link to="/signup" className="signup-link">Sign Up</Link>
     </p>
     <p className='login-text'>
-        Forgot your password? <a href="/forgot-password">Reset it here</a>
+        Forgot your password? <Link to="/forgot-password">Reset it here</Link>
       </p>
 </div>
 
