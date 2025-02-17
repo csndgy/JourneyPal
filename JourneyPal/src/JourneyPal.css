@@ -26,7 +26,7 @@
     --destination-card-background: #8eafb965;
     --destination-title-color: #333;
     --destination-description-color: #666;
-    --visited-places-color: #7b8baa75;
+    --visited-places-color: #7b8baa36;
 }
 
 body.dark-mode {
@@ -176,7 +176,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 90vh;
+    height:80vh;
     text-align: center;
     background: linear-gradient(135deg, var(--hero-gradient-start), var(--hero-gradient-end));
     transition: background 0.3s ease;
@@ -347,6 +347,7 @@ body {
 .destinations-section {
   padding: 4rem 2rem;
   background-color: #ffffff;
+  border-radius: 25px;
 }
 
 .destinations-title {
