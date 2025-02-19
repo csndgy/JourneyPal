@@ -10,7 +10,7 @@ const HeroSection: React.FC = () => {
                 <p className="hero-description">
                     Plan your next adventure with ease. Explore the world, one trip at a time.
                 </p> 
-      <button>
+      <button className='hero-button'>
         Travel
         <div className="star-1">
           <svg xmlns="http://www.w3.org/2000/svg" xmlSpace="preserve" version="1.1" style={{shapeRendering: 'geometricPrecision', textRendering: 'geometricPrecision', fillRule: 'evenodd', clipRule: 'evenodd'}} viewBox="0 0 784.11 815.53" xmlnsXlink="http://www.w3.org/1999/xlink">
