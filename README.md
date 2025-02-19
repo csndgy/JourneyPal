@@ -33,7 +33,7 @@ Feladatok:
 Az admin hozzáférhet a platform összes funkciójához, beleértve a felhasználók, programok, tartalmak és statisztikák kezelését.
 Az admin döntéseket hozhat az oldal működéséről, felhasználói aktivitásról és a tartalom frissítéséről.
 
-
+sracok a ketamifugosseggemel lealltam, udv gyarmati csanad
 
 2. Felhasználó Szerepkör
 Leírás:
