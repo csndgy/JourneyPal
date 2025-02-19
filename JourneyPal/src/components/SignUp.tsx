@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../SingUpLogin.css';
 
@@ -9,6 +9,7 @@ const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +34,7 @@ const SignUp: React.FC = () => {
   
         if (response) {
           console.log('Registration successful:', response);
+          navigate('/home')
         } else {
             console.error('Registration failed:', response);
         }

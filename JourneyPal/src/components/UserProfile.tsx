@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../UserProfile.css';
 
 interface User {
@@ -20,14 +20,16 @@ interface PasswordStrength {
 
 const UserProfile: React.FC = () => {
   const [user, setUser] = useState<User>({
-    username: "JohnDoe",
-    email: "john.doe@example.com",
+    username: "",
+    email: "",
     phoneNumber: ""
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [isEditingPhone, setIsEditingPhone] = useState<boolean>(false);
   const [isChangingPassword, setIsChangingPassword] = useState<boolean>(false);
-  const [tempPhone, setTempPhone] = useState<string>(user.phoneNumber || "");
+  const [tempPhone, setTempPhone] = useState<string>("");
   const [passwordForm, setPasswordForm] = useState<PasswordForm>({
     currentPassword: "",
     newPassword: "",
@@ -39,6 +41,52 @@ const UserProfile: React.FC = () => {
     newPassword: false,
     confirmPassword: false
   });
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    if (user.phoneNumber) {
+      setTempPhone(user.phoneNumber);
+    }
+  }, [user.phoneNumber]);
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      console.log("Token:", token); // Add this to verify token exists
+
+      const response = await fetch('https://localhost:7193/api/AccountDetails/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+
+      console.log("Response status:", response.status);
+
+      if (response.status === 401) {
+        // Token expired or invalid - redirect to login
+        // window.location.href = '/login';
+        throw new Error('Unauthorized - please log in again');
+      }
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error("Error fetching user data:", err); // Add detailed error logging
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const togglePasswordVisibility = (field: keyof typeof passwordVisibility) => {
     setPasswordVisibility(prev => ({
@@ -109,6 +157,14 @@ const UserProfile: React.FC = () => {
   };
 
   const strength = checkPasswordStrength(passwordForm.newPassword);
+
+  if (loading) {
+    return <div className="user-profile-container">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="user-profile-container">Error: {error}</div>;
+  }
 
   return (
     <div className="user-profile-container">
@@ -181,8 +237,8 @@ const UserProfile: React.FC = () => {
                   >
                     <img
                       src={
-                        passwordVisibility.currentPassword 
-                          ? "/images/close.png" 
+                        passwordVisibility.currentPassword
+                          ? "/images/close.png"
                           : "/images/open.png"
                       }
                       alt="Toggle visibility"
@@ -209,8 +265,8 @@ const UserProfile: React.FC = () => {
                   >
                     <img
                       src={
-                        passwordVisibility.newPassword 
-                          ? "/images/close.png" 
+                        passwordVisibility.newPassword
+                          ? "/images/close.png"
                           : "/images/open.png"
                       }
                       alt="Toggle visibility"
@@ -224,9 +280,8 @@ const UserProfile: React.FC = () => {
                       {[1, 2, 3].map((bar) => (
                         <div
                           key={bar}
-                          className={`strength-bar ${
-                            bar <= strength.score ? 'active' : ''
-                          }`}
+                          className={`strength-bar ${bar <= strength.score ? 'active' : ''
+                            }`}
                         />
                       ))}
                     </div>
@@ -254,8 +309,8 @@ const UserProfile: React.FC = () => {
                   >
                     <img
                       src={
-                        passwordVisibility.confirmPassword 
-                          ? "/images/close.png" 
+                        passwordVisibility.confirmPassword
+                          ? "/images/close.png"
                           : "/images/open.png"
                       }
                       alt="Toggle visibility"
