@@ -25,15 +25,18 @@ namespace JourneyPalBackend.Controllers
         private readonly JourneyPalDbContext _ctx;
         private readonly IConfiguration _conf;
         private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public AuthController(JourneyPalDbContext context, IConfiguration configuration, UserManager<User> userManager)
+        public AuthController(JourneyPalDbContext context, IConfiguration configuration, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _ctx = context;
             _conf = configuration;
             _userManager = userManager;
+            _conf = configuration;
+            _signInManager = signInManager;
         }
         #endregion
-
+        #region API Calls
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserDTO user)
         {
@@ -60,71 +63,143 @@ namespace JourneyPalBackend.Controllers
                 Email = user.Email,
                 EmailConfirmed = true
             };
+
+            var result = await _userManager.CreateAsync(newUser, user.Password);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
             await _ctx.SaveChangesAsync();
-            await _userManager.CreateAsync(newUser, user.Password);
+
             return Ok(new { Message = "Successful registration!" });
         }
+
+        //[HttpPost("login")]
+        //public async Task<IActionResult> Login([FromBody] LoginDTO user)
+        //{
+        //    try
+        //    {
+        //        User userExistsByEmail = null;
+        //        User userExistsByName = null;
+        //        byte signal = 2;
+
+        //        if (!String.IsNullOrEmpty(user.Email))
+        //        {
+        //            userExistsByEmail =  _ctx.Users.Where(x => x.Email == user.Email).First();
+        //            //userExistsByEmail = await _userManager.FindByEmailAsync(user.Email);
+        //            if (userExistsByEmail == null)
+        //            {
+        //                //return BadRequest("A user with this email does not exist.");
+        //                return BadRequest(userExistsByEmail);
+        //            }
+        //            else
+        //            {
+        //                var result = await _signInManager.CheckPasswordSignInAsync(userExistsByEmail, user.Password, false);
+        //                Console.WriteLine(result);
+        //                if (!result.Succeeded)
+        //                    return Unauthorized("Invalid credentials.");
+        //                signal = 0;
+        //            }
+        //        }
+        //        else if (!String.IsNullOrEmpty(user.UserName))
+        //        {
+        //            userExistsByName = _ctx.Users.Where(x => x.UserName == user.UserName).First();
+        //            //userExistsByName = await _userManager.FindByNameAsync(user.UserName);
+        //            if (userExistsByName == null)
+        //            {
+        //                return BadRequest("A user with this username does not exist.");
+        //            }
+        //            else
+        //            {
+        //                var result = await _signInManager.CheckPasswordSignInAsync(userExistsByEmail, user.Password, false);
+        //                Console.WriteLine(result);
+        //                if (!result.Succeeded)
+        //                    return Unauthorized("Invalid credentials.");
+        //                signal = 1;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            return BadRequest("Email or Username must be provided.");
+        //        }
+
+        //        var theChosenOne = signal == 0 ? userExistsByEmail : userExistsByName;
+
+        //        var token = GenerateToken(theChosenOne);
+        //        var refreshToken = GenerateRefreshToken();
+        //        string? identifier = theChosenOne.Id;
+
+        //        theChosenOne.RefreshToken = refreshToken;
+        //        theChosenOne.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
+        //        await _ctx.SaveChangesAsync();
+
+        //        return Ok(new { Token = token, RefreshToken = refreshToken, Identifier = identifier });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, "An error occurred while processing your request.");
+        //    }
+        //}
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO user)
         {
             try
             {
-                User userExistsByEmail = null;
-                User userExistsByName = null;
-                byte signal = 2;
-
-                if (!String.IsNullOrEmpty(user.Email))
-                {
-                    userExistsByEmail = await _userManager.FindByEmailAsync(user.Email);
-                    if (userExistsByEmail == null)
-                    {
-                        return BadRequest("A user with this email does not exist.");
-                    }
-                    else
-                    {
-                        if (!await _userManager.CheckPasswordAsync(userExistsByEmail, user.Password))
-                            return Unauthorized("Invalid credentials.");
-                        signal = 0;
-                    }
-                }
-                else if (!String.IsNullOrEmpty(user.UserName))
-                {
-                    userExistsByName = await _userManager.FindByNameAsync(user.UserName);
-                    if (userExistsByName == null)
-                    {
-                        return BadRequest("A user with this username does not exist.");
-                    }
-                    else
-                    {
-                        if (!await _userManager.CheckPasswordAsync(userExistsByName, user.Password))
-                            return Unauthorized("Invalid credentials.");
-                        signal = 1;
-                    }
-                }
-                else
+                if (string.IsNullOrEmpty(user.Email) && string.IsNullOrEmpty(user.UserName))
                 {
                     return BadRequest("Email or Username must be provided.");
                 }
 
-                var theChosenOne = signal == 0 ? userExistsByEmail : userExistsByName;
+                User? existingUser = null;
 
-                var token = GenerateToken(theChosenOne);
+
+                if (!string.IsNullOrEmpty(user.Email))
+                {
+                    existingUser = await _userManager.FindByEmailAsync(user.Email);
+                }
+                else
+                {
+                    existingUser = await _userManager.FindByNameAsync(user.UserName);
+                }
+
+                if (existingUser == null)
+                {
+                    return BadRequest("User not found.");
+                }
+
+                // Debug point 4: Log password check
+                var result = await _signInManager.CheckPasswordSignInAsync(existingUser, user.Password, false);
+
+                if (!result.Succeeded)
+                {
+                    if (result.IsLockedOut)
+                        return BadRequest("Account is locked out.");
+                    if (result.IsNotAllowed)
+                        return BadRequest("Login not allowed.");
+                    if (result.RequiresTwoFactor)
+                        return BadRequest("Requires two-factor authentication.");
+
+                    return Unauthorized("Invalid credentials.");
+                }
+
+                var token = GenerateToken(existingUser);
                 var refreshToken = GenerateRefreshToken();
+                string identifier = existingUser.Id;
 
-                theChosenOne.RefreshToken = refreshToken;
-                theChosenOne.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
+                existingUser.RefreshToken = refreshToken;
+                existingUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
                 await _ctx.SaveChangesAsync();
 
-                return Ok(new { Token = token, RefreshToken = refreshToken });
+                return Ok(new { Token = token, RefreshToken = refreshToken, Identifier = identifier });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
-
-        
 
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
@@ -249,6 +324,7 @@ namespace JourneyPalBackend.Controllers
 
             return BadRequest("Password reset failed.");
         }
+        #endregion
         #region Funny
         [HttpPost("meow")]
         public async Task<IActionResult> Meow()
@@ -288,7 +364,8 @@ namespace JourneyPalBackend.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.UserName)
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(int.Parse(_conf["Jwt:AccessTokenExpiryMinutes"])),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
@@ -314,7 +391,7 @@ namespace JourneyPalBackend.Controllers
             {
                 return null;
             }
-        }
+        } 
         private string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -351,7 +428,6 @@ namespace JourneyPalBackend.Controllers
             return principal;
         }
         #endregion
-
     }
     #region DTO/Helper Classes
     public class GoogleAuthRequest
@@ -379,8 +455,8 @@ namespace JourneyPalBackend.Controllers
     
     public class LoginDTO
     {
-        public string UserName { get; set; }
-        public string Email { get; set; }
+        public string? UserName { get; set; }
+        public string? Email { get; set; }
         public string Password { get; set; }
     }
     #endregion

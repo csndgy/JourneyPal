@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JourneyPalBackend.Migrations
 {
     [DbContext(typeof(JourneyPalDbContext))]
-    [Migration("20250213113938_sqlite.local_migration_646")]
-    partial class sqlitelocal_migration_646
+    [Migration("20250219075712_sqlite.local_migration_978")]
+    partial class sqlitelocal_migration_978
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -319,6 +319,10 @@ namespace JourneyPalBackend.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("RefreshTokenExpiryTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Telephone")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasDiscriminator().HasValue("User");

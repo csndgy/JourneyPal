@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace JourneyPalBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class sqlitelocal_migration_646 : Migration
+    public partial class sqlitelocal_migration_978 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,6 +31,7 @@ namespace JourneyPalBackend.Migrations
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Discriminator = table.Column<string>(type: "TEXT", maxLength: 13, nullable: false),
+                    Telephone = table.Column<string>(type: "TEXT", nullable: true),
                     RefreshToken = table.Column<string>(type: "TEXT", nullable: true),
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "TEXT", nullable: true),
                     RecoveryCodes = table.Column<string>(type: "TEXT", nullable: true),
