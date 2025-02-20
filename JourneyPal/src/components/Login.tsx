@@ -7,10 +7,13 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const navigate = useNavigate()
+
 
     const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault()
+        e.preventDefault();
+        
+        // Determine if input is email or username
+        const isEmail = emailOrUsername.includes('@');
         
         // Debug point 1: Log what we're sending
         const jsonObject = {
@@ -43,27 +46,48 @@ const Login: React.FC = () => {
         } catch (err){
             console.error("Login failed: ", err)
         }
-    }
+    };
 
     return (
-        <div className="login-container">
-    <h2 className="login-title">Log In</h2>
-    <form onSubmit={handleLogin} className="login-form">
-        <input type="text" name="email/username" placeholder="Email/Username" value={email} onChange={(e) => e.target.value.includes('@') ? setEmail(e.target.value) : setUsername(e.target.value)} className="login-input" />
-        <input type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="login-input" />
-        <button type="submit" className="login-button">Log In</button>
-    </form>
-    <p className="login-text">
-        Don't have an account? <Link to="/signup" className="signup-link">Sign Up</Link>
-    </p>
-    <p className='login-text'>
-        Forgot your password? <a href="/forgot-password" className='signup-link'>Reset it here</a>
-      </p>
-      <p>
-        
-      </p>
-</div>
-
+        <div className="container">
+            <div className="hero">
+                <form onSubmit={handleLogin} className="form">
+                    <div className="logo">JourneyPal</div>
+                    
+                    <input 
+                        type="text" 
+                        className="input"
+                        placeholder="Email address or username"
+                        value={emailOrUsername}
+                        onChange={(e) => setEmailOrUsername(e.target.value)}
+                        required
+                    />
+                    
+                    <input 
+                        type="password" 
+                        className="input"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    
+                    <input type="submit" value="Log in" className="input submit" />
+                    
+                    <p className="forgotten">
+                        Forgotten your login details? <Link to="/forgot-password">Get help with signing in.</Link>
+                    </p>
+                    
+                    <div className="or">or</div>
+                    
+                    <div className="input btn">Login with gugöl</div>
+                    
+                    <p className="signup">
+                        Don't have an account? <Link to="/signup">SignUp</Link>
+                    </p>
+                </form>
+            </div>
+        </div>
     );
 };
 

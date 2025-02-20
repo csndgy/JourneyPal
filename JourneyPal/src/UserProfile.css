@@ -456,7 +456,7 @@
   }
 
   button:hover {
-    background: transparent;
+    background: var(--primary-color);
     border: none;
     box-shadow: none;
   }
@@ -485,3 +485,119 @@
     flex: 1;
     padding-right: 35px;
   }
+
+
+
+  /* Instagram Login Styles - can be added to SingUpLogin.css */
+
+
+.hero {
+  width: 60%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--card-background);
+  border-radius: 25px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input {
+  padding: 1rem 1.2rem;
+  margin: 1rem;
+  border-radius: 2rem;
+  display: block;
+  width: 80%;
+  border: none;
+  box-shadow: inset 6px 6px 8px var(--login-shadow-inner),
+    6px 6px 6px var(--login-shadow);
+  outline: none;
+  background-color: inherit;
+  color: var(--text-color);
+  font-size: inherit;
+}
+
+.submit, .btn {
+  margin-top: 20px;
+  font-weight: bold;
+  box-shadow: -3px -3px 5px var(--login-shadow), 3px 3px 5px var(--login-shadow-inner);
+  color: var(--login-button);
+  cursor: pointer;
+}
+
+.btn {
+  text-align: center;
+  color: black;
+}
+
+.logo {
+  font-size: 3rem;
+  color: var(--text-color);
+  font-weight: 600;
+  margin: 30px;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+::placeholder {
+  color: rgb(161, 161, 161);
+}
+
+.forgotten {
+  text-align: center;
+  font-size: .8rem;
+  width: 80%;
+  color: gray;
+  margin: 15px 0;
+}
+
+.form a {
+  color: inherit;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.or {
+  position: relative;
+  font-weight: bold;
+  color: var(--secondary-text-color);
+  margin: 15px 0;
+}
+
+.or::before, .or::after {
+  position: absolute;
+  content: '';
+  width: 100px;
+  height: 1px;
+  top: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.or::before {
+  right: 100%;
+  margin-right: 10px;
+}
+
+.or::after {
+  left: 100%;
+  margin-left: 10px;
+}
+
+.signup {
+  color: gray;
+  margin-top: 15px;
+  font-size: 1rem;
+}
+

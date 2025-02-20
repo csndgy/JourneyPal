@@ -16,6 +16,9 @@
     --button-moon-spark-color: #88adb9;
 
 --star-color:#536999;
+
+
+--login-button-text:#6e6e73;
 }
 
 
@@ -59,6 +62,8 @@ body.dark-mode {
 
     --button-color: #013a63;
     --star-color: #ffffff;
+
+    --login-button-text:#aeaebd;
 
 }
 
