@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../SingUpLogin.css';
 
@@ -8,6 +8,7 @@ const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,18 +25,21 @@ const SignUp: React.FC = () => {
     }
 
     try {
-      console.log(JSON.stringify(jsonObject)); 
-      const response = await fetch('https://localhost:7193/api/Auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(jsonObject),
-      });
-
-      if (response.ok) {
-        console.log('Registration successful:', response);
-        // Add redirect or success notification here
-      } else {
-        console.error('Registration failed:', response);
+        console.log(JSON.stringify(jsonObject)); 
+        const response = await fetch('https://localhost:7193/api/Auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(jsonObject),
+        });
+  
+        if (response) {
+          console.log('Registration successful:', response);
+          navigate('/home')
+        } else {
+            console.error('Registration failed:', response);
+        }
+      } catch (err) {
+        console.error('Registration failed:', err);
       }
     } catch (err) {
       console.error('Registration failed:', err);
