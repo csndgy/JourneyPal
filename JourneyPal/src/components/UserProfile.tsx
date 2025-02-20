@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../UserProfile.css';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   username: string;
@@ -26,6 +28,7 @@ const UserProfile: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate()
 
   const [isEditingPhone, setIsEditingPhone] = useState<boolean>(false);
   const [isChangingPassword, setIsChangingPassword] = useState<boolean>(false);
@@ -52,41 +55,57 @@ const UserProfile: React.FC = () => {
     }
   }, [user.phoneNumber]);
 
-  const fetchUserData = async () => {
+  const isTokenValid = (token: string) => {
     try {
-      const token = localStorage.getItem('token');
-      console.log("Token:", token); // Add this to verify token exists
-
-      const response = await fetch('https://localhost:7193/api/AccountDetails/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-      });
-
-      console.log("Response status:", response.status);
-
-      if (response.status === 401) {
-        // Token expired or invalid - redirect to login
-        // window.location.href = '/login';
-        throw new Error('Unauthorized - please log in again');
-      }
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch user data');
-      }
-
-      const userData = await response.json();
-      setUser(userData);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      console.error("Error fetching user data:", err); // Add detailed error logging
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
+      const decoded: any = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      return decoded.exp > currentTime;
+    } catch {
+      return false;
     }
   };
+
+  const fetchUserData = async () => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token || !isTokenValid(token)) {
+            localStorage.removeItem('token');
+            navigate('/login');
+            return;
+        }
+
+        const messageParam = token;
+        const response = await fetch(`https://localhost:7193/api/AccountDetails/me?message=${messageParam}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+            // Remove credentials: 'include' since we're using token auth
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                navigate('/login');
+                return;
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const userData = await response.json();
+        setUser({
+            username: userData.userName,
+            email: userData.email,
+            phoneNumber: userData.telephone
+        });
+        setError(null);
+    } catch (err) {
+        console.error("Full error:", err);
+        setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+        setLoading(false);
+    }
+};
 
   const togglePasswordVisibility = (field: keyof typeof passwordVisibility) => {
     setPasswordVisibility(prev => ({

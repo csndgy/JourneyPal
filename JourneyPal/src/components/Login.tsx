@@ -2,20 +2,18 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../SingUpLogin.css';
+import jwtDecode from 'jwt-decode'
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const navigate = useNavigate()
 
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Determine if input is email or username
-        const isEmail = emailOrUsername.includes('@');
-        
-        // Debug point 1: Log what we're sending
         const jsonObject = {
             [email.includes('@') ? 'email' : 'userName']: email.includes('@') ? email : username,
             password: password
@@ -38,6 +36,7 @@ const Login: React.FC = () => {
                 const data = JSON.parse(responseText);
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("identifier", data.Identifier);
+                console.log("Token saved:", data.token);
                 console.log("Login successful:", data);
                 navigate("/profile");
             } else {
@@ -58,8 +57,8 @@ const Login: React.FC = () => {
                         type="text" 
                         className="input"
                         placeholder="Email address or username"
-                        value={emailOrUsername}
-                        onChange={(e) => setEmailOrUsername(e.target.value)}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                     />
                     

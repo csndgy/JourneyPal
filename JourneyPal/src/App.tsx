@@ -11,6 +11,7 @@ import './JourneyPal.css';
 import Login from './components/Login';
 import PopularDestinations from './components/PopularDestinations';
 import UserProfile from './components/UserProfile';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App: React.FC = () => {
   // Alapértelmezett érték: light mode, kivéve ha a localStorage-ban dark mode van
@@ -57,7 +58,7 @@ const App: React.FC = () => {
           <Route path="/checklist" element={<Checklist />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/profile" element={<UserProfile />} />
+          <Route path='/profile' element={<ProtectedRoute><UserProfile/></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>
