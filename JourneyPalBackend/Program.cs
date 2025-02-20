@@ -24,6 +24,7 @@ namespace JourneyPalBackend
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options =>
             {
@@ -33,9 +34,24 @@ namespace JourneyPalBackend
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["Issuer"],
-                    ValidAudience = jwtSettings["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]))
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                };
+
+                // Add these lines to prevent redirect
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = async context =>
+                    {
+                        // Prevent default redirect behavior
+                        context.HandleResponse();
+
+                        context.Response.StatusCode = 401;
+                        context.Response.ContentType = "application/json";
+                        await context.Response.WriteAsJsonAsync(new { message = "Unauthorized" });
+                    }
                 };
             });
 
@@ -57,7 +73,9 @@ namespace JourneyPalBackend
                 {
                     builder.WithOrigins("http://localhost:5173")
                            .AllowAnyMethod()
-                           .AllowAnyHeader();
+                           .AllowAnyHeader()
+                           .AllowCredentials();
+                           //.WithExposedHeaders("WWW-Authenticate");
                 });
             });
 
@@ -82,6 +100,7 @@ namespace JourneyPalBackend
             builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<JourneyPalDbContext>()
                 .AddDefaultTokenProviders();
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
 

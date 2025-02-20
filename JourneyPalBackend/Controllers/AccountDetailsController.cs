@@ -11,7 +11,7 @@ namespace JourneyPalBackend.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [EnableCors("AllowAll")]
-    [Authorize("token")]
+    //[Authorize]
     public class AccountDetailsController : ControllerBase
     {
         private readonly JourneyPalDbContext _ctx;
@@ -23,11 +23,10 @@ namespace JourneyPalBackend.Controllers
         }
 
         [HttpGet("me")]
-        public async Task<IActionResult> GetAccountDetails()
+        public async Task<IActionResult> GetAccountDetails([FromQuery] string token)
         {
-            Console.WriteLine("!!!!!!!!!!!!!!");
-            Console.WriteLine(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Console.WriteLine($"!!!!!!!!!!!!!!, the userID: {token}");
+            var userId = token;
              
 
             if (string.IsNullOrEmpty(userId))
