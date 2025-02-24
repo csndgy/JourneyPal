@@ -658,21 +658,7 @@ body {
     overflow: hidden;
   }
   
-  .trip-planner-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(
-      90deg,
-      var(--primary-color),
-      var(--primary-final-color),
-      var(--primary-color)
-    );
-    opacity: 0.8;
-  }
+
   
   .trip-header {
     margin-bottom: 2.5rem;

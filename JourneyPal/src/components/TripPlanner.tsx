@@ -137,12 +137,13 @@ export const TripPlanner: React.FC = () => {
               ))}
             </div>
           </div>
-          <div className="map-container">
+         {/*} <div className="map-container">
             <div className="map-placeholder">
               <p>Google Maps Integration Coming Soon</p>
             </div>
-          </div>
+          </div>*/}
         </div>
+          <button>Save</button>
       </div>
     </div>
   );
