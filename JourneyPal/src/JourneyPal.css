@@ -624,3 +624,254 @@ body {
   .dark-mode .dropdown-item:not(:last-child) {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
+
+
+
+
+
+
+
+
+
+
+
+  .trip-planner-container {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+  }
+  
+  .trip-planner-card {
+    background: linear-gradient(
+      145deg,
+      var(--card-background),
+      var(--input-background)
+    );
+    backdrop-filter: blur(10px);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow:
+      0 10px 30px -10px var(--card-shadow-color),
+      0 1px 4px var(--card-shadow-color),
+      inset 0 0 0 1px var(--border-color);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .trip-planner-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(
+      90deg,
+      var(--primary-color),
+      var(--primary-final-color),
+      var(--primary-color)
+    );
+    opacity: 0.8;
+  }
+  
+  .trip-header {
+    margin-bottom: 2.5rem;
+  }
+  
+  .destination-hero {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 15px;
+  }
+  
+  .trip-title {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+  
+  .trip-title h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-color);
+    letter-spacing: -0.5px;
+  }
+  
+  .date-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .date-input {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    background-color: var(--input-background);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+  }
+  
+  .date-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px var(--visited-places-color);
+  }
+  
+  .generate-btn {
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-final-color));
+    color: white;
+    box-shadow: 0 4px 12px var(--card-shadow-color);
+  }
+  
+  .generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--button-hover-shadow);
+  }
+  
+  .planner-container {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  .places-sidebar {
+    flex: 1.5;
+  }
+  
+  .map-container {
+    flex: 1;
+    background-color: var(--input-background);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: inset 0 0 0 1px var(--border-color);
+  }
+  
+  .map-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--secondary-text-color);
+  }
+  
+  .places-header h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+  }
+  
+  .day-plan {
+    margin-bottom: 2rem;
+  }
+  
+  .day-plan h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+  }
+  
+  .activity-input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    background-color: var(--input-background);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    resize: vertical;
+  }
+  
+  .activity-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px var(--visited-places-color);
+  }
+  
+  .image-upload {
+    margin-top: 1rem;
+  }
+  
+  .uploaded-images {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .uploaded-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+  
+  /* Dark mode enhancements */
+  .dark-mode .trip-planner-card {
+    background: linear-gradient(
+      145deg,
+      var(--card-background),
+      var(--destination-card-background)
+    );
+    box-shadow:
+      0 10px 30px -10px var(--card-shadow-color),
+      0 1px 4px var(--card-shadow-color),
+      inset 0 0 0 1px var(--border-color);
+  }
+  
+  .dark-mode .activity-input {
+    background: var(--destination-card-background);
+    border-color: var(--border-color);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .trip-planner-card {
+      padding: 2rem;
+    }
+  
+    .trip-title h1 {
+      font-size: 1.8rem;
+    }
+  
+    .planner-container {
+      flex-direction: column;
+    }
+  
+    .map-container {
+      flex: 1;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .trip-planner-card {
+      padding: 1.5rem;
+    }
+  
+    .trip-title h1 {
+      font-size: 1.5rem;
+    }
+  
+    .date-picker {
+      flex-direction: column;
+    }
+  
+    .generate-btn {
+      width: 100%;
+    }
+  }

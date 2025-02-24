@@ -41,9 +41,6 @@ const SignUp: React.FC = () => {
       } catch (err) {
         console.error('Registration failed:', err);
       }
-    } catch (err) {
-      console.error('Registration failed:', err);
-    }
   };
 
   return (
