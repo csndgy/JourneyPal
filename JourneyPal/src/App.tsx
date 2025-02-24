@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import HeroSection from './components/HeroSection';
@@ -20,21 +20,23 @@ const App: React.FC = () => {
     return savedMode === 'true'; // Ha 'true', akkor dark mode, különben light mode
   });
 
+  // Ref a PopularDestinations szekcióhoz
+  const popularDestinationsRef = useRef<HTMLDivElement>(null);
+
   // Dark mode váltó függvény
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
-    localStorage.setItem('darkMode', newMode.toString()); 
-    document.body.classList.toggle('dark-mode', newMode); 
+    localStorage.setItem('darkMode', newMode.toString());
+    document.body.classList.toggle('dark-mode', newMode);
   };
 
-  
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode');
     if (savedMode === 'true') {
-      document.body.classList.add('dark-mode'); 
+      document.body.classList.add('dark-mode');
     } else {
-      document.body.classList.remove('dark-mode'); 
+      document.body.classList.remove('dark-mode');
     }
   }, []);
 
@@ -47,8 +49,12 @@ const App: React.FC = () => {
             path="/"
             element={
               <>
-                <HeroSection />
-                <PopularDestinations/>
+                <HeroSection scrollToPopularDestinations={() => {
+                  if (popularDestinationsRef.current) {
+                    popularDestinationsRef.current.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }} />
+                <PopularDestinations ref={popularDestinationsRef} />
                 <PressRecommendations />
                 <Stats />
                 <Footer />

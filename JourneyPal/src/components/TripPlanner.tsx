@@ -3,9 +3,15 @@ import { useParams } from 'react-router-dom';
 import { destinations } from '../assets/destinations.ts';
 import { TripPlan, TripDay } from '../types';
 
-export const TripPlanner: React.FC = () => {
-  const { destinationId } = useParams<{ destinationId: string }>();
-  const destination = destinations.find(d => d.id === Number(destinationId));
+  
+  const TripPlanner = () => {
+    const { destinationId } = useParams<{ destinationId: string }>();
+    const destination = destinations.find(d => d.id === Number(destinationId));
+  
+    if (!destination) {
+      return <div>Destination not found</div>;
+    }
+  
 
   const [tripPlan, setTripPlan] = useState<TripPlan>({
     startDate: '',

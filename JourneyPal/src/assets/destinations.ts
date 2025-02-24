@@ -1,5 +1,3 @@
-// src/destinations.ts
-
 export interface Destination {
     id: number;
     image: string;
@@ -38,11 +36,11 @@ export interface Destination {
       description: "White Villages • Aegean Sea • Sunset Views"
     },
     {
-      id: 5,
-      image: "/images/siwa-oasis.jpg",
-      alt: "Siwa Oasis",
-      title: "Siwa Oasis",
-      description: "Desert Springs • Ancient Ruins • Palm Groves"
+      "id": 5,
+      "image": "/images/egypt.jpg",
+      "alt": "Egypt",
+      "title": "The Great Pyramids",
+      "description": "Desert • Ancient Ruins • Temples and Pyramids"
     },
     {
       id: 6,
