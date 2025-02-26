@@ -30,10 +30,10 @@ namespace JourneyPalBackend
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = false,
+                    ValidateIssuerSigningKey = false,
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
@@ -45,7 +45,6 @@ namespace JourneyPalBackend
                 {
                     OnChallenge = async context =>
                     {
-                        // Prevent default redirect behavior
                         context.HandleResponse();
 
                         context.Response.StatusCode = 401;
