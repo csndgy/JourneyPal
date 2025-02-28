@@ -32,7 +32,9 @@ const NavBar: React.FC<NavBarProps> = ({ isDarkMode, toggleDarkMode }) => {
 
   return (
     <nav className="navbar">
+      <a href="/" className='navbar-logo'>
       <h1 className="navbar-logo">JourneyPal</h1>
+      </a>
 
       <ul className="navbar-links">
         <li>
