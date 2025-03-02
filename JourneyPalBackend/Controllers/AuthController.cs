@@ -135,24 +135,25 @@ namespace JourneyPalBackend.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDTO request)
         {
-            var refreshToken = request.RefreshToken;
-            var principal = GetPrincipalFromExpiredToken(refreshToken);
+            if (request == null || string.IsNullOrEmpty(request.RefreshToken))
+            {
+                return BadRequest("Invalid request.");
+            }
 
-            if (principal is null)
+            var principal = GetPrincipalFromExpiredToken(request.RefreshToken);
+            if (principal == null)
+            {
                 return BadRequest("Invalid refresh token.");
+            }
 
             var username = principal.Identity.Name;
-            var user = _ctx.Users.FirstOrDefault(u => u.UserName == username);
+            var user = await _ctx.Users.FirstOrDefaultAsync(u => u.UserName == username);
 
-            if (user.RefreshToken != refreshToken
-                || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-                return BadRequest("Invalid refresh token.");
-
-            if (user is null)
+            if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
-                return BadRequest("User not found.");
+                return BadRequest("Invalid refresh token.");
             }
 
             var newToken = GenerateToken(user);
@@ -162,11 +163,13 @@ namespace JourneyPalBackend.Controllers
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             await _ctx.SaveChangesAsync();
 
-            return Ok(new
+            var response = new RefreshTokenResponseDTO
             {
                 Token = newToken,
                 RefreshToken = newRefreshToken
-            });
+            };
+
+            return Ok(response);
         }
 
         [HttpPost("logout")]
@@ -391,6 +394,16 @@ namespace JourneyPalBackend.Controllers
         public string? UserName { get; set; }
         public string? Email { get; set; }
         public string Password { get; set; }
+    }
+
+    public class RefreshTokenRequestDTO
+    {
+        public string RefreshToken { get; set; }
+    }
+    public class RefreshTokenResponseDTO
+    {
+        public string Token {  get; set; }
+        public string RefreshToken { get; set; }
     }
     #endregion
 }

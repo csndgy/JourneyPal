@@ -15,7 +15,7 @@ namespace JourneyPalBackend.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [EnableCors("AllowAll")]
-    //[Authorize]
+    
     public class AccountDetailsController : ControllerBase
     {
         private readonly JourneyPalDbContext _ctx;
@@ -27,16 +27,20 @@ namespace JourneyPalBackend.Controllers
             _userManager = userManager;
             _conf = conf;
         }
-
+        [Authorize]
         [HttpGet("me")]
-        public async Task<IActionResult> GetAccountDetails([FromQuery] string token)
+        public async Task<IActionResult> GetAccountDetails()
         {
-            var userId = ValidateAccessToken(token);
+            var authHeader = Request.Headers.Authorization.FirstOrDefault();
 
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
             {
-                return Unauthorized("User not authenticated");
+                return Unauthorized("Missing or invalid authorization token.");
             }
+
+            var token = authHeader.Substring("Bearer ".Length);
+
+            var userId = ValidateAccessToken(token);
 
             var user = await _ctx.Users
                .Where(u => u.Id == userId)
@@ -64,8 +68,10 @@ namespace JourneyPalBackend.Controllers
             var validationParameters = new TokenValidationParameters
             {
                 IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidAudiences = ["localhost"], //_conf["Jwt:Audience"],
-                ValidIssuers = ["localhost"], //_conf["Jwt:Issuer"],
+                //ValidAudiences = ["localhost"],
+                // ValidIssuers = ["localhost"], 
+                ValidAudience = _conf["Jwt:Audience"],
+                ValidIssuer = _conf["Jwt:Issuer"],
                 ValidateIssuerSigningKey = false,
                 ValidateAudience = false,
                 ValidateIssuer = false,
