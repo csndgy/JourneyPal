@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text;
 
 namespace JourneyPalBackend.Controllers

@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi.Models;
 
 namespace JourneyPalBackend
 {
@@ -53,6 +54,33 @@ namespace JourneyPalBackend
                     }
                 };
             });
+            builder.Services.AddSwaggerGen(config =>
+            {
+                config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "JWT token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer"
+                });
+                config.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type=ReferenceType.SecurityScheme,
+                                Id="Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
+
 
             builder.Services.AddAuthentication(options =>
             {
@@ -74,7 +102,7 @@ namespace JourneyPalBackend
                            .AllowAnyMethod()
                            .AllowAnyHeader()
                            .AllowCredentials();
-                           //.WithExposedHeaders("WWW-Authenticate");
+                    //.WithExposedHeaders("WWW-Authenticate");
                 });
             });
 
