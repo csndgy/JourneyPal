@@ -86,11 +86,6 @@
                 <Button Content="Load Users" 
                         Click="LoadUsers_Click" 
                         Margin="0 0 0 10" />
-                <Button Content="Refresh Token" 
-                        Click="RefreshToken_Click" 
-                        Margin="0 0 0 10" />
-                <Button Content="Logout" 
-                        Click="Logout_Click" />
                 <Label Content="Enter username " FontSize="16" Foreground="White"/>
                 <TextBox x:Name="UsernameTextBox" Margin="5" Width="150" />
                 <Button Content="Delete by Username" Click="DeleteUserByUsername_Click" Margin="5" />

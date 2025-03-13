@@ -18,6 +18,8 @@ namespace JourneyPalAdmin
         {
             InitializeComponent();
             _apiService = new ApiService("https://localhost:7193/"); // Replace with your API base URL
+            MessageBox.Show($"{_apiService.GetJwtToken()}", "Debug");
+            Clipboard.SetText(_apiService.GetJwtToken());
         }
 
         private async void LoadUsers_Click(object sender, RoutedEventArgs e)
@@ -32,6 +34,7 @@ namespace JourneyPalAdmin
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         private async void DeleteUserByUsername_Click(object sender, RoutedEventArgs e)
         {

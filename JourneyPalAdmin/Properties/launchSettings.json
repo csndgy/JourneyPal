@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "JourneyPalAdmin": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "token": "as",
+        "refreshToken": "as"
+      }
+    }
+  }
+}

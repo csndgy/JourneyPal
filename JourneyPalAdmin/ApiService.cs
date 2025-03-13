@@ -4,10 +4,33 @@ using JourneyPalAdmin.Models;
 using Newtonsoft.Json;
 namespace JourneyPalAdmin
 {
+    //public class TokenStore
+    //{
+    //    public TokenStore(string token, string refreshToken)
+    //    {
+    //        JwtToken = token;
+    //        RefreshToken = refreshToken;
+    //    }
+    //    public string JwtToken { get; set; }
+    //    public string RefreshToken { get; set; }
+
+    //    public void SetRefreshToken(string refreshToken)
+    //    {
+    //        RefreshToken = refreshToken;
+    //    }
+
+    //    public void SetJwtToken(string token)
+    //    {
+    //        JwtToken = token;
+    //    }
+    //}
+
     public class ApiService
     {
+        public HttpClient httpClient { get; }
         private readonly HttpClient _httpClient;
-        private string _jwtToken;
+        private string _jwtToken { get; set; }
+        private string _refreshToken { get; set; }
 
         public ApiService(string baseUrl)
         {
@@ -15,19 +38,34 @@ namespace JourneyPalAdmin
             {
                 BaseAddress = new Uri(baseUrl)
             };
+            httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(baseUrl)
+            };
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public void SetJwtToken(string token)
+        public void SetJwtTokens(string token, string refreshToken)
         {
-            _jwtToken = token;
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _jwtToken);
+            Environment.SetEnvironmentVariable("token", token);
+            Environment.SetEnvironmentVariable("refreshToken", refreshToken);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Environment.GetEnvironmentVariable("token"));
+        }
+        
+        public string GetRefreshToken()
+        {
+            return Environment.GetEnvironmentVariable("refreshtToken");
+        }
+
+        public string GetJwtToken()
+        {
+            return Environment.GetEnvironmentVariable("token");
         }
 
         public async Task<List<User>> GetAllUsersAsync()
         {
-            var response = await _httpClient.GetAsync("api/admin/users");
+            var response = await _httpClient.GetAsync("api/Admin/users");
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<User>>(content);
@@ -35,7 +73,7 @@ namespace JourneyPalAdmin
 
         public async Task<List<User>> GetUserByEmailAsync(string email)
         {
-            var response = await _httpClient.GetAsync($"api/admin/user-by-email?email={email}");
+            var response = await _httpClient.GetAsync($"api/Admin/user-by-email?email={email}");
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<User>>(content);
@@ -43,7 +81,7 @@ namespace JourneyPalAdmin
 
         public async Task<List<User>> GetUserByNameAsync(string username)
         {
-            var response = await _httpClient.GetAsync($"api/admin/user-by-name?username={username}");
+            var response = await _httpClient.GetAsync($"api/Admin/user-by-name?username={username}");
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<User>>(content);
@@ -51,7 +89,7 @@ namespace JourneyPalAdmin
 
         public async Task DeleteUserByUsernameAsync(string username)
         {
-            var response = await _httpClient.DeleteAsync($"api/admin/by-username/{username}");
+            var response = await _httpClient.DeleteAsync($"api/Admin/by-username/{username}");
             response.EnsureSuccessStatusCode();
         }
 

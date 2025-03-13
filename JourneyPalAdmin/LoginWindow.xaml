@@ -1,0 +1,34 @@
+﻿<Window x:Class="JourneyPalAdmin.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JourneyPalAdmin"
+        mc:Ignorable="d"
+        Title="Admin Login" Height="300" Width="400"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E"
+        Foreground="White"
+        FontFamily="Segoe UI"
+        FontSize="14">
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
+            <!-- Username Input -->
+            <TextBlock Text="Username:" Margin="0 0 0 5" />
+            <TextBox x:Name="UsernameTextBox" Background="#424242" Foreground="White" Padding="5" />
+
+            <!-- Password Input -->
+            <TextBlock Text="Password:" Margin="0 10 0 5" />
+            <PasswordBox x:Name="PasswordBox" Background="#424242" Foreground="White" Padding="5" />
+
+            <!-- Login Button -->
+            <Button Content="Login" 
+                    Click="LoginButton_Click" 
+                    Background="#FF5722" 
+                    Foreground="White" 
+                    Margin="0 20 0 0" 
+                    Padding="10 5" 
+                    Cursor="Hand" />
+        </StackPanel>
+    </Grid>
+</Window>
