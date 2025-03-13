@@ -26,7 +26,6 @@ namespace JourneyPalBackend.Controllers
             _userManager = userManager;
             _conf = conf;
         }
-        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetAccountDetails()
         {

@@ -21,7 +21,7 @@ namespace JourneyPalBackend
             // Add services to the container.
             var jwtSettings = builder.Configuration.GetSection("Jwt");
 
-            builder.Services.AddAuthentication(options =>
+            /*builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -53,7 +53,28 @@ namespace JourneyPalBackend
                         await context.Response.WriteAsJsonAsync(new { message = "Unauthorized" });
                     }
                 };
+            });*/
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    RequireExpirationTime = true,
+                    ValidIssuer = "localhost",
+                    ValidAudience = "localhost",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MN/H5QwigOM4vMPRTsEo6HhOgKrvCJM8fe8y/Xu1MNySSxcWXvCt2DigX2Zc+dwt")),
+                    ClockSkew = TimeSpan.FromSeconds(0)
+                };
             });
+
             builder.Services.AddSwaggerGen(config =>
             {
                 config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -82,17 +103,17 @@ namespace JourneyPalBackend
             });
 
 
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-                options.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie()
-            .AddGoogleOpenIdConnect(options =>
-            {
-                options.ClientId = "13684633292-hv8dlbubct2ujgmpl65btbb45551k6i4.apps.googleusercontent.com";
-                options.ClientSecret = "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";
-            });
+            //builder.Services.AddAuthentication(options =>
+            //{
+            //    options.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+            //    options.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+            //    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //}).AddCookie()
+            //.AddGoogleOpenIdConnect(options =>
+            //{
+            //    options.ClientId = "13684633292-hv8dlbubct2ujgmpl65btbb45551k6i4.apps.googleusercontent.com";
+            //    options.ClientSecret = "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";
+            //});
 
             builder.Services.AddCors(o =>
             {

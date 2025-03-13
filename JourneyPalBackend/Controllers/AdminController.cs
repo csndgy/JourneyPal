@@ -8,7 +8,7 @@ namespace JourneyPalBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    
     public class AdminController : Controller
     {
         private readonly JourneyPalDbContext _ctx;
