@@ -1300,3 +1300,129 @@ body {
   object-fit: cover;
   border-radius: 8px;
 }
+
+.sidebar-section ul ul {
+  margin-left: 20px;
+  list-style-type: disc;
+}
+
+.sidebar-section ul ul li {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Grid layout for recommended places */
+.recommended-places-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Card styles */
+.recommended-place-card {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  height: 300px;
+  cursor: pointer;
+  transform: scale(1) translateY(0);
+  filter: blur(0);
+  transition: transform 0.4s ease, filter 0.4s ease;
+  will-change: transform, filter;
+}
+
+/* First row */
+.recommended-place-card:nth-child(1),
+.recommended-place-card:nth-child(4) { /* Negyedik kártya is két oszlopot foglaljon el */
+  grid-column: span 2;
+}
+
+/* Second row */
+.recommended-place-card:nth-child(2) {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.recommended-place-card:nth-child(3),
+.recommended-place-card:nth-child(5) {
+  grid-column: span 1;
+}
+
+/* Third row */
+.recommended-place-card:nth-child(6) {
+  grid-column: span 1;
+}
+
+.recommended-place-card:nth-child(7) {
+  grid-column: span 2;
+}
+
+/* Image styles */
+.recommended-card-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.recommended-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1);
+  transition: transform 0.4s ease;
+  will-change: transform;
+}
+
+/* Content styles */
+.recommended-card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  color: white;
+}
+
+.recommended-card-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.recommended-card-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Hover effects */
+.recommended-places-grid:hover > .recommended-place-card:not(:hover) {
+  filter: blur(4px);
+  transform: scale(0.98) translateY(0);
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.recommended-place-card:hover {
+  transform: scale(1.02) translateY(-8px);
+  filter: blur(0);
+  z-index: 1;
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.recommended-place-card:hover .recommended-card-image img {
+  transform: scale(1.05);
+  transition: transform 0.4s ease;
+}
+
+/* Section margin */
+.recommended-places-section {
+  margin-top: 20px;
+}
+
+.btnPrevNext{
+  background-color: var(--button-background);
+}
