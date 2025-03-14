@@ -30,7 +30,7 @@ const Checklist: React.FC = () => {
 
     return (
         <div className="checklist">
-            <h2>Trip Checklist</h2>
+            <h2 className='trip-checklist'>Trip Checklist</h2>
             <div className="add-item">
                 <input
                     type="text"

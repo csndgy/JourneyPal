@@ -1,0 +1,42 @@
+:root{
+    /*DARK MODE COLORS*/
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --navbar-background: #302d2d;
+    --button-background: #530700;
+    --card-background: #1f1f1f;
+    --input-background: #333333;
+    --secondary-text-color: #a8a8a8;
+    --card-shadow-color: rgba(255, 255, 255, 0.05);
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --navbar-background: #302d2d;
+    --switch-background: #151515;
+    --switch-handle: #3c3c3c;
+    --button-text-color: #ffffff;
+    --card-background: #1f1f1f;
+    --card-border-color: #333333;
+    --input-background: #333333;
+    --input-border-color: #555555;
+    --input-text-color: #ffffff;
+    --primary-color: #ff6f61;
+    --primary-hover-color: #ff8a7a;
+    --primary-shadow-color: rgba(255, 111, 97, 0.2);
+    --secondary-text-color: #a8a8a8;
+    --card-shadow-color: rgba(255, 255, 255, 0.05);
+    --hero-gradient-start: rgba(18, 18, 18, 0.9);
+    --hero-gradient-end: rgba(31, 31, 31, 0.9);
+}
+
+:root{
+    /*LIGHT MODE COLORS*/
+    --background-color: #f8f8f8;
+    --text-color: #333333;
+    --navbar-background: rgba(231, 222, 222, 0.8);
+    --button-background: #990e01;
+    --card-background: rgb(233, 233, 233);
+    --input-background: rgba(255, 255, 255, 0.8);
+    --primary-color: #ff6f61;
+    --secondary-text-color: #6e6e73;
+    --card-shadow-color: rgba(0, 0, 0, 0.05);
+}
