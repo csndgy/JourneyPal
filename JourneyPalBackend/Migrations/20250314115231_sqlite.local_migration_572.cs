@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace JourneyPalBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class sqlitelocal_migration_978 : Migration
+    public partial class sqlitelocal_migration_572 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,6 +37,7 @@ namespace JourneyPalBackend.Migrations
                     RecoveryCodes = table.Column<string>(type: "TEXT", nullable: true),
                     Provider = table.Column<string>(type: "TEXT", nullable: true),
                     ProviderUserId = table.Column<string>(type: "TEXT", nullable: true),
+                    Role = table.Column<string>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -199,15 +200,14 @@ namespace JourneyPalBackend.Migrations
                     EventLinks = table.Column<string>(type: "TEXT", nullable: false),
                     EventDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EventEstimatedTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    TripId = table.Column<string>(type: "TEXT", nullable: false),
-                    TripId1 = table.Column<int>(type: "INTEGER", nullable: false)
+                    TripId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Events", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Events_Trips_TripId1",
-                        column: x => x.TripId1,
+                        name: "FK_Events_Trips_TripId",
+                        column: x => x.TripId,
                         principalTable: "Trips",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -251,9 +251,9 @@ namespace JourneyPalBackend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_TripId1",
+                name: "IX_Events_TripId",
                 table: "Events",
-                column: "TripId1");
+                column: "TripId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Trips_UserId",

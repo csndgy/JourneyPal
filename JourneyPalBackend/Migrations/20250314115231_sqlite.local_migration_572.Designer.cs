@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JourneyPalBackend.Migrations
 {
     [DbContext(typeof(JourneyPalDbContext))]
-    [Migration("20250219075712_sqlite.local_migration_978")]
-    partial class sqlitelocal_migration_978
+    [Migration("20250314115231_sqlite.local_migration_572")]
+    partial class sqlitelocal_migration_572
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,16 +48,12 @@ namespace JourneyPalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("TripId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TripId1")
+                    b.Property<int>("TripId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TripId1");
+                    b.HasIndex("TripId");
 
                     b.ToTable("Events");
                 });
@@ -321,6 +317,10 @@ namespace JourneyPalBackend.Migrations
                     b.Property<DateTime>("RefreshTokenExpiryTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Telephone")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -332,7 +332,7 @@ namespace JourneyPalBackend.Migrations
                 {
                     b.HasOne("JourneyPalBackend.Models.Trip", "Trip")
                         .WithMany("Events")
-                        .HasForeignKey("TripId1")
+                        .HasForeignKey("TripId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 
 namespace JourneyPalBackend
 {
@@ -38,7 +39,7 @@ namespace JourneyPalBackend
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                 };
 
                 // Add these lines to prevent redirect
@@ -148,7 +149,19 @@ namespace JourneyPalBackend
             builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<JourneyPalDbContext>()
                 .AddDefaultTokenProviders();
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPolicy", policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role, "Admin");
+                });
+
+                //options.AddPolicy("UserPolicy", policy =>
+                //{
+                //    policy.RequireClaim(ClaimTypes.Role, "User");
+                //});
+            });
+            
 
             var app = builder.Build();
 
@@ -163,7 +176,6 @@ namespace JourneyPalBackend
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseAuthorization();
-            app.UseAuthentication();
             app.MapControllers();
             app.Run();
         }

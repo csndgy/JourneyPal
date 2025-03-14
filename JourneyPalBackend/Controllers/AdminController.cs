@@ -8,6 +8,7 @@ namespace JourneyPalBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    //[Authorize(Policy = "AdminPolicy")]
     
     public class AdminController : Controller
     {
@@ -101,6 +102,106 @@ namespace JourneyPalBackend.Controllers
             await _ctx.SaveChangesAsync();
 
             return NoContent(); 
+        }
+        [HttpPut("update-user/{id}")]
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound($"User with ID '{id}' not found.");
+            }
+
+            // Update user properties
+            user.UserName = updatedUser.UserName;
+            user.Email = updatedUser.Email;
+            user.PhoneNumber = updatedUser.PhoneNumber;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(user);
+        }
+        [HttpPatch("update-user/{id}")]
+        public async Task<IActionResult> PartiallyUpdateUser(string id, [FromBody] Dictionary<string, string> updates)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound($"User with ID '{id}' not found.");
+            }
+
+            // Apply updates
+            foreach (var update in updates)
+            {
+                switch (update.Key.ToLower())
+                {
+                    case "username":
+                        user.UserName = update.Value;
+                        break;
+                    case "email":
+                        user.Email = update.Value;
+                        break;
+                    case "phonenumber":
+                        user.PhoneNumber = update.Value;
+                        break;
+                    default:
+                        return BadRequest($"Invalid property '{update.Key}'.");
+                }
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(user);
+        }
+        [HttpPatch("update-user/{id}")]
+        public async Task<IActionResult> PartiallyUpdateUserPW(string id, [FromBody] Dictionary<string, string> updates)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound($"User with ID '{id}' not found.");
+            }
+
+            // Apply updates
+            foreach (var update in updates)
+            {
+                switch (update.Key.ToLower())
+                {
+                    case "username":
+                        user.UserName = update.Value;
+                        break;
+                    case "email":
+                        user.Email = update.Value;
+                        break;
+                    case "phonenumber":
+                        user.PhoneNumber = update.Value;
+                        break;
+                    default:
+                        return BadRequest($"Invalid property '{update.Key}'.");
+                }
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(user);
         }
     }
 }

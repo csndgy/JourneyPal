@@ -11,6 +11,7 @@ namespace JourneyPalBackend.Models
         public string Provider { get; set; } 
         public string ProviderUserId { get; set; }
         public virtual ICollection<Trip> Trips { get; set; }
+        public string Role { get; set; } = "User";
 
         public void SetPassword(string password)
         {
