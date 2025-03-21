@@ -47,6 +47,17 @@ namespace JourneyPalBackend.Controllers
             return users;
         }
 
+        [HttpGet("user-by-id/{id}")]
+        public async Task<ActionResult<User>> GetUserById(string id)
+        {
+            var user = await _ctx.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound($"User with ID '{id}' not found.");
+            }
+            return user;
+        }
+
         [HttpGet("user-by-name")]
         public async Task<ActionResult<IEnumerable<User>>> GetUserByName([FromQuery] string username)
         {
@@ -104,7 +115,7 @@ namespace JourneyPalBackend.Controllers
             return NoContent(); 
         }
         [HttpPut("update-user/{id}")]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] UserUpdateDTO updatedUser)
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -113,8 +124,7 @@ namespace JourneyPalBackend.Controllers
                 return NotFound($"User with ID '{id}' not found.");
             }
 
-            // Update user properties
-            user.UserName = updatedUser.UserName;
+            user.UserName = updatedUser.Username;
             user.Email = updatedUser.Email;
             user.PhoneNumber = updatedUser.PhoneNumber;
 
@@ -127,8 +137,8 @@ namespace JourneyPalBackend.Controllers
 
             return Ok(user);
         }
-        [HttpPatch("update-user/{id}")]
-        public async Task<IActionResult> PartiallyUpdateUser(string id, [FromBody] Dictionary<string, string> updates)
+        [HttpPut("reset-password/{id}")]
+        public async Task<IActionResult> ResetUserPassword(string id, [FromBody] string newPassword)
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -137,71 +147,24 @@ namespace JourneyPalBackend.Controllers
                 return NotFound($"User with ID '{id}' not found.");
             }
 
-            // Apply updates
-            foreach (var update in updates)
-            {
-                switch (update.Key.ToLower())
-                {
-                    case "username":
-                        user.UserName = update.Value;
-                        break;
-                    case "email":
-                        user.Email = update.Value;
-                        break;
-                    case "phonenumber":
-                        user.PhoneNumber = update.Value;
-                        break;
-                    default:
-                        return BadRequest($"Invalid property '{update.Key}'.");
-                }
-            }
-
-            var result = await _userManager.UpdateAsync(user);
+            // Reset password
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
 
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
             }
 
-            return Ok(user);
+            return Ok("Password reset successfully.");
         }
-        [HttpPatch("update-user/{id}")]
-        public async Task<IActionResult> PartiallyUpdateUserPW(string id, [FromBody] Dictionary<string, string> updates)
+
+        public class UserUpdateDTO
         {
-            var user = await _userManager.FindByIdAsync(id);
+            public string Username { get; set; }
+            public string Email { get; set; }
+            public string PhoneNumber { get; set; }
 
-            if (user == null)
-            {
-                return NotFound($"User with ID '{id}' not found.");
-            }
-
-            // Apply updates
-            foreach (var update in updates)
-            {
-                switch (update.Key.ToLower())
-                {
-                    case "username":
-                        user.UserName = update.Value;
-                        break;
-                    case "email":
-                        user.Email = update.Value;
-                        break;
-                    case "phonenumber":
-                        user.PhoneNumber = update.Value;
-                        break;
-                    default:
-                        return BadRequest($"Invalid property '{update.Key}'.");
-                }
-            }
-
-            var result = await _userManager.UpdateAsync(user);
-
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            return Ok(user);
         }
     }
 }

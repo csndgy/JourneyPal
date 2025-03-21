@@ -26,7 +26,7 @@ namespace JourneyPalBackend.Controllers
             _userManager = userManager;
             _conf = conf;
         }
-        [HttpGet("me")]
+        [HttpGet("profile")]
         public async Task<IActionResult> GetAccountDetails()
         {
             var authHeader = Request.Headers.Authorization.FirstOrDefault();
@@ -47,7 +47,7 @@ namespace JourneyPalBackend.Controllers
                    u.Id,
                    u.UserName,
                    u.Email,
-                   u.Telephone,
+                   u.PhoneNumber,
                })
                .FirstOrDefaultAsync();
 

@@ -4,7 +4,6 @@ namespace JourneyPalBackend.Models
 {
     public class User : IdentityUser
     {
-        public string Telephone { get; set; }
         public string RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
         public List<string> RecoveryCodes { get; set; } = new List<string>();

@@ -282,7 +282,7 @@ namespace JourneyPalBackend.Controllers
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var resetLink = $"https://localhost:5173/reset-password?token={WebUtility.UrlEncode(token)}&email={WebUtility.UrlEncode(request.Email)}";
+            var resetLink = $"https://localhost:7193/reset-password?token={WebUtility.UrlEncode(token)}&email={WebUtility.UrlEncode(request.Email)}";
 
             await SendPasswordResetEmailAsync(request.Email, resetLink);
 

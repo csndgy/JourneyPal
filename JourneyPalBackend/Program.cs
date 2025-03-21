@@ -19,7 +19,6 @@ namespace JourneyPalBackend
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<JourneyPalDbContext>(options => options.UseSqlite(connectionString: "Data Source = JourneyPal.db"));
-            // Add services to the container.
             var jwtSettings = builder.Configuration.GetSection("Jwt");
 
             /*builder.Services.AddAuthentication(options =>
@@ -143,7 +142,6 @@ namespace JourneyPalBackend
             });
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddIdentity<User, IdentityRole>()
