@@ -10,9 +10,12 @@
         Background="#1E1E1E"
         Foreground="White"
         FontFamily="Segoe UI"
-        FontSize="14">
+        FontSize="14"
+        MinWidth="800"
+        MinHeight="500">
 
     <Window.Resources>
+        <!-- Button Style -->
         <Style TargetType="Button">
             <Setter Property="Background" Value="#FF5722" />
             <Setter Property="Foreground" Value="White" />
@@ -38,6 +41,7 @@
             </Setter>
         </Style>
 
+        <!-- TextBox Style -->
         <Style TargetType="TextBox">
             <Setter Property="Background" Value="#424242" />
             <Setter Property="Foreground" Value="White" />
@@ -46,18 +50,36 @@
             <Setter Property="Padding" Value="5" />
         </Style>
 
+        <!-- DataGrid Style -->
         <Style TargetType="DataGrid">
-            <Setter Property="Background" Value="#1E1E1E" />
+            <Setter Property="Background" Value="#2E2E2E" />
             <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderBrush" Value="#607D8B" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="RowBackground" Value="#2E2E2E" />
             <Setter Property="AlternatingRowBackground" Value="#1E1E1E" />
             <Setter Property="HeadersVisibility" Value="Column" />
-            <Setter Property="AutoGenerateColumns" Value="True" />
-            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="AutoGenerateColumns" Value="False" />
+            <Setter Property="IsReadOnly" Value="False" />
+            <!-- Allow editing for copying -->
             <Setter Property="GridLinesVisibility" Value="None" />
+            <Setter Property="ColumnHeaderStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#FF5722" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="FontSize" Value="14" />
+                        <Setter Property="Padding" Value="10 5" />
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    </Style>
+                </Setter.Value>
+            </Setter>
         </Style>
+
+        <!-- ContextMenu for DataGrid -->
+        <ContextMenu x:Key="DataGridContextMenu">
+            <MenuItem Header="Copy" Click="CopyCellContent_Click" />
+        </ContextMenu>
     </Window.Resources>
 
     <Grid>
@@ -66,6 +88,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <!-- Header -->
         <Border Grid.Row="0" Background="#FF5722" Padding="20">
             <TextBlock Text="Admin Dashboard" 
                        FontSize="24" 
@@ -74,33 +97,80 @@
                        VerticalAlignment="Center" />
         </Border>
 
-        
-
+        <!-- Main Content -->
         <Grid Grid.Row="1" Margin="20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" MinWidth="300" />
+                <ColumnDefinition Width="2*" MinWidth="400" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Margin="0 0 20 0">
-                <Button Content="Load Users" 
-                        Click="LoadUsers_Click" 
-                        Margin="0 0 0 10" />
-                <Label Content="Enter username " FontSize="16" Foreground="White"/>
-                <TextBox x:Name="UsernameTextBox" Margin="5" Width="150" />
-                <Button Content="Delete by Username" Click="DeleteUserByUsername_Click" Margin="5" />
-                <Label Content="Enter email " FontSize="16" Foreground="White"/>
-                <TextBox x:Name="EmailTextBox" Margin="5" Width="150" />
-                <Button Content="Delete by Email" Click="DeleteUserByEmail_Click" Margin="5" />
-            </StackPanel>
+            <!-- Left Panel (Controls) -->
+            <ScrollViewer Grid.Column="0" Margin="0 0 20 0" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Button Content="Load Users" 
+                            Click="LoadUsers_Click" 
+                            Margin="0 0 0 10"
+                            ToolTip="Load all users from the database" />
 
+                    <Label Content="Enter username" FontSize="16" Foreground="White"/>
+                    <TextBox x:Name="UsernameTextBox" Margin="5" ToolTip="Deletes a user from the database with the provided username, if no user exists with this username, nothing will happen."/>
+
+                    <Button Content="Delete by Username" 
+                            Click="DeleteUserByUsername_Click" 
+                            Margin="5"
+                            ToolTip="Delete a user by their username" />
+
+                    <Label Content="Enter email" FontSize="16" Foreground="White" />
+                    <TextBox x:Name="EmailTextBox" Margin="5" ToolTip="Deletes a user from the database with the provided email, if no user exists with this email, nothing will happen."/>
+
+                    <Button Content="Delete by Email" 
+                            Click="DeleteUserByEmail_Click" 
+                            Margin="5"
+                            ToolTip="Delete a user by their email" />
+
+                    <Label Content="Enter user ID" FontSize="16" Foreground="White"/>
+                    <TextBox x:Name="UserIdTextBox" Margin="5" ToolTip="The 'Update User' button and the 'Reset Password' button both utilizes this userID."/>
+
+                    <Label Content="Enter new username" FontSize="16" Foreground="White"/>
+                    <TextBox x:Name="NewUsernameTextBox" Margin="5" ToolTip="Sets the provided userID's username to the value of this field, if left blank, the username will remain the same." />
+
+                    <Label Content="Enter new email" FontSize="16" Foreground="White"/>
+                    <TextBox x:Name="NewEmailTextBox" Margin="5" ToolTip="Sets the provided userID's email to the value of this field, if left blank, the email will remain the same." />
+
+                    <Label Content="Enter new phone number" FontSize="16" Foreground="White"/>
+                    <TextBox x:Name="NewPhoneNumberTextBox" Margin="5" ToolTip="Sets the provided userID's phone number to the value of this field, if left blank, the phone number will remain the same."/>
+
+                    <Button Content="Update User" 
+                            Click="UpdateUser_Click" 
+                            Margin="5"
+                            ToolTip="Update user details" />
+                   
+                    <Label Content="Enter new password" FontSize="16" Foreground="White"/>
+                    <TextBox x:Name="NewPasswordTextBox" Margin="5" ToolTip="Sets the provided userID's password to the value of this field, if left blank, the password will remain the same."/>
+
+                    <Button Content="Reset Password" 
+                            Click="ResetPassword_Click" 
+                            Margin="5"
+                            ToolTip="Reset a user's password" />
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Right Panel (DataGrid) -->
             <Border Grid.Column="1" 
                     Background="#2E2E2E" 
                     CornerRadius="4" 
                     Padding="10">
-                <DataGrid x:Name="UsersDataGrid" 
-                          AutoGenerateColumns="True" 
-                          HeadersVisibility="Column" />
+                <DataGrid x:Name="UsersDataGrid" ItemsSource="{Binding Users}"
+                          AutoGenerateColumns="False"
+                          HeadersVisibility="Column"
+                          ContextMenu="{StaticResource DataGridContextMenu}" ClipboardCopyMode="ExcludeHeader" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" />   
+                        <DataGridTextColumn Header="Username" Binding="{Binding UserName}" />
+                        <DataGridTextColumn Header="Email" Binding="{Binding Email}" />
+                        <DataGridTextColumn Header="Phone Number" Binding="{Binding PhoneNumber}" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </Border>
         </Grid>
     </Grid>

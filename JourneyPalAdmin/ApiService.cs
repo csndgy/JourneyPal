@@ -2,29 +2,9 @@
 using System.Net.Http;
 using JourneyPalAdmin.Models;
 using Newtonsoft.Json;
+using System.Text;
 namespace JourneyPalAdmin
 {
-    //public class TokenStore
-    //{
-    //    public TokenStore(string token, string refreshToken)
-    //    {
-    //        JwtToken = token;
-    //        RefreshToken = refreshToken;
-    //    }
-    //    public string JwtToken { get; set; }
-    //    public string RefreshToken { get; set; }
-
-    //    public void SetRefreshToken(string refreshToken)
-    //    {
-    //        RefreshToken = refreshToken;
-    //    }
-
-    //    public void SetJwtToken(string token)
-    //    {
-    //        JwtToken = token;
-    //    }
-    //}
-
     public class ApiService
     {
         public HttpClient httpClient { get; }
@@ -34,6 +14,8 @@ namespace JourneyPalAdmin
 
         public ApiService(string baseUrl)
         {
+            HttpClientHandler handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
             _httpClient = new HttpClient
             {
                 BaseAddress = new Uri(baseUrl)
@@ -70,6 +52,13 @@ namespace JourneyPalAdmin
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<User>>(content);
         }
+        public async Task<User> GetUserByIdAsync(string id)
+        {
+            var response = await _httpClient.GetAsync($"api/Admin/user-by-id/{id}");
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<User>(content);
+        }
 
         public async Task<List<User>> GetUserByEmailAsync(string email)
         {
@@ -96,6 +85,20 @@ namespace JourneyPalAdmin
         public async Task DeleteUserByEmailAsync(string email)
         {
             var response = await _httpClient.DeleteAsync($"api/admin/by-email/{email}");
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task UpdateUserAsync(string id, User updatedUser)
+        {
+            var json = JsonConvert.SerializeObject(updatedUser);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"api/Admin/update-user/{id}", content);
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task ResetUserPasswordAsync(string id, string newPassword)
+        {
+            var json = JsonConvert.SerializeObject(newPassword);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"api/Admin/reset-password/{id}", content);
             response.EnsureSuccessStatusCode();
         }
     }

@@ -19,7 +19,7 @@ namespace JourneyPalAdmin
             InitializeComponent();
             _apiService = new ApiService("https://localhost:7193/");
             UsernameTextBox.Text = "admin";
-            PasswordBox.Password = "asd123ASD#";
+            PasswordBox.Password = "asdASD123#";
         }
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -57,7 +57,7 @@ namespace JourneyPalAdmin
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error: {ex.Message}\nInner Exception: {ex.InnerException?.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
