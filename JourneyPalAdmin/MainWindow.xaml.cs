@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
+using System.Formats.Asn1;
 
 
 namespace JourneyPalAdmin
@@ -62,10 +63,10 @@ namespace JourneyPalAdmin
             try
             {
                 var users = await _apiService.GetAllUsersAsync();
-                Users.Clear(); // Clear the existing items
+                Users.Clear(); 
                 foreach (var user in users)
                 {
-                    Users.Add(user); // Add new items to the ObservableCollection
+                    Users.Add(user);
                 }
             }
             catch (Exception ex)
@@ -104,10 +105,58 @@ namespace JourneyPalAdmin
                 await _apiService.DeleteUserByUsernameAsync(username);
                 UsernameTextBox.Clear();
                 MessageBox.Show("User deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                try
+                {
+                    var users = await _apiService.GetAllUsersAsync();
+                    Users.Clear();
+                    foreach (var user in users)
+                    {
+                        Users.Add(user);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void DeleteSelectedUser_Click(object sender, RoutedEventArgs e)
+        {
+            if (UsersDataGrid.SelectedIndex == -1)
+            {
+                MessageBox.Show("Error: No rows were selected.", "Error: No selected row", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            else
+            {
+                User selectedUser = UsersDataGrid.SelectedItem as User;
+                var email = selectedUser.Email;
+                try
+                {
+                    await _apiService.DeleteUserByEmailAsync(email);
+                    MessageBox.Show("User deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    try
+                    {
+                        var users = await _apiService.GetAllUsersAsync();
+                        Users.Clear();
+                        foreach (var user in users)
+                        {
+                            Users.Add(user);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -119,6 +168,19 @@ namespace JourneyPalAdmin
                 await _apiService.DeleteUserByEmailAsync(email);
                 MessageBox.Show("User deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 EmailTextBox.Clear();
+                try
+                {
+                    var users = await _apiService.GetAllUsersAsync();
+                    Users.Clear();
+                    foreach (var user in users)
+                    {
+                        Users.Add(user);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
             catch (Exception ex)
             {
