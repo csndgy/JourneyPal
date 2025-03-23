@@ -8,7 +8,7 @@ namespace JourneyPalBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize(Policy = "AdminPolicy")]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
     
     public class AdminController : Controller
     {
@@ -124,9 +124,11 @@ namespace JourneyPalBackend.Controllers
                 return NotFound($"User with ID '{id}' not found.");
             }
 
-            user.UserName = updatedUser.Username;
-            user.Email = updatedUser.Email;
-            user.PhoneNumber = updatedUser.PhoneNumber;
+
+
+            user.UserName = string.IsNullOrEmpty(updatedUser.Username) ? user.UserName : updatedUser.Username;
+            user.Email = string.IsNullOrEmpty(updatedUser.Email) ? user.Email : updatedUser.Email;
+            user.PhoneNumber = string.IsNullOrEmpty(updatedUser.PhoneNumber) ? user.PhoneNumber : updatedUser.PhoneNumber;
 
             var result = await _userManager.UpdateAsync(user);
 
@@ -135,7 +137,7 @@ namespace JourneyPalBackend.Controllers
                 return BadRequest(result.Errors);
             }
 
-            return Ok(user);
+            return Ok($"Successfully updated user!");
         }
         [HttpPut("reset-password/{id}")]
         public async Task<IActionResult> ResetUserPassword(string id, [FromBody] string newPassword)
@@ -155,15 +157,18 @@ namespace JourneyPalBackend.Controllers
             {
                 return BadRequest(result.Errors);
             }
+            var users = await _userManager.FindByIdAsync(id);
+            users.RefreshToken = null;
+            users.RefreshTokenExpiryTime = DateTime.MinValue;
 
             return Ok("Password reset successfully.");
         }
 
         public class UserUpdateDTO
         {
-            public string Username { get; set; }
-            public string Email { get; set; }
-            public string PhoneNumber { get; set; }
+            public string? Username { get; set; }
+            public string? Email { get; set; }
+            public string? PhoneNumber { get; set; }
 
         }
     }

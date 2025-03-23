@@ -13,6 +13,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using MimeKit;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JourneyPalBackend.Controllers
 {
@@ -62,10 +63,10 @@ namespace JourneyPalBackend.Controllers
                 UserName = user.UserName,
                 Email = user.Email,
                 EmailConfirmed = true
-
             };
 
             var result = await _userManager.CreateAsync(newUser, user.Password);
+            await _userManager.AddToRoleAsync(newUser, "User");
 
             if (!result.Succeeded)
             {
@@ -77,6 +78,7 @@ namespace JourneyPalBackend.Controllers
             return Ok(new { Message = "Successful registration!" });
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         [HttpPost("admin-register")]
         public async Task<IActionResult> AdminRegister([FromBody] UserDTO user)
         {
@@ -103,10 +105,11 @@ namespace JourneyPalBackend.Controllers
                 Email = user.Email,
                 EmailConfirmed = true,
                 Role = "Admin"
-
             };
-
+            
             var result = await _userManager.CreateAsync(newUser, user.Password);
+            await _userManager.RemoveFromRoleAsync(newUser, "User");
+            await _userManager.AddToRoleAsync(newUser, "Admin");
 
             if (!result.Succeeded)
             {
@@ -135,7 +138,8 @@ namespace JourneyPalBackend.Controllers
                 {
                     existingUser = await _userManager.FindByEmailAsync(user.Email);
                 }
-                else
+
+                if (existingUser == null && !string.IsNullOrEmpty(user.UserName))
                 {
                     existingUser = await _userManager.FindByNameAsync(user.UserName);
                 }
@@ -256,10 +260,15 @@ namespace JourneyPalBackend.Controllers
                     EmailConfirmed = true
 
                 };
+                var result = await _userManager.CreateAsync(user);
+                await _userManager.AddToRoleAsync(user, "User");
 
-                _ctx.Users.Add(user);
+                if (!result.Succeeded)
+                {
+                    return BadRequest(result.Errors);
+                }
+
                 await _ctx.SaveChangesAsync();
-
                 existingUser = user;
             }
 
@@ -299,7 +308,11 @@ namespace JourneyPalBackend.Controllers
             var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
 
             if (result.Succeeded)
+            {
+                user.RefreshToken = null;
+                user.RefreshTokenExpiryTime = DateTime.MinValue;
                 return Ok("Password reset successful.");
+            }
 
             return BadRequest("Password reset failed.");
         }
@@ -337,8 +350,10 @@ namespace JourneyPalBackend.Controllers
         }
         private string GenerateToken(User user)
         {
-            var tokenHandler = new JsonWebTokenHandler();
-            var key = Encoding.ASCII.GetBytes("MN/H5QwigOM4vMPRTsEo6HhOgKrvCJM8fe8y/Xu1MNySSxcWXvCt2DigX2Zc+dwt");
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_conf["Jwt:Key"]);
+            var securityKey = new SymmetricSecurityKey(key);
+            securityKey.KeyId = "3df71105";
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -348,13 +363,13 @@ namespace JourneyPalBackend.Controllers
                     new Claim(ClaimTypes.Role, user.Role)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(int.Parse(_conf["Jwt:AccessTokenExpiryMinutes"])),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                SigningCredentials = new SigningCredentials(securityKey,
                 SecurityAlgorithms.HmacSha256Signature),
                 Issuer = _conf["Jwt:Issuer"],
-                Audience = _conf["Jwt:Audience"]
+                Audience = _conf["Jwt:Audience"],
             };
-
-            return tokenHandler.CreateToken(tokenDescriptor);
+            Console.WriteLine($"Token generation key length: {Encoding.UTF8.GetBytes(_conf["Jwt:Key"]).Length}");
+            return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
         }
         private async Task<GoogleJsonWebSignature.Payload> ValidateGoogleToken(string idToken)
         {
@@ -386,13 +401,13 @@ namespace JourneyPalBackend.Controllers
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = false,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = _conf["Jwt:Issuer"],
                 ValidAudience = _conf["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MN/H5QwigOM4vMPRTsEo6HhOgKrvCJM8fe8y/Xu1MNySSxcWXvCt2DigX2Zc+dwt")
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_conf["Jwt:Key"])
 )
             };
 

@@ -36,7 +36,7 @@ namespace JourneyPalBackend.Controllers
                 return Unauthorized("Missing or invalid authorization token.");
             }
 
-            var token = authHeader.Substring("Bearer ".Length);
+            var token = authHeader.Substring("Bearer ".Length).Trim();
 
             var userId = ValidateAccessToken(token);
 

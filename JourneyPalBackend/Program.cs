@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
@@ -14,46 +12,13 @@ namespace JourneyPalBackend
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<JourneyPalDbContext>(options => options.UseSqlite(connectionString: "Data Source = JourneyPal.db"));
             var jwtSettings = builder.Configuration.GetSection("Jwt");
 
-            /*builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = false,
-                    ValidateIssuerSigningKey = false,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-                };
-
-                // Add these lines to prevent redirect
-                options.Events = new JwtBearerEvents
-                {
-                    OnChallenge = async context =>
-                    {
-                        context.HandleResponse();
-
-                        context.Response.StatusCode = 401;
-                        context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsJsonAsync(new { message = "Unauthorized" });
-                    }
-                };
-            });*/
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -68,10 +33,32 @@ namespace JourneyPalBackend
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     RequireExpirationTime = true,
-                    ValidIssuer = "localhost",
-                    ValidAudience = "localhost",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MN/H5QwigOM4vMPRTsEo6HhOgKrvCJM8fe8y/Xu1MNySSxcWXvCt2DigX2Zc+dwt")),
-                    ClockSkew = TimeSpan.FromSeconds(0)
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    {
+                        KeyId = "3df71105"
+                    },
+                    ClockSkew = TimeSpan.FromSeconds(0),
+                };
+                Console.WriteLine($"Token validation key length: {Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]).Length}");
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        Console.WriteLine("Token was successfully validated");
+                        return Task.CompletedTask;
+                    },
+                    OnChallenge = context =>
+                    {
+                        Console.WriteLine($"Challenge occurred: {context.Error}, {context.ErrorDescription}");
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
@@ -102,7 +89,6 @@ namespace JourneyPalBackend
                 });
             });
 
-
             //builder.Services.AddAuthentication(options =>
             //{
             //    options.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
@@ -123,7 +109,6 @@ namespace JourneyPalBackend
                            .AllowAnyMethod()
                            .AllowAnyHeader()
                            .AllowCredentials();
-                    //.WithExposedHeaders("WWW-Authenticate");
                 });
             });
 
@@ -153,17 +138,11 @@ namespace JourneyPalBackend
                 {
                     policy.RequireClaim(ClaimTypes.Role, "Admin");
                 });
-
-                //options.AddPolicy("UserPolicy", policy =>
-                //{
-                //    policy.RequireClaim(ClaimTypes.Role, "User");
-                //});
             });
             
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -175,7 +154,21 @@ namespace JourneyPalBackend
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
-            app.Run();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var roles = new[] { "Admin", "User" };
+
+                foreach (var role in roles)
+                {
+                    if (!await roleManager.RoleExistsAsync(role))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole(role));
+                    }
+                }
+            }
+                app.Run();
         }
     }
 }
