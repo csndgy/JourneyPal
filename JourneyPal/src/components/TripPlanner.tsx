@@ -25,7 +25,25 @@ const TripPlanner = () => {
   const [isDateSelected, setIsDateSelected] = useState(false);
   const [selectedDay, setSelectedDay] = useState<TripDay | null>(null);
   const [showPlacesToVisit, setShowPlacesToVisit] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0); // Új állapot az oldalszámozáshoz
+  const [showMap, setShowMap] = useState(false);
+  const [showNotes, setShowNotes] = useState(false); // Új állapot a jegyzetek megjelenítéséhez
+  const [notes, setNotes] = useState<string[]>([]); // Jegyzetek tárolása
+  const [newNote, setNewNote] = useState(''); // Új jegyzet szövege
+  const [currentPage, setCurrentPage] = useState(0);
+
+  // Jegyzet hozzáadása
+  const handleAddNote = () => {
+    if (newNote.trim()) {
+      setNotes([...notes, newNote]);
+      setNewNote('');
+    }
+  };
+
+  // Jegyzet törlése
+  const handleDeleteNote = (index: number) => {
+    const updatedNotes = notes.filter((_, i) => i !== index);
+    setNotes(updatedNotes);
+  };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,7 +74,7 @@ const TripPlanner = () => {
     });
 
     setIsDateSelected(true);
-    setCurrentPage(0); // Visszaállítjuk az oldalszámozást az első oldalra
+    setCurrentPage(0);
   };
 
   const handleImageUpload = (dayIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,18 +90,16 @@ const TripPlanner = () => {
     setSelectedDay(day);
   };
 
-  // Function to recommend 3 places from the destination's description
   const recommendPlaces = (destination: Destination) => {
     const places = destination.description.split('•').map(place => place.trim());
     return places.slice(0, 4).map((place, index) => ({
       name: place,
-      image: `/images/${destination.title.toLowerCase().replace(/ /g, '-')}-${index + 1}.jpg`, // Képek elérési útja
+      image: `/images/${destination.title.toLowerCase().replace(/ /g, '-')}-${index + 1}.jpg`,
     }));
   };
 
   const recommendedPlaces = recommendPlaces(destination);
 
-  // Napok kiválasztása az aktuális oldal alapján
   const daysPerPage = 7;
   const totalPages = Math.ceil(tripPlan.days.length / daysPerPage);
   const startIndex = currentPage * daysPerPage;
@@ -102,6 +118,12 @@ const TripPlanner = () => {
     }
   };
 
+  // Az "Explore" gombra kattintva bezárjuk a "Places to visit" nézetet és megnyitjuk a térképet
+  const handleExploreClick = () => {
+    setShowPlacesToVisit(false); // Bezárjuk a "Places to visit" nézetet
+    setShowMap(true); // Megnyitjuk a térképet
+  };
+
   return (
     <div className="app-layout">
       {isDateSelected && (
@@ -111,7 +133,7 @@ const TripPlanner = () => {
               <h2>Overview</h2>
             </div>
             <ul className="section-items">
-              <li>Explore</li>
+              <li onClick={handleExploreClick}>Explore</li> {/* Explore gomb */}
               <li>Notes</li>
               <li onClick={() => setShowPlacesToVisit(!showPlacesToVisit)}>Places to visit</li>
             </ul>
@@ -132,7 +154,6 @@ const TripPlanner = () => {
                 </li>
               ))}
             </ul>
-            {/* Oldalszámozás gombjai */}
             <div className="pagination">
               <button className='btnPrevNext' onClick={handlePrevPage} disabled={currentPage === 0}>
                 Previous
@@ -166,6 +187,17 @@ const TripPlanner = () => {
                 </div>
               ))}
             </div>
+          </div>
+        ) : showMap ? ( // Térkép megjelenítése, ha a showMap true
+          <div className="map-container">
+            <iframe
+              width="100%"
+              height="600"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+              src={`https://www.google.com/maps?q=${destination.coordinates.lat},${destination.coordinates.lng}&z=12&output=embed`}
+            ></iframe>
           </div>
         ) : (
           <>
