@@ -81,7 +81,7 @@ namespace JourneyPalAdmin
         {
             _apiService.SetJwtTokens(token, refreshToken);
 
-            var mainWindow = new MainWindow();
+            var mainWindow = new MainWindow(_apiService);
             mainWindow.Show();
             this.Close();
         }

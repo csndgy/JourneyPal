@@ -30,21 +30,41 @@ namespace JourneyPalAdmin
 
         public void SetJwtTokens(string token, string refreshToken)
         {
-            Environment.SetEnvironmentVariable("token", token);
-            Environment.SetEnvironmentVariable("refreshToken", refreshToken);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Environment.GetEnvironmentVariable("token"));
+            _jwtToken = token;
+            _refreshToken = refreshToken;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         
         public string GetRefreshToken()
         {
-            return Environment.GetEnvironmentVariable("refreshtToken");
+            return _refreshToken;
         }
 
         public string GetJwtToken()
         {
-            return Environment.GetEnvironmentVariable("token");
+            return _jwtToken;
         }
+        public async Task<bool> LogoutAsync()
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync("api/Auth/logout", null);
+                response.EnsureSuccessStatusCode();
 
+                _jwtToken = null;
+                _refreshToken = null;
+                _httpClient.DefaultRequestHeaders.Authorization = null;
+
+                return true;
+            }
+            catch
+            {
+                _jwtToken = null;
+                _refreshToken = null;
+                _httpClient.DefaultRequestHeaders.Authorization = null;
+                return false;
+            }
+        }
         public async Task<List<User>> GetAllUsersAsync()
         {
             var response = await _httpClient.GetAsync("api/Admin/users");
@@ -59,7 +79,6 @@ namespace JourneyPalAdmin
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<User>(content);
         }
-
         public async Task<List<User>> GetUserByEmailAsync(string email)
         {
             var response = await _httpClient.GetAsync($"api/Admin/user-by-email?email={email}");

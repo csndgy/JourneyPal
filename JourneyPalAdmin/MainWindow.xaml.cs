@@ -22,10 +22,10 @@ namespace JourneyPalAdmin
         private readonly DispatcherTimer _refreshTimer;
         public ObservableCollection<User> Users { get; set; }
 
-        public MainWindow()
+        public MainWindow(ApiService apiService)
         {
             InitializeComponent();
-            _apiService = new ApiService("https://localhost:7193/");
+            _apiService = apiService;
             Users = new ObservableCollection<User>();
             DataContext = this;
 
@@ -35,6 +35,8 @@ namespace JourneyPalAdmin
             _refreshTimer.Interval = TimeSpan.FromSeconds(30); // Refresh every 30 seconds
             _refreshTimer.Tick += RefreshTimer_Tick;
             _refreshTimer.Start(); // Start the timer
+            MessageBox.Show($"{_apiService.GetJwtToken()}");
+            Clipboard.SetText(_apiService.GetJwtToken());
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -56,6 +58,43 @@ namespace JourneyPalAdmin
         private async void RefreshTimer_Tick(object sender, EventArgs e)
         {
             await FetchUsers(); // Fetch users periodically
+        }
+
+        private async void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Stop the refresh timer
+                _refreshTimer.Stop();
+
+                // Call the API logout
+                var success = await _apiService.LogoutAsync();
+
+                if (success)
+                {
+                    MessageBox.Show("Logged out successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // Reopen the LoginWindow and close the current MainWindow
+                    var loginWindow = new LoginWindow(); // Replace with your actual LoginWindow class
+                    loginWindow.Show();
+                    this.Close(); // Close the current MainWindow
+                }
+                else
+                {
+                    MessageBox.Show("Logout failed but local session was cleared.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var loginWindow = new LoginWindow(); // Fallback: still reopen LoginWindow
+                    loginWindow.Show();
+                    this.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error during logout: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Fallback: reopen LoginWindow even if an error occurs
+                var loginWindow = new LoginWindow();
+                loginWindow.Show();
+                this.Close();
+            }
         }
 
         private async void LoadUsers_Click(object sender, RoutedEventArgs e)

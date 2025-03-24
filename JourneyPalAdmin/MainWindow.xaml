@@ -116,6 +116,10 @@
                             Click="DeleteSelectedUser_Click" 
                             Margin="0 0 0 10"
                             ToolTip="Deletes the selected user from the database." />
+                    <Button Content="Logout"
+                            Click="Logout_Click"
+                            Margin="0 0 0 10"
+                            ToolTip="Logs out from the admin panel." />
 
                     <Label Content="Enter username" FontSize="16" Foreground="White"/>
                     <TextBox x:Name="UsernameTextBox" Margin="5" ToolTip="Deletes a user from the database with the provided username, if no user exists with this username, nothing will happen."/>
