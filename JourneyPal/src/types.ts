@@ -10,6 +10,7 @@ export interface Destination {
     date: string;
     activities: string[];
     images: File[];
+    notes: string[];
   }
   
   export interface TripPlan {
