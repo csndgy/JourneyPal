@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { destinations } from '../assets/destinations.ts';
 import { TripPlan, TripDay, Destination } from '../types';
-import Checklist from './Checklist';
+import Checklist from './Checklist.tsx';
 
 const TripPlanner = () => {
   const { destinationId } = useParams<{ destinationId: string }>();
@@ -25,6 +25,11 @@ const TripPlanner = () => {
   const [newNote, setNewNote] = useState('');
 
   if (!destination) return <div>Destination not found</div>;
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSelectedDates(prev => ({ ...prev, [name]: value }));
+  };
 
   const generateDays = () => {
     if (!selectedDates.start || !selectedDates.end) return;
@@ -96,50 +101,30 @@ const TripPlanner = () => {
               <h2>Overview</h2>
             </div>
             <ul className="section-items">
-              <li 
-                className={showMap ? 'active' : ''}
-                onClick={() => { 
-                  setShowMap(true); 
-                  setShowNotes(false);
-                  setShowChecklist(false);
-                  setShowPlacesToVisit(false);
-                }}
-              >
-                Explore
-              </li>
-              <li 
-                className={showNotes ? 'active' : ''}
-                onClick={() => { 
-                  setShowNotes(true);
-                  setShowMap(false);
-                  setShowChecklist(false);
-                  setShowPlacesToVisit(false);
-                }}
-              >
-                Notes
-              </li>
-              <li 
-                className={showChecklist ? 'active' : ''}
-                onClick={() => { 
-                  setShowChecklist(true);
-                  setShowNotes(false);
-                  setShowMap(false);
-                  setShowPlacesToVisit(false);
-                }}
-              >
-                Checklist
-              </li>
-              <li 
-                className={showPlacesToVisit ? 'active' : ''}
-                onClick={() => { 
-                  setShowPlacesToVisit(true);
-                  setShowMap(false);
-                  setShowNotes(false);
-                  setShowChecklist(false);
-                }}
-              >
-                Places to visit
-              </li>
+              <li onClick={() => { 
+                setShowMap(true); 
+                setShowNotes(false);
+                setShowChecklist(false);
+                setShowPlacesToVisit(false);
+              }}>Explore</li>
+              <li onClick={() => { 
+                setShowNotes(true);
+                setShowMap(false);
+                setShowChecklist(false);
+                setShowPlacesToVisit(false);
+              }}>Notes</li>
+              <li onClick={() => { 
+                setShowChecklist(true);
+                setShowNotes(false);
+                setShowMap(false);
+                setShowPlacesToVisit(false);
+              }}>Checklist</li>
+              <li onClick={() => { 
+                setShowPlacesToVisit(true);
+                setShowMap(false);
+                setShowNotes(false);
+                setShowChecklist(false);
+              }}>Places to visit</li>
             </ul>
           </div>
 
@@ -151,13 +136,7 @@ const TripPlanner = () => {
               {displayedDays.map((day, index) => (
                 <li
                   key={day.date}
-                  onClick={() => {
-                    setSelectedDay(day);
-                    setShowMap(false);
-                    setShowNotes(false);
-                    setShowChecklist(false);
-                    setShowPlacesToVisit(false);
-                  }}
+                  onClick={() => setSelectedDay(day)}
                   className={selectedDay?.date === day.date ? 'selected-day' : ''}
                 >
                   Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
@@ -249,22 +228,19 @@ const TripPlanner = () => {
         ) : selectedDay ? (
           <div className="day-details">
             <h2>Day {tripPlan.days.findIndex(d => d.date === selectedDay.date) + 1}</h2>
-            <div className="notes-container">
-              <h3>Day Notes</h3>
-              <div className="notes-input-container">
-                <textarea
-                  className="notes-input"
-                  placeholder="Write notes for this day..."
-                  onBlur={(e) => {
-                    const dayIndex = tripPlan.days.findIndex(d => d.date === selectedDay.date);
-                    handleDayNoteChange(dayIndex, e.target.value);
-                  }}
-                />
-              </div>
-              <div className="notes-list">
+            <div className="day-notes-section">
+              <h3>Daily Notes</h3>
+              <textarea
+                placeholder="Add notes for this day..."
+                onBlur={(e) => {
+                  const dayIndex = tripPlan.days.findIndex(d => d.date === selectedDay.date);
+                  handleDayNoteChange(dayIndex, e.target.value);
+                }}
+              />
+              <div className="day-notes-list">
                 {selectedDay.notes?.map((note, index) => (
-                  <div key={index} className="note-card">
-                    <p>{note}</p>
+                  <div key={index} className="day-note">
+                    {note}
                   </div>
                 ))}
               </div>
