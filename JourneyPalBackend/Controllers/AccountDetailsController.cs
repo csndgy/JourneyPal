@@ -8,13 +8,16 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
+using JourneyPalBackend.Utils;
 
 namespace JourneyPalBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [EnableCors("AllowAll")]
-    
+    [Authorize(AuthenticationSchemes ="Bearer")]
+
     public class AccountDetailsController : ControllerBase
     {
         private readonly JourneyPalDbContext _ctx;
@@ -58,30 +61,77 @@ namespace JourneyPalBackend.Controllers
 
             return Ok(user);
         }
+        [HttpPatch("update-phone")]
+        public async Task<IActionResult> UpdateUserPhoneNumber(UpdatePhoneRequest request)
+        {
+
+            var authHeader = Request.Headers.Authorization.FirstOrDefault();
+
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+            {
+                return Unauthorized("Missing or invalid authorization token.");
+            }
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+
+            var userId = ValidateAccessToken(token);
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            if (!IsValidPhoneNumber(request.PhoneNumber))
+            {
+                return BadRequest("Invalid phone number format.");
+            }
+
+            user.PhoneNumber = request.PhoneNumber;
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest("Failed to update phone number.");
+            }
+
+            return Ok("Phone number updated successfully.");
+        }
+        private bool IsValidPhoneNumber(string phoneNumber)
+        {
+            var phoneNumberPattern = @"^\+?[1-9]\d{1,14}$";
+            return Regex.IsMatch(phoneNumber, phoneNumberPattern);
+        }
         private string ValidateAccessToken(string token)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_conf["Jwt:Key"]!);
-
-            var validationParameters = new TokenValidationParameters
+            try
             {
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                //ValidAudiences = ["localhost"],
-                // ValidIssuers = ["localhost"], 
-                ValidAudience = _conf["Jwt:Audience"],
-                ValidIssuer = _conf["Jwt:Issuer"],
-                ValidateIssuerSigningKey = false,
-                ValidateAudience = false,
-                ValidateIssuer = false,
-                ClockSkew = TimeSpan.Zero,
-            };
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.UTF8.GetBytes(_conf["Jwt:Key"]!);
 
-            var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+                var validIssuer = "localhost";
+                var validAudience = "localhost";
 
-            if (validatedToken is not JwtSecurityToken jwtToken || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature))
+                var validationParameters = HelperClass.GetTokenValidationParameters(_conf);
+
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+
+                if (validatedToken is not JwtSecurityToken jwtToken || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature))
+                    return "Invalid token!";
+
+                return principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new SecurityTokenException("User ID not found in token"); //"Error, token invalid or not found!";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Token validation failed: {ex.Message}");
                 return "Invalid token!";
-
-            return principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Error, token invalid or not found!";
+            }
+            
         }
     }
+    public class UpdatePhoneRequest
+{
+    public string PhoneNumber { get; set; }
+}
 }

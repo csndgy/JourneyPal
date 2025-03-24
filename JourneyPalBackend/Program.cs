@@ -17,6 +17,7 @@ namespace JourneyPalBackend
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<JourneyPalDbContext>(options => options.UseSqlite(connectionString: "Data Source = JourneyPal.db"));
+            builder.Configuration.AddJsonFile("appsettings.json");
             var jwtSettings = builder.Configuration.GetSection("Jwt");
 
             builder.Services.AddAuthentication(options =>
@@ -29,7 +30,7 @@ namespace JourneyPalBackend
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidateAudience = true,
+                    ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     RequireExpirationTime = true,

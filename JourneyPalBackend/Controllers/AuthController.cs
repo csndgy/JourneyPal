@@ -33,7 +33,6 @@ namespace JourneyPalBackend.Controllers
             _ctx = context;
             _conf = configuration;
             _userManager = userManager;
-            _conf = configuration;
             _signInManager = signInManager;
         }
         #endregion
@@ -96,7 +95,7 @@ namespace JourneyPalBackend.Controllers
 
             if (await _ctx.Users.AnyAsync(u => u.Email == user.Email))
             {
-                return BadRequest("An account is already registered with this Email address!");
+                return BadRequest("An account is already registered with this Email addreccd cdcdss!");
             }
 
             var newUser = new User
@@ -217,7 +216,7 @@ namespace JourneyPalBackend.Controllers
 
             return Ok(response);
         }
-
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -233,7 +232,6 @@ namespace JourneyPalBackend.Controllers
             await _ctx.SaveChangesAsync();
 
             return Ok(new { Message = "Logged out successfully." });
-
         }
 
         [HttpPost("signin-google")]
@@ -401,7 +399,7 @@ namespace JourneyPalBackend.Controllers
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = false,
+                ValidateIssuer = true,
                 ValidateAudience = false,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
