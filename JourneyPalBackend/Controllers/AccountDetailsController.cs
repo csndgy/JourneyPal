@@ -108,12 +108,12 @@ namespace JourneyPalBackend.Controllers
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_conf["Jwt:Key"]!);
+                var key = Encoding.UTF8.GetBytes("3df71105add26312e4d2ade913d181b525a647b0179d16fbf7d8771ff5f72df2s");
 
                 var validIssuer = "localhost";
                 var validAudience = "localhost";
 
-                var validationParameters = HelperClass.GetTokenValidationParameters(_conf);
+                var validationParameters = HelperClass.GetTokenValidationParameters();
 
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
 

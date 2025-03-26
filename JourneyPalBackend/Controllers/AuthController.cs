@@ -349,7 +349,7 @@ namespace JourneyPalBackend.Controllers
         private string GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_conf["Jwt:Key"]);
+            var key = Encoding.UTF8.GetBytes("3df71105add26312e4d2ade913d181b525a647b0179d16fbf7d8771ff5f72df2");
             var securityKey = new SymmetricSecurityKey(key);
             securityKey.KeyId = "3df71105";
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -360,13 +360,14 @@ namespace JourneyPalBackend.Controllers
                     new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(ClaimTypes.Role, user.Role)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(int.Parse(_conf["Jwt:AccessTokenExpiryMinutes"])),
+                Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(securityKey,
                 SecurityAlgorithms.HmacSha256Signature),
-                Issuer = _conf["Jwt:Issuer"],
-                Audience = _conf["Jwt:Audience"],
+                Issuer = "localhost",
+                Audience = "localhost",
+                Audiences = { "localhost" }
             };
-            Console.WriteLine($"Token generation key length: {Encoding.UTF8.GetBytes(_conf["Jwt:Key"]).Length}");
+            Console.WriteLine($"Token generation key length: {Encoding.UTF8.GetBytes("3df71105add26312e4d2ade913d181b525a647b0179d16fbf7d8771ff5f72df2").Length}");
             return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
         }
         private async Task<GoogleJsonWebSignature.Payload> ValidateGoogleToken(string idToken)

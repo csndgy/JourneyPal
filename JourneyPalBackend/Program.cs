@@ -30,19 +30,20 @@ namespace JourneyPalBackend
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidateAudience = false,
+                    ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     RequireExpirationTime = true,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    ValidIssuer = "localhost",
+                    ValidAudience = "localhost",
+                    ValidAudiences = new List<string> { "localhost" },
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("3df71105add26312e4d2ade913d181b525a647b0179d16fbf7d8771ff5f72df2"))
                     {
                         KeyId = "3df71105"
                     },
                     ClockSkew = TimeSpan.FromSeconds(0),
                 };
-                Console.WriteLine($"Token validation key length: {Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]).Length}");
+                Console.WriteLine($"Token validation key length: {Encoding.UTF8.GetBytes("3df71105add26312e4d2ade913d181b525a647b0179d16fbf7d8771ff5f72df2").Length}");
                 options.Events = new JwtBearerEvents
                 {
                     OnAuthenticationFailed = context =>
