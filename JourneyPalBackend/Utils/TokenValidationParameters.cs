@@ -16,7 +16,7 @@ namespace JourneyPalBackend.Utils
                 },
                 ValidateIssuer = true,
                 ValidIssuer = "localhost",
-                ValidateAudience = true,
+                ValidateAudience = false,
                 ValidAudience = "localhost",
                 ValidAudiences = new List<string> { "localhost" },
                 ValidateLifetime = true,

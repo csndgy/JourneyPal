@@ -117,7 +117,12 @@ namespace JourneyPalBackend.Controllers
 
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
 
-                if (validatedToken is not JwtSecurityToken jwtToken || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature))
+                foreach (var claim in principal.Claims)
+                {
+                    Console.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
+                }
+
+                if (validatedToken is not JwtSecurityToken jwtToken || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256))
                     return "Invalid token!";
 
                 return principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new SecurityTokenException("User ID not found in token"); //"Error, token invalid or not found!";
