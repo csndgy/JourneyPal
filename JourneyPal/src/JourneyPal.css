@@ -1705,3 +1705,53 @@ body {
   background: var(--primary-color);
   color: white;
 }
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-prev, .btn-next {
+  background-color: #4A90E2;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.btn-prev {
+  transform: rotate(180deg);
+}
+
+.btn-prev:hover:not(:disabled),
+.btn-next:hover:not(:disabled) {
+  background-color: #357ABD;
+}
+
+.btn-prev:hover:not(:disabled) {
+  transform: rotate(180deg) scale(1.1); /* Keep it rotated while scaling */
+}
+
+.btn-next:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.btn-prev:disabled,
+.btn-next:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 16px;
+  color: white;
+}

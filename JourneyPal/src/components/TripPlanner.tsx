@@ -143,23 +143,24 @@ const TripPlanner = () => {
                 </li>
               ))}
             </ul>
-            <div className="pagination">
-              <button 
-                className="btnPrevNext" 
-                onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-                disabled={currentPage === 0}
-              >
-                Previous
-              </button>
-              <span>Page {currentPage + 1} of {totalPages}</span>
-              <button 
-                className="btnPrevNext" 
-                onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
-                disabled={currentPage === totalPages - 1}
-              >
-                Next
-              </button>
-            </div>
+            <div className="pagination-container">
+  <button 
+    className="btn-prev" 
+    onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+    disabled={currentPage === 0}
+  >
+    ➜
+  </button>
+  <span className="page-info">Page {currentPage + 1} of {totalPages}</span>
+  <button 
+    className="btn-next" 
+    onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+    disabled={currentPage === totalPages - 1}
+  >
+    ➜
+  </button>
+</div>
+
           </div>
         </div>
       )}
