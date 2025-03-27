@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace JourneyPalBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class sqlitelocal_migration_572 : Migration
+    public partial class sqlitelocal_migration_274 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,7 +31,6 @@ namespace JourneyPalBackend.Migrations
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Discriminator = table.Column<string>(type: "TEXT", maxLength: 13, nullable: false),
-                    Telephone = table.Column<string>(type: "TEXT", nullable: true),
                     RefreshToken = table.Column<string>(type: "TEXT", nullable: true),
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "TEXT", nullable: true),
                     RecoveryCodes = table.Column<string>(type: "TEXT", nullable: true),
@@ -174,7 +173,6 @@ namespace JourneyPalBackend.Migrations
                     Destination = table.Column<string>(type: "TEXT", nullable: false),
                     StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EndDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    StayingLocaltion = table.Column<string>(type: "TEXT", nullable: false),
                     UserId = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -207,6 +205,28 @@ namespace JourneyPalBackend.Migrations
                     table.PrimaryKey("PK_Events", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Events_Trips_TripId",
+                        column: x => x.TripId,
+                        principalTable: "Trips",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TripNotes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Title = table.Column<string>(type: "TEXT", nullable: false),
+                    Content = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    TripId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TripNotes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TripNotes_Trips_TripId",
                         column: x => x.TripId,
                         principalTable: "Trips",
                         principalColumn: "Id",
@@ -256,6 +276,11 @@ namespace JourneyPalBackend.Migrations
                 column: "TripId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TripNotes_TripId",
+                table: "TripNotes",
+                column: "TripId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Trips_UserId",
                 table: "Trips",
                 column: "UserId");
@@ -281,6 +306,9 @@ namespace JourneyPalBackend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Events");
+
+            migrationBuilder.DropTable(
+                name: "TripNotes");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

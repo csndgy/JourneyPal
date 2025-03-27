@@ -315,18 +315,6 @@ namespace JourneyPalBackend.Controllers
             return BadRequest("Password reset failed.");
         }
         #endregion
-        #region Funny
-        [HttpPost("meow")]
-        public async Task<IActionResult> Meow()
-        {
-            return Ok("Meow!");
-        }
-        [HttpPost("I'm a teapot")]
-        public async Task<IActionResult> ImATeapot()
-        {
-            return StatusCode(418, "I'm a teapot!");
-        }
-        #endregion
         #region Helper functions    
         private async Task SendPasswordResetEmailAsync(string email, string resetLink)
         {

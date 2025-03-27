@@ -16,7 +16,7 @@ namespace JourneyPalBackend.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [EnableCors("AllowAll")]
-    [Authorize(AuthenticationSchemes ="Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
 
     public class AccountDetailsController : ControllerBase
     {
@@ -30,7 +30,7 @@ namespace JourneyPalBackend.Controllers
             _conf = conf;
         }
         [HttpGet("profile")]
-        public async Task<IActionResult> GetAccountDetails()
+        public async Task<IActionResult> GetAccountDetails([FromQuery] string nameId)
         {
             var authHeader = Request.Headers.Authorization.FirstOrDefault();
 
@@ -39,20 +39,18 @@ namespace JourneyPalBackend.Controllers
                 return Unauthorized("Missing or invalid authorization token.");
             }
 
-            var token = authHeader.Substring("Bearer ".Length).Trim();
+            var user = await _userManager.FindByIdAsync(nameId);
 
-            var userId = ValidateAccessToken(token);
-
-            var user = await _ctx.Users
-               .Where(u => u.Id == userId)
-               .Select(u => new
-               {
-                   u.Id,
-                   u.UserName,
-                   u.Email,
-                   u.PhoneNumber,
-               })
-               .FirstOrDefaultAsync();
+            //var user = await _ctx.Users
+            //   .Where(u => u.Id == userId)
+            //   .Select(u => new
+            //   {
+            //       u.Id,
+            //       u.UserName,
+            //       u.Email,
+            //       u.PhoneNumber,
+            //   })
+            //   .FirstOrDefaultAsync();
 
             if (user == null)
             {
@@ -62,7 +60,7 @@ namespace JourneyPalBackend.Controllers
             return Ok(user);
         }
         [HttpPatch("update-phone")]
-        public async Task<IActionResult> UpdateUserPhoneNumber(UpdatePhoneRequest request)
+        public async Task<IActionResult> UpdateUserPhoneNumber([FromQuery] string nameId, UpdatePhoneRequest request)
         {
 
             var authHeader = Request.Headers.Authorization.FirstOrDefault();
@@ -72,11 +70,7 @@ namespace JourneyPalBackend.Controllers
                 return Unauthorized("Missing or invalid authorization token.");
             }
 
-            var token = authHeader.Substring("Bearer ".Length).Trim();
-
-            var userId = ValidateAccessToken(token);
-
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(nameId);
 
             if (user == null)
             {
@@ -132,11 +126,11 @@ namespace JourneyPalBackend.Controllers
                 Console.WriteLine($"Token validation failed: {ex.Message}");
                 return "Invalid token!";
             }
-            
+
         }
     }
     public class UpdatePhoneRequest
-{
-    public string PhoneNumber { get; set; }
-}
+    {
+        public string PhoneNumber { get; set; }
+    }
 }

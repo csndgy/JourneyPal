@@ -24,10 +24,18 @@ namespace JourneyPalBackend.Models
                 .WithOne(e => e.Trip)
                 .HasForeignKey(e => e.TripId)
                 .OnDelete(DeleteBehavior.Cascade); // Cascade delete events when trip is deleted
+
+            // Configure cascade delete for Trip -> Notes
+            modelBuilder.Entity<Trip>()
+                .HasMany(t => t.Notes)
+                .WithOne(n => n.Trip)
+                .HasForeignKey(n => n.TripId)
+                .OnDelete(DeleteBehavior.Cascade); // Cascade delete notes when trip is deleted
         }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Trip> Trips { get; set; }
         public DbSet<Event> Events { get; set; }
+        public DbSet<TripNote> TripNotes { get; set; }
     }
 }

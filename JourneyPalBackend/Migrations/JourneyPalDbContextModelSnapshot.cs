@@ -71,10 +71,6 @@ namespace JourneyPalBackend.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("StayingLocaltion")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("TripName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -88,6 +84,33 @@ namespace JourneyPalBackend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Trips");
+                });
+
+            modelBuilder.Entity("JourneyPalBackend.Models.TripNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TripId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TripId");
+
+                    b.ToTable("TripNotes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -318,10 +341,6 @@ namespace JourneyPalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Telephone")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasDiscriminator().HasValue("User");
                 });
 
@@ -345,6 +364,17 @@ namespace JourneyPalBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("JourneyPalBackend.Models.TripNote", b =>
+                {
+                    b.HasOne("JourneyPalBackend.Models.Trip", "Trip")
+                        .WithMany("Notes")
+                        .HasForeignKey("TripId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trip");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -401,6 +431,8 @@ namespace JourneyPalBackend.Migrations
             modelBuilder.Entity("JourneyPalBackend.Models.Trip", b =>
                 {
                     b.Navigation("Events");
+
+                    b.Navigation("Notes");
                 });
 
             modelBuilder.Entity("JourneyPalBackend.Models.User", b =>
