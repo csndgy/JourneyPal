@@ -11,10 +11,20 @@ export interface Destination {
     activities: string[];
     images: File[];
     notes: string[];
+    events: Event[];
   }
   
   export interface TripPlan {
     startDate: string;
     endDate: string;
     days: TripDay[];
+  }
+
+  export interface Event{
+    name: string;
+    description: string;
+    location: string;
+    duration: string;
+    links: string;
+    time: string;
   }

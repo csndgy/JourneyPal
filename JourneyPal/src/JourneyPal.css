@@ -936,7 +936,7 @@ body {
   .navbar {
     flex-wrap: wrap;
     padding: 10px;
-  }
+      }
   
   .navbar-logo {
     font-size: 1.5rem;
@@ -1914,4 +1914,153 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Event Styles */
+.create-event-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  margin: 15px 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.create-event-btn:hover {
+  background-color: var(--primary-final-color);
+}
+
+.event-form {
+  background-color: var(--card-background);
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+  box-shadow: var(--card-shadow);
+}
+
+.event-form h3 {
+  margin-top: 0;
+  color: var(--text-color);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--input-background);
+  color: var(--text-color);
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.cancel-btn,
+.save-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cancel-btn {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.save-btn {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.save-btn:disabled {
+  background-color: var(--secondary-color);
+  cursor: not-allowed;
+}
+
+.events-list {
+  margin: 25px 0;
+}
+
+.event-card {
+  background-color: var(--card-background);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  gap: 15px;
+}
+
+.event-time {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  min-width: 70px;
+  text-align: center;
+  align-self: flex-start;
+}
+
+.event-content {
+  flex: 1;
+}
+
+.event-content h4 {
+  margin: 0 0 5px 0;
+  color: var(--text-color);
+}
+
+.event-detail {
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+
+.detail-label {
+  font-weight: 600;
+  margin-right: 5px;
+  color: var(--secondary-color);
+}
+
+.day-date {
+  color: var(--secondary-color);
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+.day-notes-input {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--input-background);
+  color: var(--text-color);
+  resize: vertical;
 }

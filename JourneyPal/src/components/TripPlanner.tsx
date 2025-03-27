@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { destinations } from '../assets/destinations.ts';
-import { TripPlan, TripDay, Destination } from '../types';
+import { TripPlan, TripDay, Destination, Event } from '../types';
 import Checklist from './Checklist.tsx';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -26,6 +26,15 @@ const TripPlanner = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [notes, setNotes] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [newEvent, setNewEvent] = useState<Event>({
+    name: '',
+    description: '',
+    location: '',
+    duration: '',
+    links: '',
+    time: ''
+  });
 
   if (!destination) return <div>Destination not found</div>;
 
@@ -40,7 +49,8 @@ const TripPlanner = () => {
         date: currentDate.toISOString().split('T')[0],
         activities: [],
         images: [],
-        notes: []
+        notes: [],
+        events: []
       });
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -65,7 +75,47 @@ const TripPlanner = () => {
     setNotes(notes.filter((_, i) => i !== index));
   };
 
- 
+  const handleDayClick = (day: TripDay) => {
+    // Reset all view states when selecting a day
+    setShowMap(false);
+    setShowNotes(false);
+    setShowChecklist(false);
+    setShowPlacesToVisit(false);
+    
+    setSelectedDay(day);
+    setShowEventForm(false);
+  };
+
+  const handleEventChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setNewEvent(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddEvent = () => {
+    if (!selectedDay || !newEvent.name.trim()) return;
+    
+    const updatedDays = tripPlan.days.map(day => {
+      if (day.date === selectedDay.date) {
+        return {
+          ...day,
+          events: [...(day.events || []), newEvent]
+        };
+      }
+      return day;
+    });
+
+    setTripPlan(prev => ({ ...prev, days: updatedDays }));
+    setSelectedDay(updatedDays.find(d => d.date === selectedDay.date) || null);
+    setNewEvent({
+      name: '',
+      description: '',
+      location: '',
+      duration: '',
+      links: '',
+      time: ''
+    });
+    setShowEventForm(false);
+  };
 
   const recommendPlaces = (destination: Destination) => {
     return destination.description.split('•')
@@ -99,24 +149,28 @@ const TripPlanner = () => {
                 setShowNotes(false);
                 setShowChecklist(false);
                 setShowPlacesToVisit(false);
+                setSelectedDay(null);
               }}>Explore</li>
               <li onClick={() => { 
                 setShowNotes(true);
                 setShowMap(false);
                 setShowChecklist(false);
                 setShowPlacesToVisit(false);
+                setSelectedDay(null);
               }}>Notes</li>
               <li onClick={() => { 
                 setShowChecklist(true);
                 setShowNotes(false);
                 setShowMap(false);
                 setShowPlacesToVisit(false);
+                setSelectedDay(null);
               }}>Checklist</li>
               <li onClick={() => { 
                 setShowPlacesToVisit(true);
                 setShowMap(false);
                 setShowNotes(false);
                 setShowChecklist(false);
+                setSelectedDay(null);
               }}>Places to visit</li>
             </ul>
           </div>
@@ -129,7 +183,7 @@ const TripPlanner = () => {
               {displayedDays.map((day, index) => (
                 <li
                   key={day.date}
-                  onClick={() => setSelectedDay(day)}
+                  onClick={() => handleDayClick(day)}
                   className={selectedDay?.date === day.date ? 'selected-day' : ''}
                 >
                   Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
@@ -164,31 +218,32 @@ const TripPlanner = () => {
             <div className="ios-date-picker">
               <h2>Select Travel Dates</h2>
               <div className="date-range-container">
-              <DatePicker
-  selected={startDate}
-  onChange={(date: Date | null) => setStartDate(date)}
-  selectsStart
-  startDate={startDate || undefined}
-  endDate={endDate || undefined}
-  placeholderText="Start Date"
-  className="ios-date-input"
-  dateFormat="MMMM d, yyyy"
-  calendarClassName="ios-calendar"
-  popperPlacement="bottom-start"
-/>
-<DatePicker
-  selected={endDate}
-  onChange={(date: Date | null) => setEndDate(date)}
-  selectsEnd
-  startDate={startDate || undefined}
-  endDate={endDate || undefined}
-  minDate={startDate || undefined}
-  placeholderText="End Date"
-  className="ios-date-input"
-  dateFormat="MMMM d, yyyy"
-  calendarClassName="ios-calendar"
-  popperPlacement="bottom-start"
-/>
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date: Date | null) => setStartDate(date)}
+                  selectsStart
+                  startDate={startDate || undefined}
+                  endDate={endDate || undefined}
+                  placeholderText="Start Date"
+                  className="ios-date-input"
+                  dateFormat="MMMM d, yyyy"
+                  calendarClassName="ios-calendar"
+                  popperPlacement="bottom-start"
+                />
+                <span className="date-range-separator">to</span>
+                <DatePicker
+                  selected={endDate}
+                  onChange={(date: Date | null) => setEndDate(date)}
+                  selectsEnd
+                  startDate={startDate || undefined}
+                  endDate={endDate || undefined}
+                  minDate={startDate || undefined}
+                  placeholderText="End Date"
+                  className="ios-date-input"
+                  dateFormat="MMMM d, yyyy"
+                  calendarClassName="ios-calendar"
+                  popperPlacement="bottom-start"
+                />
               </div>
               <button 
                 onClick={generateDays} 
@@ -261,18 +316,129 @@ const TripPlanner = () => {
           </div>
         ) : selectedDay ? (
           <div className="day-details">
+            <h2>Day {tripPlan.days.findIndex(d => d.date === selectedDay.date) + 1}</h2>
+            <p className="day-date">{new Date(selectedDay.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
             
-           
-                            <div className="uploaded-images">
-                {selectedDay.images.map((image, imgIndex) => (
-                  <img
-                    key={imgIndex}
-                    src={URL.createObjectURL(image)}
-                    alt={`Day ${new Date(selectedDay.date).toLocaleDateString()} Image ${imgIndex + 1}`}
-                    className="uploaded-image"
+            {!showEventForm ? (
+              <button 
+                className="create-event-btn"
+                onClick={() => setShowEventForm(true)}
+              >
+                + Create Event
+              </button>
+            ) : (
+              <div className="event-form">
+                <h3>Create New Event</h3>
+                <div className="form-group">
+                  <label>Event Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={newEvent.name}
+                    onChange={handleEventChange}
+                    placeholder="Enter event name"
                   />
+                </div>
+                <div className="form-group">
+                  <label>Start Time</label>
+                  <input
+                    type="time"
+                    name="time"
+                    value={newEvent.time}
+                    onChange={handleEventChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    name="description"
+                    value={newEvent.description}
+                    onChange={handleEventChange}
+                    placeholder="Enter event description"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Location</label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={newEvent.location}
+                    onChange={handleEventChange}
+                    placeholder="Enter location"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Duration</label>
+                  <input
+                    type="text"
+                    name="duration"
+                    value={newEvent.duration}
+                    onChange={handleEventChange}
+                    placeholder="e.g. 2 hours"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Links</label>
+                  <input
+                    type="text"
+                    name="links"
+                    value={newEvent.links}
+                    onChange={handleEventChange}
+                    placeholder="Enter relevant links"
+                  />
+                </div>
+                <div className="form-actions">
+                  <button 
+                    className="cancel-btn"
+                    onClick={() => setShowEventForm(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="save-btn"
+                    onClick={handleAddEvent}
+                    disabled={!newEvent.name.trim()}
+                  >
+                    Save Event
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {selectedDay.events && selectedDay.events.length > 0 && (
+              <div className="events-list">
+                <h3>Scheduled Events</h3>
+                {selectedDay.events.map((event, index) => (
+                  <div key={index} className="event-card">
+                    <div className="event-time">{event.time}</div>
+                    <div className="event-content">
+                      <h4>{event.name}</h4>
+                      {event.description && <p>{event.description}</p>}
+                      {event.location && (
+                        <div className="event-detail">
+                          <span className="detail-label">Location:</span>
+                          <span>{event.location}</span>
+                        </div>
+                      )}
+                      {event.duration && (
+                        <div className="event-detail">
+                          <span className="detail-label">Duration:</span>
+                          <span>{event.duration}</span>
+                        </div>
+                      )}
+                      {event.links && (
+                        <div className="event-detail">
+                          <span className="detail-label">Links:</span>
+                          <a href={event.links} target="_blank" rel="noopener noreferrer">
+                            {event.links}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
+            )}
             </div>
         ) : (
           <div className="welcome-message">
