@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../Navbar.css';
 
@@ -11,6 +11,7 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({ isDarkMode, toggleDarkMode }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const toggleProfileMenu = () => {
     setShowProfileMenu(!showProfileMenu);
@@ -30,22 +31,42 @@ const NavBar: React.FC<NavBarProps> = ({ isDarkMode, toggleDarkMode }) => {
     };
   }, []);
 
+  const scrollToDestinations = () => {
+    navigate('/');
+    setTimeout(() => {
+      const element = document.getElementById('popular-destinations');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <nav className="navbar">
       <a href="/" className='navbar-logo'>
-      <h1 className="navbar-logo">JourneyPal</h1>
+        <h1 className="navbar-logo">JourneyPal</h1>
       </a>
 
       <ul className="navbar-links">
         <li>
-          <Link to="/">Home</Link>
+          <a onClick={() => {
+            navigate('/');
+            scrollToTop();
+          }} style={{ cursor: 'pointer' }}>Home</a>
         </li>
-        {/* <li>
-          <Link to="/checklist">Checklist</Link>
-        </li> */}
+        <li>
+          <a onClick={scrollToDestinations} style={{ cursor: 'pointer' }}>Destinations</a>
+        </li>
       </ul>
+      
       <div className="navbar-search">
-        <input type="text" placeholder="Search..." />
       </div>
 
       <div className="btn-container">

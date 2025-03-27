@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { destinations } from '../assets/destinations.ts';
 import { TripPlan, TripDay, Destination } from '../types';
 import Checklist from './Checklist.tsx';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const TripPlanner = () => {
   const { destinationId } = useParams<{ destinationId: string }>();
@@ -13,7 +15,8 @@ const TripPlanner = () => {
     endDate: '',
     days: [],
   });
-  const [selectedDates, setSelectedDates] = useState({ start: '', end: '' });
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [isDateSelected, setIsDateSelected] = useState(false);
   const [selectedDay, setSelectedDay] = useState<TripDay | null>(null);
   const [showPlacesToVisit, setShowPlacesToVisit] = useState(false);
@@ -26,20 +29,13 @@ const TripPlanner = () => {
 
   if (!destination) return <div>Destination not found</div>;
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setSelectedDates(prev => ({ ...prev, [name]: value }));
-  };
-
   const generateDays = () => {
-    if (!selectedDates.start || !selectedDates.end) return;
+    if (!startDate || !endDate) return;
     
-    const start = new Date(selectedDates.start);
-    const end = new Date(selectedDates.end);
     const days: TripDay[] = [];
-    let currentDate = new Date(start);
+    let currentDate = new Date(startDate);
 
-    while (currentDate <= end) {
+    while (currentDate <= endDate) {
       days.push({
         date: currentDate.toISOString().split('T')[0],
         activities: [],
@@ -49,7 +45,11 @@ const TripPlanner = () => {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    setTripPlan({ startDate: selectedDates.start, endDate: selectedDates.end, days });
+    setTripPlan({ 
+      startDate: startDate.toISOString().split('T')[0], 
+      endDate: endDate.toISOString().split('T')[0], 
+      days 
+    });
     setIsDateSelected(true);
     setCurrentPage(0);
   };
@@ -65,14 +65,7 @@ const TripPlanner = () => {
     setNotes(notes.filter((_, i) => i !== index));
   };
 
-  const handleDayNoteChange = (dayIndex: number, noteText: string) => {
-    const updatedDays = [...tripPlan.days];
-    if (!updatedDays[dayIndex].notes) {
-      updatedDays[dayIndex].notes = [];
-    }
-    updatedDays[dayIndex].notes = [...updatedDays[dayIndex].notes, noteText];
-    setTripPlan(prev => ({ ...prev, days: updatedDays }));
-  };
+ 
 
   const recommendPlaces = (destination: Destination) => {
     return destination.description.split('•')
@@ -144,29 +137,69 @@ const TripPlanner = () => {
               ))}
             </ul>
             <div className="pagination-container">
-  <button 
-    className="btn-prev" 
-    onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-    disabled={currentPage === 0}
-  >
-    ➜
-  </button>
-  <span className="page-info">Page {currentPage + 1} of {totalPages}</span>
-  <button 
-    className="btn-next" 
-    onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
-    disabled={currentPage === totalPages - 1}
-  >
-    ➜
-  </button>
-</div>
-
+              <button 
+                className="btn-prev" 
+                onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                disabled={currentPage === 0}
+              >
+                ➜
+              </button>
+              <span className="page-info">Page {currentPage + 1} of {totalPages}</span>
+              <button 
+                className="btn-next" 
+                onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+                disabled={currentPage === totalPages - 1}
+              >
+                ➜
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       <div className="main-content">
-        {showPlacesToVisit ? (
+        {!isDateSelected ? (
+          <div className="ios-date-picker-container">
+            <h1 className="destination-title">Trip to {destination.title}</h1>
+            <div className="ios-date-picker">
+              <h2>Select Travel Dates</h2>
+              <div className="date-range-container">
+              <DatePicker
+  selected={startDate}
+  onChange={(date: Date | null) => setStartDate(date)}
+  selectsStart
+  startDate={startDate || undefined}
+  endDate={endDate || undefined}
+  placeholderText="Start Date"
+  className="ios-date-input"
+  dateFormat="MMMM d, yyyy"
+  calendarClassName="ios-calendar"
+  popperPlacement="bottom-start"
+/>
+<DatePicker
+  selected={endDate}
+  onChange={(date: Date | null) => setEndDate(date)}
+  selectsEnd
+  startDate={startDate || undefined}
+  endDate={endDate || undefined}
+  minDate={startDate || undefined}
+  placeholderText="End Date"
+  className="ios-date-input"
+  dateFormat="MMMM d, yyyy"
+  calendarClassName="ios-calendar"
+  popperPlacement="bottom-start"
+/>
+              </div>
+              <button 
+                onClick={generateDays} 
+                className="generate-btn"
+                disabled={!startDate || !endDate}
+              >
+                Generate Itinerary
+              </button>
+            </div>
+          </div>
+        ) : showPlacesToVisit ? (
           <div className="recommended-places-container">
             <h2>Recommended Places to Visit</h2>
             <div className="recommended-places-grid">
@@ -228,51 +261,9 @@ const TripPlanner = () => {
           </div>
         ) : selectedDay ? (
           <div className="day-details">
-            <h2>Day {tripPlan.days.findIndex(d => d.date === selectedDay.date) + 1}</h2>
-            <div className="day-notes-section">
-              <h3>Daily Notes</h3>
-              <textarea
-                placeholder="Add notes for this day..."
-                onBlur={(e) => {
-                  const dayIndex = tripPlan.days.findIndex(d => d.date === selectedDay.date);
-                  handleDayNoteChange(dayIndex, e.target.value);
-                }}
-              />
-              <div className="day-notes-list">
-                {selectedDay.notes?.map((note, index) => (
-                  <div key={index} className="day-note">
-                    {note}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <textarea
-              placeholder="What would you like to do on this day?"
-              className="activity-input"
-              value={selectedDay.activities.join('\n')}
-              onChange={(e) => {
-                const newDays = [...tripPlan.days];
-                const dayIndex = tripPlan.days.findIndex((d) => d.date === selectedDay.date);
-                newDays[dayIndex].activities = e.target.value.split('\n');
-                setTripPlan({ ...tripPlan, days: newDays });
-              }}
-            />
-            <div className="image-upload">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(e) => {
-                  const dayIndex = tripPlan.days.findIndex((d) => d.date === selectedDay.date);
-                  const files = e.target.files;
-                  if (files) {
-                    const newDays = [...tripPlan.days];
-                    newDays[dayIndex].images = Array.from(files);
-                    setTripPlan({ ...tripPlan, days: newDays });
-                  }
-                }}
-              />
-              <div className="uploaded-images">
+            
+           
+                            <div className="uploaded-images">
                 {selectedDay.images.map((image, imgIndex) => (
                   <img
                     key={imgIndex}
@@ -283,46 +274,11 @@ const TripPlanner = () => {
                 ))}
               </div>
             </div>
-          </div>
         ) : (
-          <>
-            <div className="hero-section">
-              <h1>Trip to {destination.title}</h1>
-              <div className="trip-info">
-                <div className="date-range">
-                  {selectedDates.start && selectedDates.end
-                    ? `${selectedDates.start} to ${selectedDates.end}`
-                    : 'Select your dates'}
-                </div>
-              </div>
-            </div>
-
-            {!isDateSelected && (
-              <div className="date-picker-section">
-                <h2>Plan Your Trip</h2>
-                <div className="date-picker">
-                  <input
-                    type="date"
-                    name="start"
-                    value={selectedDates.start}
-                    onChange={handleDateChange}
-                    className="date-input"
-                  />
-                  <span>to</span>
-                  <input
-                    type="date"
-                    name="end"
-                    value={selectedDates.end}
-                    onChange={handleDateChange}
-                    className="date-input"
-                  />
-                  <button onClick={generateDays} className="generate-btn">
-                    Generate Plan
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
+          <div className="welcome-message">
+            <h2>Welcome to your {destination.title} trip!</h2>
+            <p>Select an option from the sidebar to start planning.</p>
+          </div>
         )}
       </div>
     </div>
