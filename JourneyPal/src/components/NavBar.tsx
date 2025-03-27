@@ -64,6 +64,9 @@ const NavBar: React.FC<NavBarProps> = ({ isDarkMode, toggleDarkMode }) => {
         <li>
           <a onClick={scrollToDestinations} style={{ cursor: 'pointer' }}>Destinations</a>
         </li>
+        <li>
+  <Link to="/plan-your-trip">Plan your trip</Link>
+</li>
       </ul>
       
       <div className="navbar-search">
