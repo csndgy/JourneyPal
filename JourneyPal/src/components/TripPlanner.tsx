@@ -5,10 +5,11 @@ import { TripPlan, TripDay, Destination, Event } from '../types';
 import Checklist from './Checklist.tsx';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import '../Trip.css'
 
 const TripPlanner = () => {
   const { destinationId } = useParams<{ destinationId: string }>();
-  const destination = destinations.find(d => d.id === Number(destinationId));
+const destination = destinations.find(d => d.id === Number(destinationId)) || destinations[0];
 
   const [tripPlan, setTripPlan] = useState<TripPlan>({
     startDate: '',
@@ -28,6 +29,7 @@ const TripPlanner = () => {
   const [newNote, setNewNote] = useState('');
   const [showEventForm, setShowEventForm] = useState(false);
   const [newEvent, setNewEvent] = useState<Event>({
+    id: '', // Added id property
     name: '',
     description: '',
     location: '',
@@ -94,11 +96,17 @@ const TripPlanner = () => {
   const handleAddEvent = () => {
     if (!selectedDay || !newEvent.name.trim()) return;
     
+    // Generate a unique ID for the new event
+    const eventWithId: Event = {
+      ...newEvent,
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    };
+    
     const updatedDays = tripPlan.days.map(day => {
       if (day.date === selectedDay.date) {
         return {
           ...day,
-          events: [...(day.events || []), newEvent]
+          events: [...(day.events || []), eventWithId]
         };
       }
       return day;
@@ -107,6 +115,7 @@ const TripPlanner = () => {
     setTripPlan(prev => ({ ...prev, days: updatedDays }));
     setSelectedDay(updatedDays.find(d => d.date === selectedDay.date) || null);
     setNewEvent({
+      id: '', // Reset with empty id
       name: '',
       description: '',
       location: '',

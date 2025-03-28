@@ -1,0 +1,510 @@
+.create-event-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    margin: 15px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .create-event-btn:hover {
+    background-color: var(--primary-final-color);
+  }
+  
+  .event-form {
+    background-color: var(--card-background);
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: var(--card-shadow);
+  }
+  
+  .event-form h3 {
+    margin-top: 0;
+    color: var(--text-color);
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--input-background);
+    color: var(--text-color);
+  }
+  
+  .form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .cancel-btn,
+  .save-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .cancel-btn {
+    background-color: var(--secondary-color);
+    color: white;
+  }
+  
+  .save-btn {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .save-btn:disabled {
+    background-color: var(--secondary-color);
+    cursor: not-allowed;
+  }
+  
+  .events-list {
+    margin: 25px 0;
+  }
+  
+  .event-card {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    gap: 15px;
+  }
+  
+  .event-time {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    min-width: 70px;
+    text-align: center;
+    align-self: flex-start;
+  }
+  
+  .event-content {
+    flex: 1;
+  }
+  
+  .event-content h4 {
+    margin: 0 0 5px 0;
+    color: var(--text-color);
+  }
+  
+  .event-detail {
+    margin: 5px 0;
+    font-size: 0.9rem;
+  }
+  
+  .detail-label {
+    font-weight: 600;
+    margin-right: 5px;
+    color: var(--secondary-color);
+  }
+  
+  .day-date {
+    color: var(--secondary-color);
+    margin-top: -10px;
+    margin-bottom: 20px;
+  }
+  
+  .day-notes-input {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--input-background);
+    color: var(--text-color);
+    resize: vertical;
+  }
+  
+  
+  
+  /* Your Trips Page */
+  .your-trips-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-top: 2rem;
+  }
+  
+  .empty-state button {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .trips-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .trip-card {
+    background: var(--card-background);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    cursor: pointer;
+    transition: transform 0.3s;
+    position: relative;
+  }
+  
+  .trip-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .trip-card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+  }
+  
+  .delete-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+  
+  .delete-btn:hover {
+    background: #ff6b81;
+  }
+  
+  /* Radio group styles */
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  /* Your Trips Page */
+.your-trips-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-top: 2rem;
+  }
+  
+  .empty-state button {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .trips-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .trip-card {
+    background: var(--card-background);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    cursor: pointer;
+    transition: transform 0.3s;
+    position: relative;
+  }
+  
+  .trip-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .trip-card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+  }
+  
+  .delete-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+  
+  .delete-btn:hover {
+    background: #ff6b81;
+  }
+  
+  /* Radio group styles */
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .plan-your-trip-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--card-background);
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+  }
+  
+  .trip-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form-group label {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: 0.875rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--input-background);
+    color: var(--text-color);
+    font-size: 1rem;
+  }
+  
+  .radio-group {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+  }
+  
+  .radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: var(--secondary-text-color);
+  }
+  
+  input[type="radio"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: var(--primary-color);
+  }
+  
+  .date-range-container {
+    position: relative;
+    z-index: 1000;
+  }
+  
+  .react-datepicker-popper {
+    z-index: 1001 !important;
+  }
+
+  .date-range-separator {
+    color: var(--text-color);
+    font-weight: 500;
+    padding: 0 1rem;
+    margin: 0 0.5rem;
+    background: var(--input-background);
+    border-radius: 6px;
+  }
+
+  .react-datepicker__input-container {
+    position: relative;
+    z-index: 1000;
+  }
+  
+  .react-datepicker-popper {
+    z-index: 1001 !important;
+  }
+  
+  .date-range-container {
+    position: relative;
+    z-index: 999;
+  }
+  
+  .destinations-grid {
+    position: relative;
+    z-index: 1;
+  }
+
+  .success-message {
+    background: #4CAF50;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    animation: slideIn 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Hibakezelés */
+.error-message {
+    background: #ffebee;
+    border: 2px solid #ff1744;
+    color: #d32f2f;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .error-text {
+    color: #d32f2f;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+    display: block;
+  }
+  
+  .has-error {
+    border-color: #ff1744 !important;
+    background: #fff5f5 !important;
+  }
+  
+  /* Sikeres üzenet */
+  .success-message {
+    background: #e8f5e9;
+    border: 2px solid #4caf50;
+    color: #2e7d32;
+    padding: 2rem;
+    border-radius: 12px;
+    margin: 2rem 0;
+    text-align: center;
+    animation: slideIn 0.5s ease-out;
+  }
+  
+  .success-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .trip-dates {
+    font-size: 1.2rem;
+    color: #1b5e20;
+    margin-top: 0.5rem;
+    font-weight: 500;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Dátumválasztó korrekciók */
+  .react-datepicker-wrapper {
+    flex: 1;
+  }
+  
+  .react-datepicker__input-container {
+    width: 100%;
+  }
+  
+  .date-range-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .date-separator {
+    color: #666;
+    font-weight: 500;
+  }

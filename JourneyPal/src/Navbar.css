@@ -531,7 +531,7 @@ label {
 @media screen and (min-width: 768px) {
   .navbar {
     padding: 20px 40px;
-    gap: 60px;
+    gap: 20px;
   }
 
   .navbar-logo {

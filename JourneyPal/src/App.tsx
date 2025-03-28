@@ -13,6 +13,7 @@ import PopularDestinations from './components/PopularDestinations';
 import UserProfile from './components/UserProfile';
 import TripPlanner from './components/TripPlanner';
 import PlanYourTrip from './components/PlanYourTrip';
+import YourTrips from './components/YourTrips';
 
 const App: React.FC = () => {
   // Alapértelmezett érték: light mode, kivéve ha a localStorage-ban dark mode van
@@ -68,6 +69,7 @@ const App: React.FC = () => {
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/plan/:destinationId" element={<TripPlanner />} />
           <Route path="/plan-your-trip" element={<PlanYourTrip />} />
+          <Route path="/trips" element={<YourTrips />} />
         </Routes>
       </div>
     </Router>

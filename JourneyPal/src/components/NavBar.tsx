@@ -67,6 +67,9 @@ const NavBar: React.FC<NavBarProps> = ({ isDarkMode, toggleDarkMode }) => {
         <li>
   <Link to="/plan-your-trip">Plan your trip</Link>
 </li>
+<li>
+  <Link to="/trips">Your Trips</Link>
+</li>
       </ul>
       
       <div className="navbar-search">
