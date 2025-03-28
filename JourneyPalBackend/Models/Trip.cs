@@ -12,5 +12,6 @@ namespace JourneyPalBackend.Models
         public virtual User User { get; set; }
         public virtual ICollection<Event> Events { get; set; } = new List<Event>();
         public virtual ICollection<TripNote> Notes { get; set; } = new List<TripNote>();
+
     }
 }

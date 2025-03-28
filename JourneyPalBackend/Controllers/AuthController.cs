@@ -216,7 +216,7 @@ namespace JourneyPalBackend.Controllers
 
             return Ok(response);
         }
-        [Authorize]
+        [Authorize(AuthenticationSchemes ="Bearer")]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -383,7 +383,6 @@ namespace JourneyPalBackend.Controllers
                 return Convert.ToBase64String(randomNumber);
             }
         }
-
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
             var tokenValidationParameters = new TokenValidationParameters

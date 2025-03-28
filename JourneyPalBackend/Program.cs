@@ -7,6 +7,8 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
+using Google.Apis.Auth.AspNetCore3;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace JourneyPalBackend
 {
@@ -91,17 +93,17 @@ namespace JourneyPalBackend
                 });
             });
 
-            //builder.Services.AddAuthentication(options =>
-            //{
-            //    options.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-            //    options.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-            //    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            //}).AddCookie()
-            //.AddGoogleOpenIdConnect(options =>
-            //{
-            //    options.ClientId = "13684633292-hv8dlbubct2ujgmpl65btbb45551k6i4.apps.googleusercontent.com";
-            //    options.ClientSecret = "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";
-            //});
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie()
+            .AddGoogleOpenIdConnect(options =>
+            {
+                options.ClientId = "13684633292-hv8dlbubct2ujgmpl65btbb45551k6i4.apps.googleusercontent.com";
+                options.ClientSecret = "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";
+            });
 
             builder.Services.AddCors(o =>
             {

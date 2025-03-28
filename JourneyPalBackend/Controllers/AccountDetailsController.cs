@@ -97,7 +97,7 @@ namespace JourneyPalBackend.Controllers
             var phoneNumberPattern = @"^\+?[1-9]\d{1,14}$";
             return Regex.IsMatch(phoneNumber, phoneNumberPattern);
         }
-        private string ValidateAccessToken(string token)
+        /*private string ValidateAccessToken(string token)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace JourneyPalBackend.Controllers
                 return "Invalid token!";
             }
 
-        }
+        }*/
     }
     public class UpdatePhoneRequest
     {

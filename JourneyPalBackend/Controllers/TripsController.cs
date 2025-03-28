@@ -88,7 +88,6 @@ namespace JourneyPalBackend.Controllers
                 Notes = trip.Notes.Select(n => new TripNoteDto
                 {
                     Id = n.Id,
-                    Title = n.Title,
                     Content = n.Content,
                     CreatedAt = n.CreatedAt,
                     TripId = n.TripId
@@ -127,40 +126,6 @@ namespace JourneyPalBackend.Controllers
                 });
         }
 
-        // PATCH: api/trips/5
-        [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateTrip(int id, JsonPatchDocument<UpdateTripDto> patchDoc)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var trip = await _context.Trips.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
-
-            if (trip == null) return NotFound();
-
-            var tripToPatch = new UpdateTripDto
-            {
-                TripName = trip.TripName,
-                Destination = trip.Destination,
-                StartDate = trip.StartDate,
-                EndDate = trip.EndDate
-            };
-
-            patchDoc.ApplyTo(tripToPatch, (Microsoft.AspNetCore.JsonPatch.Adapters.IObjectAdapter)ModelState);
-
-            if (!TryValidateModel(tripToPatch))
-            {
-                return ValidationProblem(ModelState);
-            }
-
-            trip.TripName = tripToPatch.TripName;
-            trip.Destination = tripToPatch.Destination;
-            trip.StartDate = tripToPatch.StartDate;
-            trip.EndDate = tripToPatch.EndDate;
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
         // DELETE: api/trips/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTrip(int id)
@@ -192,7 +157,6 @@ namespace JourneyPalBackend.Controllers
                 .Select(n => new TripNoteDto
                 {
                     Id = n.Id,
-                    Title = n.Title,
                     Content = n.Content,
                     CreatedAt = n.CreatedAt,
                     TripId = n.TripId
@@ -217,7 +181,6 @@ namespace JourneyPalBackend.Controllers
             return new TripNoteDto
             {
                 Id = note.Id,
-                Title = note.Title,
                 Content = note.Content,
                 CreatedAt = note.CreatedAt,
                 TripId = note.TripId
@@ -235,7 +198,6 @@ namespace JourneyPalBackend.Controllers
 
             var note = new TripNote
             {
-                Title = createNoteDto.Title,
                 Content = createNoteDto.Content,
                 TripId = tripId,
                 CreatedAt = DateTime.UtcNow
@@ -249,7 +211,6 @@ namespace JourneyPalBackend.Controllers
                 new TripNoteDto
                 {
                     Id = note.Id,
-                    Title = note.Title,
                     Content = note.Content,
                     CreatedAt = note.CreatedAt,
                     TripId = note.TripId
@@ -258,7 +219,7 @@ namespace JourneyPalBackend.Controllers
 
         // PATCH: api/trips/5/notes/10
         [HttpPatch("{tripId}/notes/{noteId}")]
-        public async Task<IActionResult> UpdateTripNote(int tripId, int noteId, JsonPatchDocument<UpdateTripNoteDto> patchDoc)
+        public async Task<IActionResult> UpdateTripNote(int tripId, int noteId, [FromBody]UpdateTripNoteDto dto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var tripExists = await _context.Trips.AnyAsync(t => t.Id == tripId && t.UserId == userId);
@@ -267,21 +228,18 @@ namespace JourneyPalBackend.Controllers
             var note = await _context.TripNotes.FirstOrDefaultAsync(n => n.Id == noteId && n.TripId == tripId);
             if (note == null) return NotFound("Note not found");
 
-            var noteToPatch = new UpdateTripNoteDto
+            // Update only the properties that were provided in the DTO
+
+            if (dto.Content != null)
             {
-                Title = note.Title,
-                Content = note.Content
-            };
+                note.Content = dto.Content;
+            }
 
-            patchDoc.ApplyTo(noteToPatch, (Microsoft.AspNetCore.JsonPatch.Adapters.IObjectAdapter)ModelState);
-
-            if (!TryValidateModel(noteToPatch))
+            // Validate the updated note
+            if (!TryValidateModel(note))
             {
                 return ValidationProblem(ModelState);
             }
-
-            note.Title = noteToPatch.Title;
-            note.Content = noteToPatch.Content;
 
             await _context.SaveChangesAsync();
 
@@ -305,8 +263,7 @@ namespace JourneyPalBackend.Controllers
             return NoContent();
         }
     }
-
-    // DTOs
+    #region DTO/Helper classes
     public class CreateTripDto
     {
         public string TripName { get; set; }
@@ -353,7 +310,6 @@ namespace JourneyPalBackend.Controllers
 
     public class CreateTripNoteDto
     {
-        public string Title { get; set; }
         public string Content { get; set; }
     }
 
@@ -365,4 +321,5 @@ namespace JourneyPalBackend.Controllers
         public DateTime CreatedAt { get; set; }
         public int TripId { get; set; }
     }
+    #endregion
 }

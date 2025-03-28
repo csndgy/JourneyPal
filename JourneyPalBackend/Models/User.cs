@@ -11,15 +11,5 @@ namespace JourneyPalBackend.Models
         public string ProviderUserId { get; set; }
         public virtual ICollection<Trip> Trips { get; set; }
         public string Role { get; set; } = "User";
-
-        public void SetPassword(string password)
-        {
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
-        }
-
-        public bool VerifyPassword(string password)
-        {
-            return BCrypt.Net.BCrypt.Verify(password, PasswordHash);
-        }
     }
 }
