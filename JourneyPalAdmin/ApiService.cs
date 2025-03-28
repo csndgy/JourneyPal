@@ -7,7 +7,7 @@ namespace JourneyPalAdmin
 {
     public class ApiService
     {
-        public HttpClient httpClient { get; }
+        public HttpClient httpClient { get; set; }
         private readonly HttpClient _httpClient;
         private string _jwtToken { get; set; }
         private string _refreshToken { get; set; }
@@ -119,6 +119,44 @@ namespace JourneyPalAdmin
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PutAsync($"api/Admin/reset-password/{id}", content);
             response.EnsureSuccessStatusCode();
+        }
+        public async Task<bool> LoginAsync(string username, string password)
+        {
+            try
+            {
+                var loginRequest = new LoginRequest
+                {
+                    Username = username,
+                    Password = password
+                };
+
+                var json = JsonConvert.SerializeObject(loginRequest);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("api/Auth/login", content);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
+
+                SetJwtTokens(tokenResponse.Token, tokenResponse.RefreshToken);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public class TokenResponse
+        {
+            public string Token { get; set; }
+            public string RefreshToken { get; set; }
+        }
+        public class LoginRequest
+        {
+            public string Username { get; set; }
+            public string Password { get; set; }
         }
     }
 }
