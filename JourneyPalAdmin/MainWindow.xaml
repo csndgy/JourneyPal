@@ -5,184 +5,233 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JourneyPalAdmin"
         mc:Ignorable="d"
-        Title="Admin Dashboard" Height="600" Width="1000"
+        Title="JourneyPal Admin Dashboard" 
+        Height="800" 
+        Width="1400"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E1E"
-        Foreground="White"
-        FontFamily="Segoe UI"
-        FontSize="14"
-        MinWidth="800"
-        MinHeight="500">
-
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize">
     <Window.Resources>
-        <!-- Button Style -->
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="#FF5722" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="Padding" Value="10 5" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="Cursor" Value="Hand" />
+        <Style x:Key="SidebarButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#B0BEC5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="15 10"/>
+            <Setter Property="Margin" Value="0 5"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center" />
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5">
+                            <TextBlock Text="{TemplateBinding Content}" 
+                                       Foreground="{TemplateBinding Foreground}"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       Margin="{TemplateBinding Padding}"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2C2C2C"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#1E1E1E"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect ShadowDepth="2" Opacity="0.5" />
-                </Setter.Value>
-            </Setter>
         </Style>
 
-        <!-- TextBox Style -->
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#424242" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="BorderBrush" Value="#607D8B" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="5" />
-        </Style>
-
-        <!-- DataGrid Style -->
-        <Style TargetType="DataGrid">
-            <Setter Property="Background" Value="#2E2E2E" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="BorderBrush" Value="#607D8B" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="RowBackground" Value="#2E2E2E" />
-            <Setter Property="AlternatingRowBackground" Value="#1E1E1E" />
-            <Setter Property="HeadersVisibility" Value="Column" />
-            <Setter Property="AutoGenerateColumns" Value="False" />
-            <Setter Property="IsReadOnly" Value="False" />
-            <!-- Allow editing for copying -->
-            <Setter Property="GridLinesVisibility" Value="None" />
+        <Style x:Key="ModernDataGrid" TargetType="DataGrid">
+            <Setter Property="Background" Value="#1F1F1F"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#2C2C2C"/>
+            <Setter Property="AlternatingRowBackground" Value="#2C2C2C"/>
+            <Setter Property="RowBackground" Value="#1F1F1F"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="GridLinesVisibility" Value="None"/>
             <Setter Property="ColumnHeaderStyle">
                 <Setter.Value>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#FF5722" />
-                        <Setter Property="Foreground" Value="White" />
-                        <Setter Property="FontSize" Value="14" />
-                        <Setter Property="Padding" Value="10 5" />
-                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        <Setter Property="Background" Value="#2C2C2C"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="Padding" Value="10"/>
                     </Style>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <!-- ContextMenu for DataGrid -->
-        <ContextMenu x:Key="DataGridContextMenu">
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#2C2C2C"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#404040"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Margin" Value="0 5"/>
+        </Style>
+
+        <Style x:Key="InputLabel" TargetType="Label">
+            <Setter Property="Foreground" Value="#B0BEC5"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Margin" Value="0 0 0 5"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <ContextMenu x:Key="DataGridContextMenu" x:Shared="False">
             <MenuItem Header="Copy" Click="CopyCellContent_Click" />
         </ContextMenu>
+        <ToolTip x:Key="CopyNotificationToolTip" 
+             x:Shared="False"
+             Placement="Mouse"
+             StaysOpen="False"
+             Background="#FF2C2C2C"
+             Foreground="White">
+            <StackPanel Orientation="Horizontal">
+                <Path Data="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" 
+                  Fill="LightGreen"
+                  Stretch="Uniform"
+                  Width="12"
+                  Height="12"
+                  Margin="0 0 5 0"/>
+                <TextBlock Text="Copied to clipboard!"/>
+            </StackPanel>
+        </ToolTip>
     </Window.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <!-- Header -->
-        <Border Grid.Row="0" Background="#FF5722" Padding="20">
-            <TextBlock Text="Admin Dashboard" 
-                       FontSize="24" 
-                       FontWeight="Bold" 
-                       Foreground="White" 
-                       VerticalAlignment="Center" />
-        </Border>
-
-        <!-- Main Content -->
-        <Grid Grid.Row="1" Margin="20">
+    <Border Background="#1F1F1F" 
+            CornerRadius="10" 
+            Margin="10"
+            Effect="{x:Null}">
+        <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MinWidth="300" />
-                <ColumnDefinition Width="2*" MinWidth="400" />
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Left Panel (Controls) -->
-            <ScrollViewer Grid.Column="0" Margin="0 0 20 0" VerticalScrollBarVisibility="Auto">
-                <StackPanel>
+            <!-- Sidebar -->
+            <Border Grid.Column="0" 
+                    Background="#2C2C2C" 
+                    CornerRadius="10 0 0 10">
+                <StackPanel Margin="20">
+                    <TextBlock Text="JourneyPal" 
+                               Foreground="White" 
+                               FontSize="24" 
+                               FontWeight="Bold"
+                               Margin="0 0 0 30"
+                               HorizontalAlignment="Center"/>
+
                     <Button Content="Load Users" 
-                            Click="LoadUsers_Click" 
-                            Margin="0 0 0 10"
-                            ToolTip="Load all users from the database" />
-                    
-                    <Button Content="Delete Selected User" 
-                            Click="DeleteSelectedUser_Click" 
-                            Margin="0 0 0 10"
-                            ToolTip="Deletes the selected user from the database." />
-                    <Button Content="Logout"
+                            Style="{StaticResource SidebarButton}"
+                            Click="LoadUsers_Click"/>
+                    <Button Content="Logout" 
+                            Style="{StaticResource SidebarButton}"
                             Click="Logout_Click"
-                            Margin="0 0 0 10"
-                            ToolTip="Logs out from the admin panel." />
-
-                    <Label Content="Enter username" FontSize="16" Foreground="White"/>
-                    <TextBox x:Name="UsernameTextBox" Margin="5" ToolTip="Deletes a user from the database with the provided username, if no user exists with this username, nothing will happen."/>
-
-                    <Button Content="Delete by Username" 
-                            Click="DeleteUserByUsername_Click" 
-                            Margin="5"
-                            ToolTip="Delete a user by their username" />
-
-                    <Label Content="Enter email" FontSize="16" Foreground="White" />
-                    <TextBox x:Name="EmailTextBox" Margin="5" ToolTip="Deletes a user from the database with the provided email, if no user exists with this email, nothing will happen."/>
-
-                    <Button Content="Delete by Email" 
-                            Click="DeleteUserByEmail_Click" 
-                            Margin="5"
-                            ToolTip="Delete a user by their email" />
-
-                    <Label Content="Enter user ID" FontSize="16" Foreground="White"/>
-                    <TextBox x:Name="UserIdTextBox" Margin="5" ToolTip="The 'Update User' button and the 'Reset Password' button both utilizes this userID."/>
-
-                    <Label Content="Enter new username" FontSize="16" Foreground="White"/>
-                    <TextBox x:Name="NewUsernameTextBox" Margin="5" ToolTip="Sets the provided userID's username to the value of this field, if left blank, the username will remain the same." />
-
-                    <Label Content="Enter new email" FontSize="16" Foreground="White"/>
-                    <TextBox x:Name="NewEmailTextBox" Margin="5" ToolTip="Sets the provided userID's email to the value of this field, if left blank, the email will remain the same." />
-
-                    <Label Content="Enter new phone number" FontSize="16" Foreground="White"/>
-                    <TextBox x:Name="NewPhoneNumberTextBox" Margin="5" ToolTip="Sets the provided userID's phone number to the value of this field, if left blank, the phone number will remain the same."/>
-
-                    <Button Content="Update User" 
-                            Click="UpdateUser_Click" 
-                            Margin="5"
-                            ToolTip="Update user details" />
-
-                    <Label Content="Enter new password" FontSize="16" Foreground="White"/>
-                    <TextBox x:Name="NewPasswordTextBox" Margin="5" ToolTip="Sets the provided userID's password to the value of this field, if left blank, the password will remain the same."/>
-
-                    <Button Content="Reset Password" 
-                            Click="ResetPassword_Click" 
-                            Margin="5"
-                            ToolTip="Reset a user's password" />
+                            Margin="0 30 0 0"/>
                 </StackPanel>
-            </ScrollViewer>
+            </Border>
 
-            <!-- Right Panel (DataGrid) -->
-            <Border Grid.Column="1" 
-                    Background="#2E2E2E" 
-                    CornerRadius="4" 
-                    Padding="10">
-                <DataGrid x:Name="UsersDataGrid" ItemsSource="{Binding Users}"
+            <!-- Main Content -->
+            <Grid Grid.Column="1" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackPanel Grid.Row="0" 
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Right">
+                    <Button Content="✕" 
+                            Width="30" 
+                            Height="30" 
+                            Background="Transparent" 
+                            Foreground="White"
+                            BorderThickness="0"
+                            Click="CloseWindow_Click"/>
+                </StackPanel>
+
+                <!-- Users DataGrid -->
+                <DataGrid Grid.Row="1"
+                          x:Name="UsersDataGrid" 
+                          ItemsSource="{Binding Users}"
+                          Style="{StaticResource ModernDataGrid}"
+                          Margin="0 20 0 0"
                           AutoGenerateColumns="False"
-                          HeadersVisibility="Column"
                           SelectionMode="Single"
                           ContextMenu="{StaticResource DataGridContextMenu}" ClipboardCopyMode="ExcludeHeader" IsReadOnly="True">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
-                        <DataGridTextColumn Header="Username" Binding="{Binding UserName}" />
-                        <DataGridTextColumn Header="Email" Binding="{Binding Email}" />
-                        <DataGridTextColumn Header="Phone Number" Binding="{Binding PhoneNumber}" />
-                        <DataGridTextColumn Header="Role" Binding="{Binding Role}" />
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*"/>
+                        <DataGridTextColumn Header="Username" Binding="{Binding UserName}" Width="*"/>
+                        <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="*"/>
+                        <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="*"/>
+                        <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="*"/>
                     </DataGrid.Columns>
                 </DataGrid>
-            </Border>
+
+                <!-- Action Panel -->
+                <Grid Grid.Row="2" Margin="0 20 0 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Delete Section -->
+                    <StackPanel Grid.Column="0" Margin="0 0 10 0">
+                        <TextBlock Text="Delete User" Foreground="White" FontWeight="Bold" Margin="0 0 0 10"/>
+                        <Label Content="Username" Style="{StaticResource InputLabel}"/>
+                        <TextBox x:Name="UsernameTextBox" 
+                                 Style="{StaticResource ModernTextBox}"/>
+                        <Label Content="Email" Style="{StaticResource InputLabel}"/>
+                        <TextBox x:Name="EmailTextBox" 
+                                 Style="{StaticResource ModernTextBox}"/>
+                        <Button Content="Delete by Username" 
+                                Style="{StaticResource SidebarButton}"
+                                Click="DeleteUserByUsername_Click"/>
+                        <Button Content="Delete by Email" 
+                                Style="{StaticResource SidebarButton}"
+                                Click="DeleteUserByEmail_Click"/>
+                        <Button Content="Delete Selected" 
+                                Style="{StaticResource SidebarButton}"
+                                Click="DeleteSelectedUser_Click"/>
+                    </StackPanel>
+
+                    <!-- Update Section -->
+                    <StackPanel Grid.Column="1" Margin="0 0 10 0">
+                        <TextBlock Text="Update User" Foreground="White" FontWeight="Bold" Margin="0 0 0 10"/>
+                        <Label Content="User ID" Style="{StaticResource InputLabel}"/>
+                        <TextBox x:Name="UserIdTextBox" 
+                                 Style="{StaticResource ModernTextBox}"/>
+                        <Label Content="New Username" Style="{StaticResource InputLabel}"/>
+                        <TextBox x:Name="NewUsernameTextBox" 
+                                 Style="{StaticResource ModernTextBox}"/>
+                        <Label Content="New Email" Style="{StaticResource InputLabel}"/>
+                        <TextBox x:Name="NewEmailTextBox" 
+                                 Style="{StaticResource ModernTextBox}"/>
+                        <Label Content="New Phone Number" Style="{StaticResource InputLabel}"/>
+                        <TextBox x:Name="NewPhoneNumberTextBox" 
+                                 Style="{StaticResource ModernTextBox}"/>
+                        <Button Content="Update User" 
+                                Style="{StaticResource SidebarButton}"
+                                Click="UpdateUser_Click"/>
+                    </StackPanel>
+
+                    <!-- Password Reset Section -->
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Reset Password" Foreground="White" FontWeight="Bold" Margin="0 0 0 10"/>
+                        <Label Content="New Password" Style="{StaticResource InputLabel}"/>
+                        <TextBox x:Name="NewPasswordTextBox" 
+                                 Style="{StaticResource ModernTextBox}"/>
+                        <Button Content="Reset Password" 
+                                Style="{StaticResource SidebarButton}"
+                                Click="ResetPassword_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </Window>

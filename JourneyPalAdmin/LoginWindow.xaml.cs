@@ -21,8 +21,19 @@ namespace JourneyPalAdmin
             _apiService = new ApiService("https://localhost:7193/");
             UsernameTextBox.Text = "admin";
             PasswordBox.Password = "asdASD123#";
-        }
 
+            this.MouseLeftButtonDown += (sender, e) => {
+                if (e.ButtonState == System.Windows.Input.MouseButtonState.Pressed)
+                    this.DragMove();
+            };
+        }
+        private void CloseWindow_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Application.Current.Shutdown();
+            });
+        }
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string username = UsernameTextBox.Text;

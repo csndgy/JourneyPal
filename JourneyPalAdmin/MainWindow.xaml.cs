@@ -20,6 +20,8 @@ namespace JourneyPalAdmin
     {
         private readonly ApiService _apiService;
         private readonly DispatcherTimer _refreshTimer;
+        private bool _isRefreshing = false;
+        private DateTime _lastRefreshTime = DateTime.MinValue;
         public ObservableCollection<User> Users { get; set; }
 
         public MainWindow(ApiService apiService)
@@ -31,14 +33,16 @@ namespace JourneyPalAdmin
 
             Loaded += MainWindow_Loaded;
 
-            _refreshTimer = new DispatcherTimer();
-            _refreshTimer.Interval = TimeSpan.FromSeconds(30); // Refresh every 30 seconds
-            _refreshTimer.Tick += RefreshTimer_Tick;
-            _refreshTimer.Start(); // Start the timer
-            MessageBox.Show($"{_apiService.GetJwtToken()}");
-            Clipboard.SetText(_apiService.GetJwtToken());
-        }
+            this.MouseLeftButtonDown += (sender, e) => {
+                if (e.ButtonState == System.Windows.Input.MouseButtonState.Pressed)
+                    this.DragMove();
+            };
 
+            _refreshTimer = new DispatcherTimer();
+            _refreshTimer.Interval = TimeSpan.FromSeconds(30); // More reasonable interval
+            _refreshTimer.Tick += async (sender, e) => await FetchUsers();
+            _refreshTimer.Start(); // Start the timer
+        }
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -54,17 +58,21 @@ namespace JourneyPalAdmin
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }  
         }
-
-        private async void RefreshTimer_Tick(object sender, EventArgs e)
+        private void CloseWindow_Click(object sender, RoutedEventArgs e)
         {
-            await FetchUsers(); // Fetch users periodically
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Application.Current.Shutdown();
+            });
         }
-
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+        }
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Stop the refresh timer
                 _refreshTimer.Stop();
 
                 // Call the API logout
@@ -116,22 +124,37 @@ namespace JourneyPalAdmin
 
         private async Task FetchUsers()
         {
+            if (_isRefreshing) return;
+
+            if ((DateTime.Now - _lastRefreshTime).TotalSeconds < 25)
+                return;
+
+            _lastRefreshTime = DateTime.Now;
+
             try
             {
-                do
+                _isRefreshing = true;
+
+                var users = await _apiService.GetAllUsersAsync();
+
+                // Only update if the collection actually changed
+                if (!Users.SequenceEqual(users))
                 {
-                    var users = await _apiService.GetAllUsersAsync();
                     Users.Clear();
                     foreach (var user in users)
                     {
                         Users.Add(user);
                     }
-                } while (true);
-                
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Consider more subtle error handling
+                Console.WriteLine($"Refresh error: {ex.Message}");
+            }
+            finally
+            {
+                _isRefreshing = false;
             }
         }
 
@@ -301,7 +324,18 @@ namespace JourneyPalAdmin
                 if (cellContent is TextBlock textBlock)
                 {
                     Clipboard.SetText(textBlock.Text);
-                    MessageBox.Show("Copied to clipboard: " + textBlock.Text, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var toolTip = (ToolTip)this.Resources["CopyNotificationToolTip"];
+                    toolTip.PlacementTarget = UsersDataGrid;
+                    toolTip.IsOpen = true;
+
+                    // Auto-close after 2 seconds
+                    var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                    timer.Tick += (s, args) =>
+                    {
+                        toolTip.IsOpen = false;
+                        timer.Stop();
+                    };
+                    timer.Start();
                 }
             }
         }
