@@ -1,14 +1,25 @@
 // types.ts
 export interface Destination {
-  id: number;
+  id: number | string;
   image: string;
-  alt: string; // Required property
+  alt: string;
   title: string;
   description: string;
   coordinates?: {
     lat: number;
     lng: number;
   };
+}
+
+export interface Event {
+  id: string;
+  name: string;
+  description: string;
+  location: string;
+  duration: string;
+  links: string;
+  time: string;
+  date?: string;  // Add optional date property
 }
 
 export interface TripDay {
@@ -25,16 +36,6 @@ export interface TripPlan {
   days: TripDay[];
 }
 
-export interface Event {
-  id: string;
-  name: string;
-  description: string;
-  location: string;
-  duration: string;
-  links: string;
-  time: string;
-}
-
 export interface Trip {
   id: number;
   name: string;
@@ -42,6 +43,7 @@ export interface Trip {
   startDate: string;
   endDate: string;
   isCustom: boolean;
+  events?: Event[];
   coordinates?: {
     lat: number;
     lng: number;

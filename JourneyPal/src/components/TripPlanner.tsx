@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import { destinations } from '../assets/destinations.ts';
 import { TripPlan, TripDay, Destination, Event } from '../types';
 import Checklist from './Checklist.tsx';
@@ -9,7 +9,19 @@ import '../Trip.css'
 
 const TripPlanner = () => {
   const { destinationId } = useParams<{ destinationId: string }>();
-const destination = destinations.find(d => d.id === Number(destinationId)) || destinations[0];
+  const location = useLocation();
+  const destination = destinations.find(d => d.id === Number(destinationId)) || 
+  (destinationId === 'custom' ? 
+    { 
+      id: 'custom', 
+      title: location.state?.destination || 'Custom Destination',
+      description: 'Custom Destination Description',
+      coordinates: { lat: 0, lng: 0 },
+      image: '/images/custom-destination.jpg',  // Add a default image
+      alt: 'Custom Destination'  // Add an alt text
+    } : 
+    destinations[0]
+  );
 
   const [tripPlan, setTripPlan] = useState<TripPlan>({
     startDate: '',
@@ -29,7 +41,7 @@ const destination = destinations.find(d => d.id === Number(destinationId)) || de
   const [newNote, setNewNote] = useState('');
   const [showEventForm, setShowEventForm] = useState(false);
   const [newEvent, setNewEvent] = useState<Event>({
-    id: '', // Added id property
+    id: '', 
     name: '',
     description: '',
     location: '',
@@ -37,6 +49,53 @@ const destination = destinations.find(d => d.id === Number(destinationId)) || de
     links: '',
     time: ''
   });
+
+  // Check if trip details are passed from Your Trips page
+  useEffect(() => {
+    if (location.state) {
+      const state = location.state as { 
+        startDate?: string, 
+        endDate?: string,
+        existingEvents?: Event[],
+        tripName?: string
+      };
+
+      if (state.startDate && state.endDate) {
+        const start = new Date(state.startDate);
+        const end = new Date(state.endDate);
+        
+        setStartDate(start);
+        setEndDate(end);
+        
+        // Generate days and pre-populate with existing events if any
+        const days: TripDay[] = [];
+        let currentDate = new Date(start);
+
+        while (currentDate <= end) {
+          const dateString = currentDate.toISOString().split('T')[0];
+          const dayEvents = (state.existingEvents || [])
+            .filter(event => event.date === dateString);
+
+          days.push({
+            date: dateString,
+            activities: [],
+            images: [],
+            notes: [],
+            events: dayEvents || []
+          });
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        setTripPlan({ 
+          startDate: start.toISOString().split('T')[0], 
+          endDate: end.toISOString().split('T')[0], 
+          days 
+        });
+        setIsDateSelected(true);
+        setCurrentPage(0);
+      }
+    }
+  }, [location.state]);
 
   if (!destination) return <div>Destination not found</div>;
 
@@ -99,7 +158,8 @@ const destination = destinations.find(d => d.id === Number(destinationId)) || de
     // Generate a unique ID for the new event
     const eventWithId: Event = {
       ...newEvent,
-      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      date: selectedDay.date  // Add date to the event
     };
     
     const updatedDays = tripPlan.days.map(day => {
@@ -115,7 +175,7 @@ const destination = destinations.find(d => d.id === Number(destinationId)) || de
     setTripPlan(prev => ({ ...prev, days: updatedDays }));
     setSelectedDay(updatedDays.find(d => d.date === selectedDay.date) || null);
     setNewEvent({
-      id: '', // Reset with empty id
+      id: '', 
       name: '',
       description: '',
       location: '',
@@ -448,7 +508,7 @@ const destination = destinations.find(d => d.id === Number(destinationId)) || de
                 ))}
               </div>
             )}
-            </div>
+          </div>
         ) : (
           <div className="welcome-message">
             <h2>Welcome to your {destination.title} trip!</h2>

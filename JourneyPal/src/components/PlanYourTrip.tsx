@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { destinations } from '../assets/destinations';
@@ -15,6 +15,8 @@ interface TripFormData {
 }
 
 const PlanYourTrip: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState<TripFormData>({
     tripName: '',
     destinationType: 'predefined',
@@ -24,7 +26,6 @@ const PlanYourTrip: React.FC = () => {
     endDate: null
   });
   
-  const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
   const [errors, setErrors] = useState({
     tripName: '',
@@ -33,10 +34,33 @@ const PlanYourTrip: React.FC = () => {
     general: ''
   });
 
+  // Use pre-filled data if passed from Your Trips page for editing
+  useEffect(() => {
+    const state = location.state as { 
+      destination?: string, 
+      startDate?: string, 
+      endDate?: string,
+      isCustom?: boolean,
+      tripName?: string
+    };
+
+    if (state) {
+      setFormData(prev => ({
+        ...prev,
+        tripName: state.tripName || '',
+        destinationType: state.isCustom ? 'custom' : 'predefined',
+        predefinedDestination: !state.isCustom ? state.destination || '' : '',
+        customDestination: state.isCustom ? state.destination || '' : '',
+        startDate: state.startDate ? new Date(state.startDate) : null,
+        endDate: state.endDate ? new Date(state.endDate) : null
+      }));
+    }
+  }, [location.state]);
+
   useEffect(() => {
     if (showSuccess) {
       const timer = setTimeout(() => {
-        navigateToPlanner();
+        navigateToNextStep();
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -113,7 +137,7 @@ const PlanYourTrip: React.FC = () => {
     setErrors({ tripName: '', destination: '', dates: '', general: '' });
   };
 
-  const navigateToPlanner = () => {
+  const navigateToNextStep = () => {
     const destination = formData.destinationType === 'custom'
       ? { 
           id: 'custom', 
@@ -123,15 +147,18 @@ const PlanYourTrip: React.FC = () => {
         }
       : destinations.find(d => d.title === formData.predefinedDestination);
 
-    if (destination) {
+    // If predefined destination, go directly to planner with destination ID
+    if (destination && destination.id !== 'custom') {
       navigate(`/plan/${destination.id}`, { 
         state: {
           tripName: formData.tripName,
           startDate: formData.startDate,
-          endDate: formData.endDate,
-          isCustom: formData.destinationType === 'custom'
+          endDate: formData.endDate
         }
       });
+    } else {
+      // For custom destinations, go to Your Trips page
+      navigate('/trips');
     }
   };
 
