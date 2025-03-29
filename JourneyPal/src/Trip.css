@@ -1398,8 +1398,47 @@ input[type="radio"] {
   }
   
   .sidebar {
-    top: 150px;
+    top: 75px;
     height: calc(100vh - 64px);
   }
 }
 
+/* Mobile-first enhancements */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .sidebar.active {
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .section-items-container {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  
+  .recommended-places-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .recommended-place-card {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .menu-toggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+  }
+}

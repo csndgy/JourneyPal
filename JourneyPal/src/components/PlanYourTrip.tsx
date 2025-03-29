@@ -12,7 +12,7 @@ interface TripFormData {
   customDestination: string;
   startDate: Date | null;
   endDate: Date | null;
-  editingTripId?: number; // Add field to track if we're editing an existing trip
+  editingTripId?: number;
 }
 
 const PlanYourTrip: React.FC = () => {
@@ -43,7 +43,7 @@ const PlanYourTrip: React.FC = () => {
       endDate?: string,
       isCustom?: boolean,
       tripName?: string,
-      tripId?: number // Add tripId to track which trip we're editing
+      tripId?: number
     };
 
     if (state) {
@@ -55,7 +55,7 @@ const PlanYourTrip: React.FC = () => {
         customDestination: state.isCustom ? state.destination || '' : '',
         startDate: state.startDate ? new Date(state.startDate) : null,
         endDate: state.endDate ? new Date(state.endDate) : null,
-        editingTripId: state.tripId // Store the trip ID if we're editing
+        editingTripId: state.tripId
       }));
     }
   }, [location.state]);
@@ -173,28 +173,8 @@ const PlanYourTrip: React.FC = () => {
   };
 
   const navigateToNextStep = () => {
-    const destination = formData.destinationType === 'custom'
-      ? { 
-          id: 'custom', 
-          title: formData.customDestination,
-          description: 'Custom Destination',
-          image: '/images/custom-destination.jpg'
-        }
-      : destinations.find(d => d.title === formData.predefinedDestination);
-
-    // If predefined destination, go directly to planner with destination ID
-    if (destination && destination.id !== 'custom') {
-      navigate(`/plan/${destination.id}`, { 
-        state: {
-          tripName: formData.tripName,
-          startDate: formData.startDate,
-          endDate: formData.endDate
-        }
-      });
-    } else {
-      // For custom destinations, go to Your Trips page
-      navigate('/trips');
-    }
+    // Modified function: Always navigate to /trips instead of /plan/{id}
+    navigate('/trips');
   };
 
   const formatDate = (date: Date) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { destinations } from '../assets/destinations.ts';
 import { TripPlan, TripDay, Destination, Event } from '../types';
 import Checklist from './Checklist.tsx';
@@ -12,18 +12,16 @@ const TripPlanner = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
-  const destination = destinations.find(d => d.id === Number(destinationId)) || 
-  (destinationId === 'custom' ? 
-    { 
-      id: 'custom', 
+  const destination = destinationId === 'custom' 
+  ? {
+      id: 'custom',
       title: location.state?.destination || 'Custom Destination',
       description: 'Custom Destination Description',
       coordinates: { lat: 0, lng: 0 },
       image: '/images/custom-destination.jpg',
       alt: 'Custom Destination'
-    } : 
-    destinations[0]
-  );
+    }
+  : destinations.find(d => d.id === Number(destinationId));
 
   // ... existing state declarations remain the same ...
   const [tripPlan, setTripPlan] = useState<TripPlan>({
@@ -43,6 +41,7 @@ const TripPlanner = () => {
   const [notes, setNotes] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
   const [showEventForm, setShowEventForm] = useState(false);
+  const navigate = useNavigate();
   const [newEvent, setNewEvent] = useState<Event>({
     id: '', 
     name: '',
@@ -52,7 +51,12 @@ const TripPlanner = () => {
     links: '',
     time: ''
   });
-
+  useEffect(() => {
+    if (!location.state?.startDate || !location.state?.endDate) {
+      console.error('Missing required trip dates in state');
+      navigate('/trips');
+    }
+  }, [location.state]);
 
   // Check if trip details are passed from Your Trips page
   useEffect(() => {
@@ -65,6 +69,7 @@ const TripPlanner = () => {
       };
 
       if (state.startDate && state.endDate) {
+        // Fix: Use proper date handling to avoid timezone issues
         const start = new Date(state.startDate);
         const end = new Date(state.endDate);
         
@@ -76,7 +81,8 @@ const TripPlanner = () => {
         let currentDate = new Date(start);
 
         while (currentDate <= end) {
-          const dateString = currentDate.toISOString().split('T')[0];
+          // Fix: Format date properly to avoid timezone shifts
+          const dateString = formatDateToLocalISOString(currentDate);
           const dayEvents = (state.existingEvents || [])
             .filter(event => event.date === dateString);
 
@@ -91,8 +97,8 @@ const TripPlanner = () => {
         }
 
         setTripPlan({ 
-          startDate: start.toISOString().split('T')[0], 
-          endDate: end.toISOString().split('T')[0], 
+          startDate: formatDateToLocalISOString(start), 
+          endDate: formatDateToLocalISOString(end), 
           days 
         });
         setIsDateSelected(true);
@@ -100,8 +106,16 @@ const TripPlanner = () => {
       }
     }
   }, [location.state]);
+  
+  if (!destination) return <div className="error-message">Invalid destination</div>;
 
-  if (!destination) return <div>Destination not found</div>;
+  // Helper function to format dates correctly without timezone issues
+  const formatDateToLocalISOString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const generateDays = () => {
     if (!startDate || !endDate) return;
@@ -110,8 +124,10 @@ const TripPlanner = () => {
     let currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
+      // Fix: Use our helper function to get consistent date strings
+      const dateString = formatDateToLocalISOString(currentDate);
       days.push({
-        date: currentDate.toISOString().split('T')[0],
+        date: dateString,
         activities: [],
         images: [],
         notes: [],
@@ -121,8 +137,8 @@ const TripPlanner = () => {
     }
 
     setTripPlan({ 
-      startDate: startDate.toISOString().split('T')[0], 
-      endDate: endDate.toISOString().split('T')[0], 
+      startDate: formatDateToLocalISOString(startDate), 
+      endDate: formatDateToLocalISOString(endDate), 
       days 
     });
     setIsDateSelected(true);
@@ -289,20 +305,22 @@ const TripPlanner = () => {
             <div className="section-header">
               <h2>Itinerary</h2>
             </div>
-            <ul className="section-items">
-              {displayedDays.map((day, index) => (
-                <li
-                  key={day.date}
-                  onClick={() => {
-                    handleDayClick(day);
-                    setIsMenuOpen(false);
-                  }}
-                  className={selectedDay?.date === day.date ? 'selected-day' : ''}
-                >
-                  Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
-                </li>
-              ))}
-            </ul>
+            <div className="section-items-container">
+              <ul className="section-items">
+                {displayedDays.map((day, index) => (
+                  <li
+                    key={day.date}
+                    onClick={() => {
+                      handleDayClick(day);
+                      setIsMenuOpen(false);
+                    }}
+                    className={selectedDay?.date === day.date ? 'selected-day' : ''}
+                  >
+                    Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
+                  </li>
+                ))}
+              </ul>
+            </div>
             <div className="pagination-container">
               <button 
                 className="btn-prev" 
@@ -542,9 +560,22 @@ const TripPlanner = () => {
                       {event.links && (
                         <div className="event-detail">
                           <span className="detail-label">Links:</span>
-                          <a href={event.links} target="_blank" rel="noopener noreferrer">
-                            {event.links}
-                          </a>
+                          {event.links && (
+                            <a 
+                              href={event.links.startsWith('http') ? event.links : `https://${event.links}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              onClick={(e) => {
+                                // Prevent navigation for invalid links
+                                if (!/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/.test(event.links)) {
+                                  e.preventDefault();
+                                  alert('Please enter a valid URL');
+                                }
+                              }}
+                            >
+                              {event.links}
+                            </a>
+                          )}
                         </div>
                       )}
                     </div>
