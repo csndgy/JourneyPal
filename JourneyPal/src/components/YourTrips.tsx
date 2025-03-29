@@ -95,7 +95,8 @@ const YourTrips: React.FC = () => {
         startDate: trip.startDate,
         endDate: trip.endDate,
         isCustom: trip.isCustom,
-        tripName: trip.name
+        tripName: trip.name,
+        tripId: trip.id  // Pass the trip ID to identify which trip is being edited
       }
     });
   };

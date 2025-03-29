@@ -556,3 +556,421 @@ label {
     gap: 20px;
   }
 }
+
+
+
+
+/*mobile first, might be some re-written codes in there*/
+
+/* Base mobile-first styles */
+.navbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-color);
+  border-radius: 15px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 12px 15px;
+  margin: 10px;
+  position: sticky;
+  top: 10px;
+  z-index: 1000;
+}
+
+.navbar-logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--text-color);
+  text-decoration: none;
+  margin: 0;
+}
+
+/* Mobile menu visibility control */
+.desktop-only {
+  display: none;
+}
+
+.mobile-only {
+  display: flex;
+}
+
+/* Navbar links styling */
+.navbar-links {
+  display: none; /* Initially hidden on mobile */
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  gap: 10px;
+}
+
+.navbar-links.active {
+  display: flex;
+  margin-top: 15px;
+  order: 4; /* Ensure it's below all other elements */
+}
+
+.navbar-links li {
+  margin: 5px 0;
+}
+
+.navbar-links a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 8px 5px;
+  display: block;
+  text-align: center;
+  transition: color 0.3s;
+}
+
+.navbar-links a:hover {
+  color: var(--accent-color);
+}
+
+/* Dark mode toggle styling */
+.btn-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-container svg {
+  position: relative;
+  top: -2px;
+}
+
+label {
+  font-size: 13px;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner {
+  margin: 0px;
+  width: 110px;
+  height: 30px;
+  background: #E0E0E0;
+  border-radius: 26px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  display: block;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner:before {
+  content: attr(data-on);
+  position: absolute;
+  font-size: 12px;
+  font-weight: 500;
+  top: 7px;
+  right: 20px;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+  content: attr(data-off);
+  width: 55px;
+  height: 16px;
+  background: #fff;
+  border-radius: 26px;
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0px 0px 6px -2px #111;
+  padding: 5px 0px;
+}
+
+.btn-color-mode-switch input[type="checkbox"] {
+  cursor: pointer;
+  width: 50px;
+  height: 25px;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  margin: 0px;
+}
+
+.btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner {
+  background: #151515;
+  color: #fff;
+}
+
+.btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after {
+  content: attr(data-on);
+  left: 53px;
+  background: #3c3c3c;
+}
+
+.btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:before {
+  content: attr(data-off);
+  right: auto;
+  left: 20px;
+}
+
+/* Profile dropdown styling */
+.profile-container {
+  position: relative;
+  margin-left: 5px;
+}
+
+.profile-button {
+  cursor: pointer;
+}
+
+.profile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--bg-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  width: 180px;
+  padding: 10px;
+  margin-top: 10px;
+  z-index: 10;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 8px 12px;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.dropdown-item:hover {
+  background-color: var(--hover-color);
+  border-radius: 4px;
+}
+
+/* Mobile menu toggle hamburger button */
+.mobile-menu-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+  margin-left: auto;
+}
+
+.hamburger {
+  position: relative;
+  width: 25px;
+  height: 20px;
+}
+
+.hamburger span {
+  display: block;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background-color: var(--text-color);
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.hamburger span:nth-child(1) {
+  top: 0;
+}
+
+.hamburger span:nth-child(2) {
+  top: 8px;
+}
+
+.hamburger span:nth-child(3) {
+  top: 16px;
+}
+
+/* Hamburger animation */
+.hamburger.active span:nth-child(1) {
+  top: 8px;
+  transform: rotate(45deg);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  top: 8px;
+  transform: rotate(-45deg);
+}
+
+/* Dark mode compatibility */
+.dark-mode .hamburger span {
+  background-color: var(--text-color);
+}
+
+/* Mobile Navbar Ordering */
+@media screen and (max-width: 768px) {
+  .navbar {
+    justify-content: space-between;
+  }
+  
+  .mobile-menu-toggle {
+    order: 3;
+  }
+}
+
+/* Tablet styles (481px and up) */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  .navbar {
+    padding: 15px;
+  }
+  
+  .navbar-logo {
+    font-size: 1.5rem;
+  }
+  
+  .navbar-links {
+    order: 4;
+    width: 100%;
+  }
+  
+  .profile-dropdown {
+    right: 0;
+  }
+}
+
+/* Desktop styles (769px and up) */
+@media screen and (min-width: 769px) {
+  .navbar {
+    flex-wrap: nowrap;
+    padding: 15px 30px;
+    gap: 20px;
+  }
+  
+  .navbar-logo {
+    font-size: 1.8rem;
+    order: 1;
+  }
+  
+  /* Show desktop elements, hide mobile elements */
+  .desktop-only {
+    display: flex;
+  }
+  
+  .mobile-only,
+  .mobile-menu-toggle {
+    display: none;
+  }
+  
+  .navbar-links {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    order: 2;
+    margin-top: 0;
+    gap: 30px;
+    align-items: center;
+  }
+  
+  .navbar-links li {
+    margin: 0;
+  }
+  
+  .navbar-links a {
+    padding: 5px 10px;
+  }
+  
+  .btn-container {
+    order: 3;
+    gap: 8px;
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner {
+    width: 140px;
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+    width: 70px;
+  }
+  
+  .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after {
+    left: 68px;
+  }
+  
+  .profile-container {
+    order: 4;
+  }
+  
+  .profile-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .profile-dropdown {
+    width: 200px;
+  }
+}
+
+/* For very large screens */
+@media screen and (min-width: 1200px) {
+  .navbar {
+    padding: 20px 40px;
+  }
+  
+  .navbar-links {
+    gap: 60px;
+  }
+}
+
+/* Base hide/show for mobile/desktop elements */
+.desktop-only {
+  display: none;
+}
+
+.mobile-only {
+  display: flex;
+}
+
+/* Desktop styles (769px and up) */
+@media screen and (min-width: 769px) {
+  /* Show desktop elements, hide mobile elements */
+  .desktop-only {
+    display: flex;
+  }
+  
+  .mobile-only {
+    display: none;
+  }
+}
+
+/* Base hide/show for mobile/desktop elements */
+.desktop-only {
+  display: none;
+}
+
+.mobile-only {
+  display: flex;
+}
+
+/* Desktop styles (769px and up) */
+@media screen and (min-width: 769px) {
+  /* Show desktop elements, hide mobile elements */
+  .desktop-only {
+    display: flex;
+  }
+  
+  .mobile-only {
+    display: none;
+  }
+}

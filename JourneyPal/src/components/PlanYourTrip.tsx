@@ -12,6 +12,7 @@ interface TripFormData {
   customDestination: string;
   startDate: Date | null;
   endDate: Date | null;
+  editingTripId?: number; // Add field to track if we're editing an existing trip
 }
 
 const PlanYourTrip: React.FC = () => {
@@ -41,7 +42,8 @@ const PlanYourTrip: React.FC = () => {
       startDate?: string, 
       endDate?: string,
       isCustom?: boolean,
-      tripName?: string
+      tripName?: string,
+      tripId?: number // Add tripId to track which trip we're editing
     };
 
     if (state) {
@@ -52,7 +54,8 @@ const PlanYourTrip: React.FC = () => {
         predefinedDestination: !state.isCustom ? state.destination || '' : '',
         customDestination: state.isCustom ? state.destination || '' : '',
         startDate: state.startDate ? new Date(state.startDate) : null,
-        endDate: state.endDate ? new Date(state.endDate) : null
+        endDate: state.endDate ? new Date(state.endDate) : null,
+        editingTripId: state.tripId // Store the trip ID if we're editing
       }));
     }
   }, [location.state]);
@@ -101,6 +104,11 @@ const PlanYourTrip: React.FC = () => {
   };
 
   const checkDuplicateTrip = () => {
+    // If we're editing an existing trip, don't check for duplicates
+    if (formData.editingTripId) {
+      return false;
+    }
+
     const existingTrips: Trip[] = JSON.parse(localStorage.getItem('trips') || '[]');
     return existingTrips.some(trip => 
       trip.name.toLowerCase() === formData.tripName.toLowerCase() &&
@@ -119,19 +127,46 @@ const PlanYourTrip: React.FC = () => {
       return;
     }
 
-    const newTrip: Trip = {
-      id: Date.now(),
-      name: formData.tripName.trim(),
-      destination: formData.destinationType === 'custom' 
-        ? formData.customDestination.trim() 
-        : formData.predefinedDestination,
-      startDate: formData.startDate!.toISOString(),
-      endDate: formData.endDate!.toISOString(),
-      isCustom: formData.destinationType === 'custom'
-    };
+    // Get existing trips
+    const existingTrips: Trip[] = JSON.parse(localStorage.getItem('trips') || '[]');
+    
+    // Check if we're updating an existing trip
+    if (formData.editingTripId) {
+      // Find the trip to update
+      const updatedTrips = existingTrips.map(trip => {
+        if (trip.id === formData.editingTripId) {
+          // Update the trip with new values
+          return {
+            ...trip,
+            name: formData.tripName.trim(),
+            destination: formData.destinationType === 'custom' 
+              ? formData.customDestination.trim() 
+              : formData.predefinedDestination,
+            startDate: formData.startDate!.toISOString(),
+            endDate: formData.endDate!.toISOString(),
+            isCustom: formData.destinationType === 'custom'
+          };
+        }
+        return trip;
+      });
+      
+      localStorage.setItem('trips', JSON.stringify(updatedTrips));
+    } else {
+      // Create a new trip
+      const newTrip: Trip = {
+        id: Date.now(),
+        name: formData.tripName.trim(),
+        destination: formData.destinationType === 'custom' 
+          ? formData.customDestination.trim() 
+          : formData.predefinedDestination,
+        startDate: formData.startDate!.toISOString(),
+        endDate: formData.endDate!.toISOString(),
+        isCustom: formData.destinationType === 'custom'
+      };
 
-    const updatedTrips = [...JSON.parse(localStorage.getItem('trips') || '[]'), newTrip];
-    localStorage.setItem('trips', JSON.stringify(updatedTrips));
+      const updatedTrips = [...existingTrips, newTrip];
+      localStorage.setItem('trips', JSON.stringify(updatedTrips));
+    }
     
     setShowSuccess(true);
     setErrors({ tripName: '', destination: '', dates: '', general: '' });
@@ -170,9 +205,14 @@ const PlanYourTrip: React.FC = () => {
     });
   };
 
+  const handleCancel = () => {
+    // Navigate back to trips page
+    navigate('/trips');
+  };
+
   return (
     <div className="plan-your-trip-container">
-      <h1 className="page-title">Plan a New Trip</h1>
+      <h1 className="page-title">{formData.editingTripId ? 'Edit Trip' : 'Plan a New Trip'}</h1>
 
       {errors.general && (
         <div className="error-message">
@@ -294,13 +334,22 @@ const PlanYourTrip: React.FC = () => {
           {errors.dates && <span className="error-text">{errors.dates}</span>}
         </div>
 
-        <button 
-          type="submit" 
-          className="save-btn"
-          disabled={showSuccess}
-        >
-          {showSuccess ? 'Redirecting...' : 'Save Trip'}
-        </button>
+        <div className="form-buttons">
+          <button
+            type="button"
+            className="cancel-btn"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            className="save-btn"
+            disabled={showSuccess}
+          >
+            {showSuccess ? 'Redirecting...' : formData.editingTripId ? 'Update Trip' : 'Save Trip'}
+          </button>
+        </div>
       </form>
     </div>
   );

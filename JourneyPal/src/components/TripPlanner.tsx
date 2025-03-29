@@ -5,11 +5,13 @@ import { TripPlan, TripDay, Destination, Event } from '../types';
 import Checklist from './Checklist.tsx';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../Trip.css'
+import '../Trip.css';
 
 const TripPlanner = () => {
   const { destinationId } = useParams<{ destinationId: string }>();
   const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
   const destination = destinations.find(d => d.id === Number(destinationId)) || 
   (destinationId === 'custom' ? 
     { 
@@ -17,12 +19,13 @@ const TripPlanner = () => {
       title: location.state?.destination || 'Custom Destination',
       description: 'Custom Destination Description',
       coordinates: { lat: 0, lng: 0 },
-      image: '/images/custom-destination.jpg',  // Add a default image
-      alt: 'Custom Destination'  // Add an alt text
+      image: '/images/custom-destination.jpg',
+      alt: 'Custom Destination'
     } : 
     destinations[0]
   );
 
+  // ... existing state declarations remain the same ...
   const [tripPlan, setTripPlan] = useState<TripPlan>({
     startDate: '',
     endDate: '',
@@ -49,6 +52,7 @@ const TripPlanner = () => {
     links: '',
     time: ''
   });
+
 
   // Check if trip details are passed from Your Trips page
   useEffect(() => {
@@ -206,44 +210,81 @@ const TripPlanner = () => {
 
   return (
     <div className="app-layout">
-      {isDateSelected && (
-        <div className="sidebar">
-          <div className="sidebar-section">
-            <div className="section-header">
-              <h2>Overview</h2>
-            </div>
-            <ul className="section-items">
-              <li onClick={() => { 
-                setShowMap(true); 
-                setShowNotes(false);
-                setShowChecklist(false);
-                setShowPlacesToVisit(false);
-                setSelectedDay(null);
-              }}>Explore</li>
-              <li onClick={() => { 
-                setShowNotes(true);
-                setShowMap(false);
-                setShowChecklist(false);
-                setShowPlacesToVisit(false);
-                setSelectedDay(null);
-              }}>Notes</li>
-              <li onClick={() => { 
-                setShowChecklist(true);
-                setShowNotes(false);
-                setShowMap(false);
-                setShowPlacesToVisit(false);
-                setSelectedDay(null);
-              }}>Checklist</li>
-              <li onClick={() => { 
-                setShowPlacesToVisit(true);
-                setShowMap(false);
-                setShowNotes(false);
-                setShowChecklist(false);
-                setSelectedDay(null);
-              }}>Places to visit</li>
-            </ul>
+      <button 
+        className="menu-toggle"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+      >
+        ☰
+      </button>
+      
+      <div className={`sidebar ${isMenuOpen ? 'active' : ''}`}>
+        <div className="overview-cards">
+          <div 
+            className="overview-card"
+            onClick={() => {
+              setShowMap(true);
+              setShowNotes(false);
+              setShowChecklist(false);
+              setShowPlacesToVisit(false);
+              setSelectedDay(null);
+              setIsMenuOpen(false);
+            }}
+          >
+            <div className="card-icon">🗺️</div>
+            <h3>Explore Map</h3>
+            <p>Discover locations and plan routes</p>
           </div>
 
+          <div 
+            className="overview-card"
+            onClick={() => {
+              setShowNotes(true);
+              setShowMap(false);
+              setShowChecklist(false);
+              setShowPlacesToVisit(false);
+              setSelectedDay(null);
+              setIsMenuOpen(false);
+            }}
+          >
+            <div className="card-icon">📝</div>
+            <h3>Travel Notes</h3>
+            <p>Capture your thoughts and ideas</p>
+          </div>
+
+          <div 
+            className="overview-card"
+            onClick={() => {
+              setShowChecklist(true);
+              setShowNotes(false);
+              setShowMap(false);
+              setShowPlacesToVisit(false);
+              setSelectedDay(null);
+              setIsMenuOpen(false);
+            }}
+          >
+            <div className="card-icon">✅</div>
+            <h3>Packing List</h3>
+            <p>Manage your travel essentials</p>
+          </div>
+
+          <div 
+            className="overview-card"
+            onClick={() => {
+              setShowPlacesToVisit(true);
+              setShowMap(false);
+              setShowNotes(false);
+              setShowChecklist(false);
+              setSelectedDay(null);
+              setIsMenuOpen(false);
+            }}
+          >
+            <div className="card-icon">🏛️</div>
+            <h3>Destinations</h3>
+            <p>Recommended places to visit</p>
+          </div>
+        </div>
+
+        {isDateSelected && (
           <div className="sidebar-section">
             <div className="section-header">
               <h2>Itinerary</h2>
@@ -252,7 +293,10 @@ const TripPlanner = () => {
               {displayedDays.map((day, index) => (
                 <li
                   key={day.date}
-                  onClick={() => handleDayClick(day)}
+                  onClick={() => {
+                    handleDayClick(day);
+                    setIsMenuOpen(false);
+                  }}
                   className={selectedDay?.date === day.date ? 'selected-day' : ''}
                 >
                   Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
@@ -277,8 +321,8 @@ const TripPlanner = () => {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="main-content">
         {!isDateSelected ? (
