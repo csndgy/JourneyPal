@@ -21,6 +21,12 @@
     position: relative;
     overflow: hidden;
   }
+  
+  .error-message {
+    color: #ff4444;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
 
   .profile-card::before {
     content: '';

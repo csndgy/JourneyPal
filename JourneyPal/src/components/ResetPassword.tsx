@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import api from '../services/Interceptor';
+import api from '../Services/Interceptor';
 
 const ResetPassword: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
@@ -31,7 +31,7 @@ const ResetPassword: React.FC = () => {
       setError('');
       setTimeout(() => navigate('/login'), 3000); // Redirect to login after 3 seconds
     } catch (err) {
-      setError('Failed to reset password. Please try again.');
+      setError('Failed to reset password. Please try again.' + err);
       setMessage('');
     }
   };

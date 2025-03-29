@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../SingUpLogin.css';
+import api from '../Services/Interceptor';
 
 const SignUp: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -25,16 +26,11 @@ const SignUp: React.FC = () => {
     }
 
     try {
-        console.log(JSON.stringify(jsonObject)); 
-        const response = await fetch('https://localhost:7193/api/Auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(jsonObject),
-        });
+        const response = await api.post('https://localhost:7193/api/Auth/register', jsonObject)
   
         if (response) {
           console.log('Registration successful:', response);
-          navigate('/home')
+          navigate('/login')
         } else {
             console.error('Registration failed:', response);
         }
@@ -52,12 +48,6 @@ const SignUp: React.FC = () => {
           <div className="signup-subtitle">
             Sign up to plan travels with your family and friends.
           </div>
-          
-          <div className="input btn google-signup">
-            <span>GOOGLE MAJD BENI</span>
-          </div>
-          
-          <div className="or">or</div>
           
           <input 
             type="text" 
@@ -78,7 +68,7 @@ const SignUp: React.FC = () => {
           />
           
           <input 
-            type="password" 
+            type="password"
             className="input" 
             placeholder="Password" 
             value={password} 
@@ -87,7 +77,7 @@ const SignUp: React.FC = () => {
           />
           
           <input 
-            type="password" 
+            type="password"  
             className="input" 
             placeholder="Confirm Password" 
             value={confirmPassword} 

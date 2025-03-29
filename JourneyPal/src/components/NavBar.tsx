@@ -2,13 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../Navbar.css';
+import api from '../Services/Interceptor'
 
 interface NavBarProps {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
+  isAuthenticated: boolean;
+  onLogout: () => void;
 }
 
-const NavBar: React.FC<NavBarProps> = ({ isDarkMode, toggleDarkMode }) => {
+const NavBar: React.FC<NavBarProps> = ({ isDarkMode, toggleDarkMode, isAuthenticated, onLogout }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -30,6 +33,22 @@ const NavBar: React.FC<NavBarProps> = ({ isDarkMode, toggleDarkMode }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  const handleLogOutClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/api/Auth/logout')
+      if (response.status === 200) {
+        localStorage.clear()
+        onLogout(); // Notify parent component
+        navigate('/')
+      }
+    } catch (err) {
+      console.error("Logout failed: ", err)
+    }
+    setShowProfileMenu(false);
+  }
+
 
   const scrollToDestinations = () => {
     navigate('/');
@@ -110,9 +129,41 @@ const NavBar: React.FC<NavBarProps> = ({ isDarkMode, toggleDarkMode }) => {
         
         {showProfileMenu && (
           <div className="profile-dropdown">
-            <Link to="/profile" className="dropdown-item">Profile</Link>
-            <Link to="/login" className="dropdown-item">Log In</Link>
-            <Link to="/signup" className="dropdown-item">Sign Up</Link>
+            {isAuthenticated ? (
+              <>
+                <Link 
+                  to="/profile" 
+                  className="dropdown-item"
+                  onClick={() => setShowProfileMenu(false)}
+                >
+                  Profile
+                </Link>
+                <Link 
+                  to="" 
+                  className="dropdown-item" 
+                  onClick={handleLogOutClick}
+                >
+                  Log out
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link 
+                  to="/login" 
+                  className="dropdown-item"
+                  onClick={() => setShowProfileMenu(false)}
+                >
+                  Log In
+                </Link>
+                <Link 
+                  to="/signup" 
+                  className="dropdown-item"
+                  onClick={() => setShowProfileMenu(false)}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         )}
       </div>
