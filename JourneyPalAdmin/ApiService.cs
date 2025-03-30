@@ -3,6 +3,8 @@ using System.Net.Http;
 using JourneyPalAdmin.Models;
 using Newtonsoft.Json;
 using System.Text;
+using System;
+
 namespace JourneyPalAdmin
 {
     public class ApiService
@@ -34,7 +36,7 @@ namespace JourneyPalAdmin
             _refreshToken = refreshToken;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
-        
+
         public string GetRefreshToken()
         {
             return _refreshToken;
@@ -44,11 +46,54 @@ namespace JourneyPalAdmin
         {
             return _jwtToken;
         }
+
+        public async Task<bool> RefreshTokenAsync()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(_refreshToken))
+                    return false;
+
+                var content = new StringContent(JsonConvert.SerializeObject(_refreshToken), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("api/Auth/refresh", content);
+
+                if (!response.IsSuccessStatusCode)
+                    return false;
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
+
+                SetJwtTokens(tokenResponse.Token, tokenResponse.RefreshToken);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private async Task<HttpResponseMessage> ExecuteWithTokenRefresh(Func<Task<HttpResponseMessage>> apiCall)
+        {
+            var response = await apiCall();
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                if (await RefreshTokenAsync())
+                {
+                    response = await apiCall();
+                }
+                else
+                {
+                    throw new UnauthorizedAccessException("Session expired. Please login again.");
+                }
+            }
+            return response;
+        }
+
         public async Task<bool> LogoutAsync()
         {
             try
             {
-                var response = await _httpClient.PostAsync("api/Auth/logout", null);
+                var response = await ExecuteWithTokenRefresh(() => _httpClient.PostAsync("api/Auth/logout", null));
                 response.EnsureSuccessStatusCode();
 
                 _jwtToken = null;
@@ -56,6 +101,10 @@ namespace JourneyPalAdmin
                 _httpClient.DefaultRequestHeaders.Authorization = null;
 
                 return true;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw;
             }
             catch
             {
@@ -65,23 +114,26 @@ namespace JourneyPalAdmin
                 return false;
             }
         }
+
         public async Task<List<User>> GetAllUsersAsync()
         {
-            var response = await _httpClient.GetAsync("api/Admin/users");
+            var response = await ExecuteWithTokenRefresh(() => _httpClient.GetAsync("api/Admin/users"));
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<User>>(content);
         }
+
         public async Task<User> GetUserByIdAsync(string id)
         {
-            var response = await _httpClient.GetAsync($"api/Admin/user-by-id/{id}");
+            var response = await ExecuteWithTokenRefresh(() => _httpClient.GetAsync($"api/Admin/user-by-id/{id}"));
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<User>(content);
         }
+
         public async Task<List<User>> GetUserByEmailAsync(string email)
         {
-            var response = await _httpClient.GetAsync($"api/Admin/user-by-email?email={email}");
+            var response = await ExecuteWithTokenRefresh(() => _httpClient.GetAsync($"api/Admin/user-by-email?email={email}"));
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<User>>(content);
@@ -89,7 +141,7 @@ namespace JourneyPalAdmin
 
         public async Task<List<User>> GetUserByNameAsync(string username)
         {
-            var response = await _httpClient.GetAsync($"api/Admin/user-by-name?username={username}");
+            var response = await ExecuteWithTokenRefresh(() => _httpClient.GetAsync($"api/Admin/user-by-name?username={username}"));
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<User>>(content);
@@ -97,29 +149,32 @@ namespace JourneyPalAdmin
 
         public async Task DeleteUserByUsernameAsync(string username)
         {
-            var response = await _httpClient.DeleteAsync($"api/Admin/by-username/{username}");
+            var response = await ExecuteWithTokenRefresh(() => _httpClient.DeleteAsync($"api/Admin/by-username/{username}"));
             response.EnsureSuccessStatusCode();
         }
 
         public async Task DeleteUserByEmailAsync(string email)
         {
-            var response = await _httpClient.DeleteAsync($"api/admin/by-email/{email}");
+            var response = await ExecuteWithTokenRefresh(() => _httpClient.DeleteAsync($"api/admin/by-email/{email}"));
             response.EnsureSuccessStatusCode();
         }
+
         public async Task UpdateUserAsync(string id, User updatedUser)
         {
             var json = JsonConvert.SerializeObject(updatedUser);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"api/Admin/update-user/{id}", content);
+            var response = await ExecuteWithTokenRefresh(() => _httpClient.PutAsync($"api/Admin/update-user/{id}", content));
             response.EnsureSuccessStatusCode();
         }
+
         public async Task ResetUserPasswordAsync(string id, string newPassword)
         {
             var json = JsonConvert.SerializeObject(newPassword);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"api/Admin/reset-password/{id}", content);
+            var response = await ExecuteWithTokenRefresh(() => _httpClient.PutAsync($"api/Admin/reset-password/{id}", content));
             response.EnsureSuccessStatusCode();
         }
+
         public async Task<bool> LoginAsync(string username, string password)
         {
             try
@@ -153,6 +208,7 @@ namespace JourneyPalAdmin
             public string Token { get; set; }
             public string RefreshToken { get; set; }
         }
+
         public class LoginRequest
         {
             public string Username { get; set; }

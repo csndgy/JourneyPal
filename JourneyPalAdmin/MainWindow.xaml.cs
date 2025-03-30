@@ -147,9 +147,12 @@ namespace JourneyPalAdmin
                     }
                 }
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                HandleTokenExpiration(ex.Message);
+            }
             catch (Exception ex)
             {
-                // Consider more subtle error handling
                 Console.WriteLine($"Refresh error: {ex.Message}");
             }
             finally
@@ -338,6 +341,16 @@ namespace JourneyPalAdmin
                     timer.Start();
                 }
             }
+        }
+        private void HandleTokenExpiration(string message)
+        {
+            _refreshTimer.Stop();
+            MessageBox.Show(message, "Session Expired", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+            // Return to login window
+            var loginWindow = new LoginWindow();
+            loginWindow.Show();
+            this.Close();
         }
     }
 }

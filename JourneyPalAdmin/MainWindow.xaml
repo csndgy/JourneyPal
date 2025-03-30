@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:JourneyPalAdmin"
         mc:Ignorable="d"
         Title="JourneyPal Admin Dashboard" 
-        Height="800" 
-        Width="1400"
+        Height="870" 
+        Width="1500"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -69,9 +69,10 @@
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderBrush" Value="#404040"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Padding" Value="8"/>
             <Setter Property="Height" Value="35"/>
             <Setter Property="Margin" Value="0 5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
         <Style x:Key="InputLabel" TargetType="Label">
