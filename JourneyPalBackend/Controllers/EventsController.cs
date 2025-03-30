@@ -45,7 +45,6 @@ namespace JourneyPalBackend.Controllers
                     EventLocation = e.EventLocation,
                     EventLinks = e.EventLinks,
                     EventDate = e.EventDate,
-                    EventEstimatedTime = e.EventEstimatedTime,
                     TripId = e.TripId
                 })
                 .ToListAsync();
@@ -73,7 +72,6 @@ namespace JourneyPalBackend.Controllers
                 EventLocation = eventEntity.EventLocation,
                 EventLinks = eventEntity.EventLinks,
                 EventDate = eventEntity.EventDate,
-                EventEstimatedTime = eventEntity.EventEstimatedTime,
                 TripId = eventEntity.TripId
             };
         }
@@ -96,8 +94,7 @@ namespace JourneyPalBackend.Controllers
                 EventDescription = createEventDto.EventDescription,
                 EventLocation = createEventDto.EventLocation,
                 EventLinks = createEventDto.EventLinks,
-                EventDate = createEventDto.EventDate,
-                EventEstimatedTime = createEventDto.EventEstimatedTime,
+                EventDate = (DateTime)createEventDto.EventDate,
                 TripId = createEventDto.TripId
             };
 
@@ -114,14 +111,13 @@ namespace JourneyPalBackend.Controllers
                     EventLocation = eventEntity.EventLocation,
                     EventLinks = eventEntity.EventLinks,
                     EventDate = eventEntity.EventDate,
-                    EventEstimatedTime = eventEntity.EventEstimatedTime,
                     TripId = eventEntity.TripId
                 });
         }
 
         // PATCH: api/events/5
         [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateEvent(int id, JsonPatchDocument<UpdateEventDto> patchDoc)
+        public async Task<IActionResult> UpdateEvent(int id, UpdateEventDto request)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -131,29 +127,31 @@ namespace JourneyPalBackend.Controllers
 
             if (eventEntity == null) return NotFound();
 
-            var eventToPatch = new UpdateEventDto
+            // Only update fields that have values in the DTO
+            if (!string.IsNullOrEmpty(request.EventName))
             {
-                EventName = eventEntity.EventName,
-                EventDescription = eventEntity.EventDescription,
-                EventLocation = eventEntity.EventLocation,
-                EventLinks = eventEntity.EventLinks,
-                EventDate = eventEntity.EventDate,
-                EventEstimatedTime = eventEntity.EventEstimatedTime
-            };
-
-            patchDoc.ApplyTo(eventToPatch, (Microsoft.AspNetCore.JsonPatch.Adapters.IObjectAdapter)ModelState);
-
-            if (!TryValidateModel(eventToPatch))
-            {
-                return ValidationProblem(ModelState);
+                eventEntity.EventName = request.EventName;
             }
 
-            eventEntity.EventName = eventToPatch.EventName;
-            eventEntity.EventDescription = eventToPatch.EventDescription;
-            eventEntity.EventLocation = eventToPatch.EventLocation;
-            eventEntity.EventLinks = eventToPatch.EventLinks;
-            eventEntity.EventDate = eventToPatch.EventDate;
-            eventEntity.EventEstimatedTime = eventToPatch.EventEstimatedTime;
+            if (!string.IsNullOrEmpty(request.EventDescription))
+            {
+                eventEntity.EventDescription = request.EventDescription;
+            }
+
+            if (!string.IsNullOrEmpty(request.EventLocation))
+            {
+                eventEntity.EventLocation = request.EventLocation;
+            }
+
+            if (request.EventLinks != null && request.EventLinks.Length > 0)
+            {
+                eventEntity.EventLinks = request.EventLinks;
+            }
+
+            if (request.EventDate != default) // or use updateDto.EventDate != DateTime.MinValue
+            {
+                eventEntity.EventDate = (DateTime)request.EventDate;
+            }
 
             await _context.SaveChangesAsync();
 

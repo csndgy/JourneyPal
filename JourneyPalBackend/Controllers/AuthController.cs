@@ -168,7 +168,7 @@ namespace JourneyPalBackend.Controllers
                 string identifier = existingUser.Id;
 
                 existingUser.RefreshToken = refreshToken;
-                existingUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
+                existingUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
                 await _ctx.SaveChangesAsync();
 
                 return Ok(new { Token = token, RefreshToken = refreshToken, Identifier = identifier });
@@ -178,7 +178,7 @@ namespace JourneyPalBackend.Controllers
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
-
+        [Authorize(AuthenticationSchemes ="Bearer")]
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDTO request)
         {
@@ -187,34 +187,22 @@ namespace JourneyPalBackend.Controllers
                 return BadRequest("Invalid request.");
             }
 
-            var principal = GetPrincipalFromExpiredToken(request.RefreshToken);
-            if (principal == null)
-            {
-                return BadRequest("Invalid refresh token.");
-            }
+            // Find user by refresh token (instead of validating as JWT)
+            var user = await _ctx.Users.FirstOrDefaultAsync(u => u.RefreshToken == request.RefreshToken);
 
-            var username = principal.Identity.Name;
-            var user = await _ctx.Users.FirstOrDefaultAsync(u => u.UserName == username);
-
-            if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
                 return BadRequest("Invalid refresh token.");
             }
 
             var newToken = GenerateToken(user);
-            var newRefreshToken = GenerateRefreshToken();
+            var newRefreshToken = GenerateRefreshToken(); // Keep as random string if you prefer
 
             user.RefreshToken = newRefreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             await _ctx.SaveChangesAsync();
 
-            var response = new RefreshTokenResponseDTO
-            {
-                Token = newToken,
-                RefreshToken = newRefreshToken
-            };
-
-            return Ok(response);
+            return Ok(new { Token = newToken, RefreshToken = newRefreshToken });
         }
         [Authorize(AuthenticationSchemes ="Bearer")]
         [HttpPost("logout")]
@@ -233,53 +221,7 @@ namespace JourneyPalBackend.Controllers
 
             return Ok(new { Message = "Logged out successfully." });
         }
-
-        [HttpPost("signin-google")]
-        public async Task<IActionResult> RegisterOrLoginWithGoogle([FromBody] GoogleAuthRequest request)
-        {
-            var payload = await ValidateGoogleToken(request.IdToken);
-            if (payload == null)
-                return BadRequest("Invalid Google token.");
-
-            var email = payload.Email;
-            var name = payload.Name;
-            var providerUserId = payload.Subject;
-
-            var existingUser = await _ctx.Users.FirstOrDefaultAsync(u => u.ProviderUserId == providerUserId && u.Provider == "Google");
-
-            if (existingUser == null)
-            {
-                var user = new User
-                {
-                    Email = email,
-                    UserName = email,
-                    Provider = "Google",
-                    ProviderUserId = providerUserId,
-                    EmailConfirmed = true
-
-                };
-                var result = await _userManager.CreateAsync(user);
-                await _userManager.AddToRoleAsync(user, "User");
-
-                if (!result.Succeeded)
-                {
-                    return BadRequest(result.Errors);
-                }
-
-                await _ctx.SaveChangesAsync();
-                existingUser = user;
-            }
-
-            var token = GenerateToken(existingUser);
-            var refreshToken = GenerateRefreshToken();
-
-            existingUser.RefreshToken = refreshToken;
-            existingUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(int.Parse(_conf["Jwt:RefreshTokenExpiryDays"]));
-
-            await _ctx.SaveChangesAsync();
-
-            return Ok(new { Token = token, RefreshToken = refreshToken });
-        }
+        
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
         {
@@ -289,7 +231,7 @@ namespace JourneyPalBackend.Controllers
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var resetLink = $"https://localhost:7193/reset-password?token={WebUtility.UrlEncode(token)}&email={WebUtility.UrlEncode(request.Email)}";
+            var resetLink = $"http://localhost:5173/reset-password?token={WebUtility.UrlEncode(token)}&email={WebUtility.UrlEncode(request.Email)}";
 
             await SendPasswordResetEmailAsync(request.Email, resetLink);
 
@@ -355,25 +297,8 @@ namespace JourneyPalBackend.Controllers
                 Audience = "localhost",
                 Audiences = { "localhost" }
             };
-            Console.WriteLine($"Token generation key length: {Encoding.UTF8.GetBytes("3df71105add26312e4d2ade913d181b525a647b0179d16fbf7d8771ff5f72df2").Length}");
             return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
         }
-        private async Task<GoogleJsonWebSignature.Payload> ValidateGoogleToken(string idToken)
-        {
-            try
-            {
-                var settings = new GoogleJsonWebSignature.ValidationSettings
-                {
-                    Audience = new[] { _conf["Authentication:Google:ClientId"] }
-                };
-
-                return await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
-            }
-            catch
-            {
-                return null;
-            }
-        } 
         private string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -382,32 +307,6 @@ namespace JourneyPalBackend.Controllers
                 rng.GetBytes(randomNumber);
                 return Convert.ToBase64String(randomNumber);
             }
-        }
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-        {
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = false,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = _conf["Jwt:Issuer"],
-                ValidAudience = _conf["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_conf["Jwt:Key"])
-)
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters,
-                out var securityToken);
-
-            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
-                !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return null;
-            }
-
-            return principal;
         }
         #endregion
     }

@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using JourneyPalBackend.Utils;
+using System.ComponentModel.DataAnnotations;
 
 namespace JourneyPalBackend.Controllers
 {
@@ -57,7 +58,15 @@ namespace JourneyPalBackend.Controllers
                 return NotFound("User not found.");
             }
 
-            return Ok(user);
+            var data = new UserRequestObject
+            {
+                Username = user.UserName,
+                Email = user.Email,
+                Telephone = user.PhoneNumber
+
+            };
+
+            return Ok(data);
         }
         [HttpPatch("update-phone")]
         public async Task<IActionResult> UpdateUserPhoneNumber([FromQuery] string nameId, UpdatePhoneRequest request)
@@ -97,40 +106,86 @@ namespace JourneyPalBackend.Controllers
             var phoneNumberPattern = @"^\+?[1-9]\d{1,14}$";
             return Regex.IsMatch(phoneNumber, phoneNumberPattern);
         }
-        /*private string ValidateAccessToken(string token)
+        [HttpPatch("change-password")]
+        public async Task<IActionResult> ChangePassword([FromQuery] string nameId, ChangePasswordRequest request)
         {
-            try
+            var authHeader = Request.Headers.Authorization.FirstOrDefault();
+
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes("3df71105add26312e4d2ade913d181b525a647b0179d16fbf7d8771ff5f72df2s");
-
-                var validIssuer = "localhost";
-                var validAudience = "localhost";
-
-                var validationParameters = HelperClass.GetTokenValidationParameters();
-
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
-
-                foreach (var claim in principal.Claims)
-                {
-                    Console.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-                }
-
-                if (validatedToken is not JwtSecurityToken jwtToken || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256))
-                    return "Invalid token!";
-
-                return principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new SecurityTokenException("User ID not found in token"); //"Error, token invalid or not found!";
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Token validation failed: {ex.Message}");
-                return "Invalid token!";
+                return Unauthorized("Missing or invalid authorization token.");
             }
 
-        }*/
+            var user = await _userManager.FindByIdAsync(nameId);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Verify current password
+            var passwordValid = await _userManager.CheckPasswordAsync(user, request.CurrentPassword);
+            if (!passwordValid)
+            {
+                return BadRequest("Current password is incorrect.");
+            }
+
+            // Manual validation to match your specific requirements
+            var errors = new List<string>();
+
+            if (request.NewPassword.Length < 8)
+                errors.Add("Password must be at least 8 characters long.");
+
+            if (!Regex.IsMatch(request.NewPassword, @"\d"))
+                errors.Add("Password must contain at least one digit (0-9).");
+
+            if (!Regex.IsMatch(request.NewPassword, @"[a-z]"))
+                errors.Add("Password must contain at least one lowercase letter (a-z).");
+
+            if (!Regex.IsMatch(request.NewPassword, @"[A-Z]"))
+                errors.Add("Password must contain at least one uppercase letter (A-Z).");
+
+            if (!Regex.IsMatch(request.NewPassword, @"[^a-zA-Z0-9]"))
+                errors.Add("Password must contain at least one non-alphanumeric character.");
+
+            if (errors.Any())
+            {
+                return BadRequest(string.Join(" ", errors));
+            }
+
+            // Change password
+            var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+            if (!result.Succeeded)
+            {
+                return BadRequest(string.Join(" ", result.Errors.Select(e => e.Description)));
+            }
+
+            return Ok("Password changed successfully.");
+        }
     }
+    #region DTO/Helper Classes
+    public class ChangePasswordRequest
+    {
+        [Required(ErrorMessage = "Current password is required.")]
+        public string CurrentPassword { get; set; }
+
+        [Required(ErrorMessage = "New password is required.")]
+        public string NewPassword { get; set; }
+
+        [Required(ErrorMessage = "Confirmation password is required.")]
+        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; }
+    }
+
     public class UpdatePhoneRequest
     {
         public string PhoneNumber { get; set; }
     }
+
+    public class UserRequestObject
+    {
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string? Telephone { get; set; }
+    }
+    #endregion
 }

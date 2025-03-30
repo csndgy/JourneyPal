@@ -8,7 +8,6 @@
         public string EventLocation { get; set; }
         public string[] EventLinks { get; set; }
         public DateTime EventDate { get; set; }
-        public TimeSpan EventEstimatedTime { get; set; }
         public int TripId { get; set; }
         public virtual Trip Trip { get; set; }
     }

@@ -45,7 +45,6 @@ namespace JourneyPalBackend
                     },
                     ClockSkew = TimeSpan.FromSeconds(0),
                 };
-                Console.WriteLine($"Token validation key length: {Encoding.UTF8.GetBytes("3df71105add26312e4d2ade913d181b525a647b0179d16fbf7d8771ff5f72df2").Length}");
                 options.Events = new JwtBearerEvents
                 {
                     OnAuthenticationFailed = context =>
@@ -101,8 +100,8 @@ namespace JourneyPalBackend
             }).AddCookie()
             .AddGoogleOpenIdConnect(options =>
             {
-                options.ClientId = "13684633292-hv8dlbubct2ujgmpl65btbb45551k6i4.apps.googleusercontent.com";
-                options.ClientSecret = "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";
+                options.ClientId = "657605945054-cqvc0348b99aijcf5f2oet9ud7n4efkj.apps.googleusercontent.com";
+                options.ClientSecret = "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";
             });
 
             builder.Services.AddCors(o =>

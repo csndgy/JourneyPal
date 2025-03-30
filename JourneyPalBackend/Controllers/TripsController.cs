@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Net;
 using System.Security.Claims;
 
@@ -27,31 +28,22 @@ namespace JourneyPalBackend.Controllers
         public async Task<ActionResult<IEnumerable<TripDto>>> GetTrips()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return await _context.Trips
+            var data = await _context.Trips
                 .Where(t => t.UserId == userId)
                 .Include(t => t.Events)
                 .Include(t => t.Notes)
                 .Select(t => new TripDto
                 {
                     Id = t.Id,
+                    UserId = t.UserId,
                     TripName = t.TripName,
                     Destination = t.Destination,
                     StartDate = t.StartDate,
                     EndDate = t.EndDate,
-                    UserId = t.UserId,
-                    Events = t.Events.Select(e => new EventDto
-                    {
-                        Id = e.Id,
-                        EventName = e.EventName,
-                        EventDescription = e.EventDescription,
-                        EventLocation = e.EventLocation,
-                        EventLinks = e.EventLinks,
-                        EventDate = e.EventDate,
-                        EventEstimatedTime = e.EventEstimatedTime,
-                        TripId = e.TripId
-                    }).ToList()
                 })
                 .ToListAsync();
+
+            return data;
         }
 
         // GET: api/trips/5
@@ -82,7 +74,6 @@ namespace JourneyPalBackend.Controllers
                     EventLocation = e.EventLocation,
                     EventLinks = e.EventLinks,
                     EventDate = e.EventDate,
-                    EventEstimatedTime = e.EventEstimatedTime,
                     TripId = e.TripId
                 }).ToList(),
                 Notes = trip.Notes.Select(n => new TripNoteDto
@@ -100,10 +91,16 @@ namespace JourneyPalBackend.Controllers
         public async Task<ActionResult<TripDto>> CreateTrip(CreateTripDto createTripDto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            //var dateOnlyStart = createTripDto.StartDate.ToString().Split(' ')[0];
+            //var dateOnlyEnd = createTripDto.EndDate.ToString().Split(' ')[0];
+
             var trip = new Trip
             {
                 TripName = createTripDto.TripName,
                 Destination = createTripDto.Destination,
+                //StartDate = DateTime.ParseExact(dateOnlyStart, "dd/MM/yyyy", CultureInfo.InvariantCulture),
+                //EndDate = DateTime.ParseExact(dateOnlyEnd, "dd/MM/yyyy", CultureInfo.InvariantCulture),
                 StartDate = createTripDto.StartDate,
                 EndDate = createTripDto.EndDate,
                 UserId = userId
@@ -288,18 +285,17 @@ namespace JourneyPalBackend.Controllers
 
     public class CreateEventDto
     {
-        public string EventName { get; set; }
-        public string EventDescription { get; set; }
-        public string EventLocation { get; set; }
-        public string[] EventLinks { get; set; }
-        public DateTime EventDate { get; set; }
-        public TimeSpan EventEstimatedTime { get; set; }
+        public string? EventName { get; set; }
+        public string? EventDescription { get; set; }
+        public string? EventLocation { get; set; }
+        public string[]? EventLinks { get; set; }
+        public DateTime? EventDate { get; set; }
         public int TripId { get; set; }
     }
 
     public class UpdateEventDto : CreateEventDto
     {
-        public new int TripId { get; }
+        public new int? TripId { get; }
     }
 
     public class EventDto : CreateEventDto
