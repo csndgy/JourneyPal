@@ -22,7 +22,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             [isEmail ? 'email' : 'userName']: identifier,
             password: password
         }
-        console.log('Sending login request:', jsonObject);
         
         try {
             const response = await api.post('/api/Auth/login', jsonObject)

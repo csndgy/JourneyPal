@@ -1,6 +1,6 @@
 // src/pages/ForgotPassword.tsx
 import React, { useState } from 'react';
-import api from '../services/Interceptor';
+import api from '../Services/Interceptor';
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -11,11 +11,11 @@ const ForgotPassword: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await api.post('/auth/forgot-password', { email });
+      const response = await api.post('api/Auth/forgot-password', { email });
       setMessage(response.data.message); 
       setError('');
     } catch (err) {
-      setError('Failed to send password reset link. Please try again.');
+      setError('Failed to send password reset link. Please try again.' + err);
       setMessage('');
     }
   };

@@ -65,7 +65,6 @@ const UserProfile: React.FC = () => {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('token');
-      console.log("Token:", token);
 
       const response = await fetch(`https://localhost:7193/api/AccountDetails/profile?nameId=${localStorage.getItem("identifier")}`, {
         headers: {
@@ -76,8 +75,6 @@ const UserProfile: React.FC = () => {
       console.log("Response status:", response.status);
 
       if (response.status === 401) {
-        // Token expired or invalid - redirect to login
-        // window.location.href = '/login';
         throw new Error('Unauthorized - please log in again');
       }
 
@@ -90,7 +87,7 @@ const UserProfile: React.FC = () => {
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-      console.error("Error fetching user data:", err); // Add detailed error logging
+      console.error("Error fetching user data:", err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);

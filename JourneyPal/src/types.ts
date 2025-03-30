@@ -16,7 +16,6 @@ export interface Event {
   name: string;
   description: string;
   location: string;
-  duration: string;
   links: string;
   time: string;
   date?: string;  // Add optional date property
@@ -36,18 +35,22 @@ export interface TripPlan {
   days: TripDay[];
 }
 
+export interface ApiTrip {
+  id: number;
+  userId: string;
+  tripName: string;
+  destination: string;
+  startDate: string;
+  endDate: string;
+}
+
 export interface Trip {
   id: number;
   name: string;
   destination: string;
-  startDate: string;
-  endDate: string;
+  startDate: string; // ISO string
+  endDate: string;   // ISO string
   isCustom: boolean;
-  events?: Event[];
-  coordinates?: {
-    lat: number;
-    lng: number;
-  }; 
 }
 export interface CreateTripDto {
   TripName: string;

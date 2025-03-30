@@ -29,7 +29,6 @@ const SignUp: React.FC = () => {
         const response = await api.post('https://localhost:7193/api/Auth/register', jsonObject)
   
         if (response) {
-          console.log('Registration successful:', response);
           navigate('/login')
         } else {
             console.error('Registration failed:', response);

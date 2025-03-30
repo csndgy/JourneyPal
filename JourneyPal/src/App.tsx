@@ -14,6 +14,9 @@ import TripPlanner from './components/TripPlanner';
 import PlanYourTrip from './components/PlanYourTrip';
 import YourTrips from './components/YourTrips';
 import ProtectedRoute from './Services/ProtectedRoute';
+import NewTripPage from './components/NewTripPage';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 const App: React.FC = () => {
   // Alapértelmezett érték: light mode, kivéve ha a localStorage-ban dark mode van
@@ -91,11 +94,14 @@ const App: React.FC = () => {
           {/* <Route path="/checklist" element={<Checklist />} /> */}
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path='/forgot-password' element={<ForgotPassword />} />
+          <Route path='/reset-password' element={<ResetPassword />} />
           <Route element={<ProtectedRoute isAllowed={isAuthenticated} />}>
             <Route path="/profile" element={<UserProfile />} />
-            <Route path="/plan/:destinationId" element={<TripPlanner />} />
+            <Route path="/plan/:tripId" element={<TripPlanner />} />
             <Route path="/plan-your-trip" element={<PlanYourTrip />} />
             <Route path="/trips" element={<YourTrips />} />
+            <Route path="/trip/new" element={<NewTripPage />} />
           </Route>
         </Routes>
       </div>
