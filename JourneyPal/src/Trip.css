@@ -40,7 +40,7 @@
   
   .form-group input,
   .form-group textarea {
-    width: 100%;
+    width: 90%;
     padding: 10px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -1025,7 +1025,7 @@ input[type="radio"] {
 
   .form-group input,
   .form-group textarea {
-    width: 100%; /* Reset to original */
+    width: 90%; /* Reset to original */
     margin-left: unset;
     margin-right: unset;
     display: block;
@@ -1157,7 +1157,7 @@ input[type="radio"] {
   .form-group input,
   .form-group select {
     padding: 0.875rem; /* Original padding */
-    width: 100%; /* Reset to original */
+    width: 90%; /* Reset to original */
     margin-left: unset;
     margin-right: unset;
   }
@@ -1440,5 +1440,115 @@ input[type="radio"] {
     top: 10px;
     right: 10px;
     z-index: 1000;
+  }
+}
+.menu-toggle {
+  display: block;
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 1000;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+}
+
+.sidebar {
+  position: fixed;
+  left: -100%;
+  top: 0;
+  bottom: 0;
+  width: 280px;
+  background: var(--card-background);
+  transition: left 0.3s ease;
+  z-index: 999;
+  overflow-y: auto;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  padding-top: 20px;
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+.overview-cards {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.overview-card {
+  background: var(--card-background);
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  border: 1px solid var(--border-color);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+  }
+  
+  .card-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+  }
+  
+  h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color);
+  }
+  
+  p {
+    margin: 0;
+    color: var(--secondary-text-color);
+    font-size: 0.9rem;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  .menu-toggle {
+    display: none;
+  }
+  
+  .sidebar {
+    position: relative;
+    left: 0;
+    width: 300px;
+    box-shadow: none;
+  }
+  
+}
+.main-content {
+  padding: 1rem;
+  transition: margin-left 0.3s ease;
+}
+
+@media (min-width: 769px) {
+  .main-content {
+    padding: 2rem;
+  }
+}
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 998;
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar.active + .sidebar-overlay {
+    display: block;
   }
 }

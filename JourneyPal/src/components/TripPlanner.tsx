@@ -9,6 +9,39 @@ import 'react-datepicker/dist/react-datepicker.css';
 import '../Trip.css'
 import api from '../Services/Interceptor.ts';
 import destinationsFromJson from '../assets/destinations.json';
+const IMAGE_MANIFEST = new Set([
+  '/images/egypt-1.jpg',
+  '/images/egypt-2.jpg',
+  '/images/egypt-3.jpeg',
+  '/images/egypt-4.jpg',
+  '/images/egypt.jpg',
+  '/images/farce-islands-1.jpg',
+  '/images/farce-islands-2.jpg',
+  '/images/farce-islands-3.jpg',
+  '/images/farce-islands-4.jpg',
+  '/images/farce-islands.jpg',
+  '/images/ham.gif',
+  '/images/kiskunfelegyhaza.png',
+  '/images/machu-picchu.jpg',
+  '/images/open.png',
+  '/images/piltvice-lakes-1.jpg',
+  '/images/piltvice-lakes-2.jpg',
+  '/images/piltvice-lakes-3.jpg',
+  '/images/piltvice-lakes-4.jpg',
+  '/images/piltvice-lakes.jpg',
+  '/images/profile.png',
+  '/images/santorini-1.jpg',
+  '/images/santorini-2.jpg',
+  '/images/santorini-3.jpg',
+  '/images/santorini-4.jpg',
+  '/images/santorini.jpg',
+  '/images/siva-oasis.jpg',
+  '/images/tokyo-1.jpg',
+  '/images/tokyo-2.jpg',
+  '/images/tokyo-3.jpg',
+  '/images/tokyo-4.jpg',
+  '/images/tokyo.jpeg'
+]);
 
 const TripPlanner = () => {
   const { tripId } = useParams<{ tripId: string }>();
@@ -373,64 +406,51 @@ const TripPlanner = () => {
     setShowEventForm(false);
   };
 
+  function checkIfImageExists(imagePath: string): boolean {
+    return IMAGE_MANIFEST.has(imagePath);
+  }
+
   const recommendPlaces = (destination: { title: string; description: string }, allDestinations: Destination[] = []) => {
-    console.log('===== recommendPlaces Debug Start =====');
-    console.log('Input destination:', destination);
-    console.log('All destinations available:', allDestinations);
-  
-    // Check if this destination exists in the provided data
-    const matchedDestination = allDestinations.find(dest => {
-      const isMatch = dest.title.toLowerCase() === destination.title.toLowerCase();
-      console.log(`Comparing "${dest.title}" with "${destination.title}":`, isMatch);
-      return isMatch;
-    });
-  
-    console.log('Matched destination:', matchedDestination);
-  
-    // Split the description into places
-    const rawPlaces = destination.description.split(/[•-]/);
-    console.log('Raw places from description:', rawPlaces);
-  
-    const places = rawPlaces
-      .map(place => {
-        const trimmed = place.trim();
-        console.log(`Place before trim: "${place}", after trim: "${trimmed}"`);
-        return trimmed;
-      })
-      .filter(place => {
-        const isValid = !!place;
-        console.log(`Is place "${place}" valid?`, isValid);
-        return isValid;
-      })
+    // Find matching destination
+    const matchedDestination = allDestinations.find(dest =>
+      dest.title.toLowerCase() === destination.title.toLowerCase()
+    );
+
+    // Use matched description if available
+    const descriptionToUse = matchedDestination?.description || destination.description;
+
+    // Process places
+    const places = descriptionToUse.split(/[•-]/)
+      .map(place => place.trim())
+      .filter(place => place)
       .slice(0, 4);
-  
-    console.log('Final places array:', places);
-  
-    // If we found a matching destination, use its image for all recommendations
-    if (matchedDestination) {
-      console.log('Using matched destination image:', matchedDestination.image);
-      const result = places.map(place => ({
-        name: place,
-        image: matchedDestination.image
-      }));
-      console.log('Final result (matched destination):', result);
-      console.log('===== recommendPlaces Debug End =====');
-      return result;
-    }
-  
-    // Fallback to original behavior with numbered images
-    const generatedImages = places.map((place, index) => {
-      const generatedPath = `/images/${destination.title.toLowerCase().replace(/ /g, '-')}-${index + 1}.jpg`;
-      console.log(`Generated image path for "${place}":`, generatedPath);
+
+    return places.map((place, index) => {
+      const baseName = (matchedDestination || destination).title.toLowerCase().replace(/ /g, '-');
+
+      // Try numbered images first (e.g., tokyo-1.jpg)
+      const numberedImage = `/images/${baseName}-${index + 1}.jpg`;
+      if (checkIfImageExists(numberedImage)) {
+        return { name: place, image: numberedImage };
+      }
+
+      // Try alternative extensions for numbered images
+      const jpegVariant = `/images/${baseName}-${index + 1}.jpeg`;
+      if (checkIfImageExists(jpegVariant)) {
+        return { name: place, image: jpegVariant };
+      }
+
+      // Fallback to main image if matched destination exists
+      if (matchedDestination?.image && checkIfImageExists(matchedDestination.image)) {
+        return { name: place, image: matchedDestination.image };
+      }
+
+      // Final fallback (for custom destinations)
       return {
         name: place,
-        image: generatedPath
+        image: `/images/${baseName}-${index + 1}.jpg` // Will return 404 if doesn't exist
       };
     });
-  
-    console.log('Final result (generated images):', generatedImages);
-    console.log('===== recommendPlaces Debug End =====');
-    return generatedImages;
   };
 
   const recommendedPlaces = recommendPlaces(destination, destinationsFromJson);
@@ -444,109 +464,113 @@ const TripPlanner = () => {
 
   return (
     <div className="app-layout">
+      <button
+        className="menu-toggle"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
       {isDateSelected && (
-        <div className="sidebar">
-          <div
-            className="overview-card"
-            onClick={() => {
-              setShowMap(true);
-              setShowNotes(false);
-              setShowChecklist(false);
-              setShowPlacesToVisit(false);
-              setSelectedDay(null);
-              setIsMenuOpen(false);
-            }}
-          >
-            <div className="card-icon">🗺️</div>
-            <h3>Explore Map</h3>
-            <p>Discover locations and plan routes</p>
-          </div>
-          <div
-            className="overview-card"
-            onClick={() => {
-              setShowNotes(true);
-              setShowMap(false);
-              setShowChecklist(false);
-              setShowPlacesToVisit(false);
-              setSelectedDay(null);
-              setIsMenuOpen(false);
-            }}
-          >
-            <div className="card-icon">📝</div>
-            <h3>Travel Notes</h3>
-            <p>Capture your thoughts and ideas</p>
-          </div>
-
-          <div
-            className="overview-card"
-            onClick={() => {
-              setShowChecklist(true);
-              setShowNotes(false);
-              setShowMap(false);
-              setShowPlacesToVisit(false);
-              setSelectedDay(null);
-              setIsMenuOpen(false);
-            }}
-          >
-            <div className="card-icon">✅</div>
-            <h3>Packing List</h3>
-            <p>Manage your travel essentials</p>
-          </div>
-
-          <div
-            className="overview-card"
-            onClick={() => {
-              setShowPlacesToVisit(true);
-              setShowMap(false);
-              setShowNotes(false);
-              setShowChecklist(false);
-              setSelectedDay(null);
-              setIsMenuOpen(false);
-            }}
-          >
-            <div className="card-icon">🏛️</div>
-            <h3>Destinations</h3>
-            <p>Recommended places to visit</p>
-          </div>
-        </div>)}
-
-      {isDateSelected && (
-        <div className="sidebar-section">
-          <div className="section-header">
-            <h2>Itinerary</h2>
-          </div>
-          <div className="section-items-container">
-            <ul className="section-items">
-              {displayedDays.map((day, index) => (
-                <li
-                  key={day.date}
-                  onClick={() => {
-                    handleDayClick(day);
-                    setIsMenuOpen(false);
-                  }}
-                  className={selectedDay?.date === day.date ? 'selected-day' : ''}
-                >
-                  Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="pagination-container">
-            <button
-              className="btn-prev"
-              onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-              disabled={currentPage === 0}
+        <div className={`sidebar ${isMenuOpen ? 'active' : ''}`}>
+          <div className="overview-cards">
+            <div
+              className="overview-card"
+              onClick={() => {
+                setShowMap(true);
+                setShowNotes(false);
+                setShowChecklist(false);
+                setShowPlacesToVisit(false);
+                setSelectedDay(null);
+                setIsMenuOpen(false);
+              }}
             >
-              ➜
-            </button>
-            <span className="page-info">Page {currentPage + 1} of {totalPages}</span>
-            <button
-              className="btn-next"
-              onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
-              disabled={currentPage === totalPages - 1}
+              <div className="card-icon">🗺️</div>
+              <h3>Explore Map</h3>
+              <p>Discover locations and plan routes</p>
+            </div>
+            <div
+              className="overview-card"
+              onClick={() => {
+                setShowNotes(true);
+                setShowMap(false);
+                setShowChecklist(false);
+                setShowPlacesToVisit(false);
+                setSelectedDay(null);
+                setIsMenuOpen(false);
+              }}
             >
-              ➜
-            </button>
+              <div className="card-icon">📝</div>
+              <h3>Travel Notes</h3>
+              <p>Capture your thoughts and ideas</p>
+            </div>
+
+            <div
+              className="overview-card"
+              onClick={() => {
+                setShowChecklist(true);
+                setShowNotes(false);
+                setShowMap(false);
+                setShowPlacesToVisit(false);
+                setSelectedDay(null);
+                setIsMenuOpen(false);
+              }}
+            >
+              <div className="card-icon">✅</div>
+              <h3>Packing List</h3>
+              <p>Manage your travel essentials</p>
+            </div>
+
+            <div
+              className="overview-card"
+              onClick={() => {
+                setShowPlacesToVisit(true);
+                setShowMap(false);
+                setShowNotes(false);
+                setShowChecklist(false);
+                setSelectedDay(null);
+                setIsMenuOpen(false);
+              }}
+            >
+              <div className="card-icon">🏛️</div>
+              <h3>Destinations</h3>
+              <p>Recommended places to visit</p>
+            </div>
+          </div>
+
+          <div className="sidebar-section">
+            <div className="section-header">
+              <h2>Itinerary</h2>
+            </div>
+            <div className="section-items-container">
+              <ul className="section-items">
+                {displayedDays.map((day, index) => (
+                  <li
+                    key={day.date}
+                    onClick={() => {
+                      handleDayClick(day);
+                      setIsMenuOpen(false);
+                    }}
+                    className={selectedDay?.date === day.date ? 'selected-day' : ''}
+                  >
+                    Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="pagination-container">
+              <button
+                className="btn-prev"
+                onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                disabled={currentPage === 0}
+              >
+                ➜
+              </button>
+              <span className="page-info">Page {currentPage + 1} of {totalPages}</span>
+              <button
+                className="btn-next"
+                onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+                disabled={currentPage === totalPages - 1}
+              >
+                ➜
+              </button>
+            </div>
           </div>
         </div>
       )}
