@@ -1,0 +1,976 @@
+/* From Uiverse.io by JaydipPrajapati1910 */
+.btn-container {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Távolság a switch és az ikonok között */
+  }
+  
+  .btn-container svg {
+    position: relative;
+    top: -2px; /* Ikonok feljebb pozicionálása */
+  }
+  
+  label {
+    font-size: 13px;
+    color: #424242;
+    font-weight: 500;
+  }
+  
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner {
+    margin: 0px;
+    width: 140px;
+    height: 30px;
+    background: #E0E0E0;
+    border-radius: 26px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s ease;
+    display: block;
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner:before {
+    content: attr(data-on);
+    position: absolute;
+    font-size: 12px;
+    font-weight: 500;
+    top: 7px;
+    right: 20px;
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+    content: attr(data-off);
+    width: 70px;
+    height: 16px;
+    background: #fff;
+    border-radius: 26px;
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0px 0px 6px -2px #111;
+    padding: 5px 0px;
+  }
+  
+  
+  .btn-color-mode-switch input[type="checkbox"] {
+    cursor: pointer;
+    width: 50px;
+    height: 25px;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    margin: 0px;
+  }
+  
+  .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner {
+    background: #151515;
+    color: #fff;
+  }
+  
+  .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after {
+    content: attr(data-on);
+    left: 68px;
+    background: #3c3c3c;
+  }
+  
+  .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:before {
+    content: attr(data-off);
+    right: auto;
+    left: 20px;
+  }
+
+/* Mobile-first responsive styles */
+@media screen and (max-width: 1200px) {
+  .journey-pal-container {
+    padding: 15px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .stats {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .destinations-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .destination-card:nth-child(1),
+  .destination-card:nth-child(2),
+  .destination-card:nth-child(3),
+  .destination-card:nth-child(4),
+  .destination-card:nth-child(5),
+  .destination-card:nth-child(6),
+  .destination-card:nth-child(7) {
+    grid-column: span 1;
+  }
+  
+  .hero-slogan {
+    font-size: 2.5rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+  
+  .navbar-logo {
+    font-size: 1.5rem;
+    text-decoration: none;
+    
+  }
+  
+  .navbar-links {
+    order: 3;
+    width: 100%;
+    margin-top: 10px;
+    justify-content: center;
+  }
+  
+  .navbar-search {
+    flex: 1;
+    margin: 0 10px;
+  }
+  
+  .navbar-search input {
+    width: 100%;
+  }
+  
+  .hero-section {
+    height: auto;
+    padding: 40px 20px;
+  }
+  
+  .hero-slogan {
+    font-size: 2rem;
+  }
+  
+  .hero-description {
+    font-size: 1rem;
+  }
+  
+  .press-card {
+    flex: 0 0 calc(100% - 20px);
+  }
+  
+  .scroll-arrow.left {
+    left: 10px;
+  }
+  
+  .scroll-arrow.right {
+    right: 10px;
+  }
+  
+  .profile-dropdown {
+    width: 180px;
+    right: -10px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .navbar-buttons {
+    margin-left: auto;
+  }
+  
+  .destinations-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-button {
+    padding: 12px 24px;
+    font-size: 1rem;
+  }
+  
+  .trip-planner-card {
+    padding: 1rem;
+  }
+  
+  .destination-hero {
+    height: 200px;
+  }
+  
+  .date-picker {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .date-input {
+    width: 90%;
+  }
+  
+  .planner-container {
+    flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .navbar {
+    margin: 0 0 10px 0;
+    border-radius: 10px;
+  }
+  
+  .navbar-logo {
+    font-size: 1.2rem;
+    text-decoration: none;
+  }
+  
+  .navbar-links a {
+    font-size: 0.9rem;
+    padding: 5px;
+  }
+  
+  .navbar-buttons button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .profile-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .hero-slogan {
+    font-size: 1.8rem;
+  }
+  
+  .stat h2 {
+    font-size: 1.5rem;
+  }
+  
+  .stat p {
+    font-size: 0.9rem;
+  }
+  
+  .loading-gif {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .loading-screen p {
+    font-size: 1rem;
+  }
+  
+  /* Dark Mode Toggle Responsive */
+  .btn-container {
+    gap: 5px;
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner {
+    width: 110px;
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+    width: 55px;
+  }
+  
+  .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after {
+    left: 53px;
+  }
+}
+
+/* Fix for mobile menu interactions */
+@media screen and (max-width: 768px) {
+  .navbar-links {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .navbar-links.active {
+    display: flex;
+  }
+  
+  .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color);
+  }
+  
+  .mobile-menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: var(--text-color);
+    margin: 5px 0;
+    transition: transform 0.3s ease;
+  }
+  
+  /* Dark mode toggle button responsive */
+  .btn-container {
+    margin-left: auto;
+  }
+}
+
+/* Dark mode mobile compatibility */
+@media screen and (max-width: 768px) {
+  .dark-mode .mobile-menu-toggle span {
+    background-color: var(--text-color);
+  }
+  
+  .dark-mode .loading-screen {
+    background: rgba(18, 18, 18, 0.9);
+  }
+  
+  .dark-mode .loading-screen p {
+    color: var(--text-color);
+  }
+  
+  .dark-mode .btn-color-mode-switch > label.btn-color-mode-switch-inner {
+    background: #151515;
+  }
+  
+  .dark-mode .btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+    background: #3c3c3c;
+    color: #fff;
+  }
+}
+
+/* From Uiverse.io by JaydipPrajapati1910 */
+.btn-container {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Távolság a switch és az ikonok között */
+}
+
+.btn-container svg {
+  position: relative;
+  top: -2px; /* Ikonok feljebb pozicionálása */
+}
+
+label {
+  font-size: 13px;
+  color: #424242;
+  font-weight: 500;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner {
+  margin: 0px;
+  width: 140px;
+  height: 30px;
+  background: #E0E0E0;
+  border-radius: 26px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  display: block;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner:before {
+  content: attr(data-on);
+  position: absolute;
+  font-size: 12px;
+  font-weight: 500;
+  top: 7px;
+  right: 20px;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+  content: attr(data-off);
+  width: 70px;
+  height: 16px;
+  background: #fff;
+  border-radius: 26px;
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0px 0px 6px -2px #111;
+  padding: 5px 0px;
+}
+
+.btn-color-mode-switch input[type="checkbox"] {
+  cursor: pointer;
+  width: 50px;
+  height: 25px;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  margin: 0px;
+}
+
+.btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner {
+  background: #151515;
+  color: #fff;
+}
+
+.btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after {
+  content: attr(data-on);
+  left: 68px;
+  background: #3c3c3c;
+}
+
+.btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:before {
+  content: attr(data-off);
+  right: auto;
+  left: 20px;
+}
+
+/* Dark mode compatibility for toggle */
+.dark-mode label {
+  color: var(--text-color);
+}
+
+/* Mobile-first alapstílusok */
+@media screen and (max-width: 480px) {
+  .navbar {
+    flex-wrap: wrap;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .navbar-logo {
+    font-size: 1.2rem;
+    flex: 1 1 100%;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .navbar-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 10px;
+    display: none; /* Alapértelmezettként rejtve */
+  }
+
+  .navbar-links.active {
+    display: flex; /* Menü megnyitásakor látható */
+  }
+
+  .navbar-search {
+    flex: 1 1 100%;
+    margin: 10px 0;
+  }
+
+  .navbar-search input {
+    width: 100%;
+  }
+
+  .navbar-buttons {
+    flex: 1 1 100%;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .mobile-menu-toggle {
+    display: flex; /* Mobilmenü gomb látható */
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .mobile-menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: #424242;
+    margin: 5px 0;
+    transition: transform 0.3s ease;
+  }
+}
+
+/* Tablet nézet (480px-től 768px-ig) */
+@media screen and (min-width: 480px) and (max-width: 768px) {
+  .navbar {
+    flex-wrap: nowrap;
+    padding: 15px;
+  }
+
+  .navbar-logo {
+    font-size: 1.5rem;
+    flex: 0 1 auto;
+    text-align: left;
+    text-decoration: none;
+  }
+
+  .navbar-links {
+    display: flex;
+    order: 0;
+    width: auto;
+    gap: 15px;
+  }
+
+  .navbar-search {
+    flex: 1 1 auto;
+    margin: 0 15px;
+  }
+
+  .navbar-search input {
+    width: 100%;
+  }
+
+  .navbar-buttons {
+    flex: 0 1 auto;
+    gap: 15px;
+  }
+
+  .mobile-menu-toggle {
+    display: none; /* Mobilmenü gomb elrejtve */
+  }
+}
+
+/* Asztal nézet (768px-től) */
+@media screen and (min-width: 768px) {
+  .navbar {
+    padding: 20px 40px;
+    gap: 20px;
+  }
+
+  .navbar-logo {
+    font-size: 1.8rem;
+    text-decoration: none;
+  }
+
+  .navbar-links {
+    gap: 60px;
+  }
+
+  .navbar-search {
+    flex: 1 1 auto;
+    margin: 0 20px;
+  }
+
+  .navbar-search input {
+    width: 250px;
+  }
+
+  .navbar-buttons {
+    gap: 20px;
+  }
+}
+
+
+
+
+/*mobile first, might be some re-written codes in there*/
+
+/* Base mobile-first styles */
+.navbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-color);
+  border-radius: 15px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 12px 15px;
+  margin: 10px;
+  position: sticky;
+  top: 10px;
+  z-index: 1000;
+}
+
+.navbar-logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--text-color);
+  text-decoration: none;
+  margin: 0;
+}
+
+/* Mobile menu visibility control */
+.desktop-only {
+  display: none;
+}
+
+.mobile-only {
+  display: flex;
+}
+
+/* Navbar links styling */
+.navbar-links {
+  display: none; /* Initially hidden on mobile */
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  gap: 10px;
+}
+
+.navbar-links.active {
+  display: flex;
+  margin-top: 15px;
+  order: 4; /* Ensure it's below all other elements */
+}
+
+.navbar-links li {
+  margin: 5px 0;
+}
+
+.navbar-links a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 8px 5px;
+  display: block;
+  text-align: center;
+  transition: color 0.3s;
+}
+
+.navbar-links a:hover {
+  color: var(--accent-color);
+}
+
+/* Dark mode toggle styling */
+.btn-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-container svg {
+  position: relative;
+  top: -2px;
+}
+
+label {
+  font-size: 13px;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner {
+  margin: 0px;
+  width: 110px;
+  height: 30px;
+  background: #E0E0E0;
+  border-radius: 26px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  display: block;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner:before {
+  content: attr(data-on);
+  position: absolute;
+  font-size: 12px;
+  font-weight: 500;
+  top: 7px;
+  right: 20px;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+  content: attr(data-off);
+  width: 55px;
+  height: 16px;
+  background: #fff;
+  border-radius: 26px;
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0px 0px 6px -2px #111;
+  padding: 5px 0px;
+}
+
+.btn-color-mode-switch input[type="checkbox"] {
+  cursor: pointer;
+  width: 50px;
+  height: 25px;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  margin: 0px;
+}
+
+.btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner {
+  background: #151515;
+  color: #fff;
+}
+
+.btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after {
+  content: attr(data-on);
+  left: 53px;
+  background: #3c3c3c;
+}
+
+.btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:before {
+  content: attr(data-off);
+  right: auto;
+  left: 20px;
+}
+
+/* Profile dropdown styling */
+.profile-container {
+  position: relative;
+  margin-left: 5px;
+}
+
+.profile-button {
+  cursor: pointer;
+}
+
+.profile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--bg-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  width: 180px;
+  padding: 10px;
+  margin-top: 10px;
+  z-index: 10;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 8px 12px;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.dropdown-item:hover {
+  background-color: var(--hover-color);
+  border-radius: 4px;
+}
+
+/* Mobile menu toggle hamburger button */
+.mobile-menu-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+  margin-left: auto;
+}
+
+.hamburger {
+  position: relative;
+  width: 25px;
+  height: 20px;
+}
+
+.hamburger span {
+  display: block;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background-color: var(--text-color);
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.hamburger span:nth-child(1) {
+  top: 0;
+}
+
+.hamburger span:nth-child(2) {
+  top: 8px;
+}
+
+.hamburger span:nth-child(3) {
+  top: 16px;
+}
+
+/* Hamburger animation */
+.hamburger.active span:nth-child(1) {
+  top: 8px;
+  transform: rotate(45deg);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  top: 8px;
+  transform: rotate(-45deg);
+}
+
+/* Dark mode compatibility */
+.dark-mode .hamburger span {
+  background-color: var(--text-color);
+}
+
+/* Mobile Navbar Ordering */
+@media screen and (max-width: 768px) {
+  .navbar {
+    justify-content: space-between;
+  }
+  
+  .mobile-menu-toggle {
+    order: 3;
+  }
+}
+
+/* Tablet styles (481px and up) */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  .navbar {
+    padding: 15px;
+  }
+  
+  .navbar-logo {
+    font-size: 1.5rem;
+  }
+  
+  .navbar-links {
+    order: 4;
+    width: 100%;
+  }
+  
+  .profile-dropdown {
+    right: 0;
+  }
+}
+
+/* Desktop styles (769px and up) */
+@media screen and (min-width: 769px) {
+  .navbar {
+    flex-wrap: nowrap;
+    padding: 15px 30px;
+    gap: 20px;
+  }
+  
+  .navbar-logo {
+    font-size: 1.8rem;
+    order: 1;
+  }
+  
+  /* Show desktop elements, hide mobile elements */
+  .desktop-only {
+    display: flex;
+  }
+  
+  .mobile-only,
+  .mobile-menu-toggle {
+    display: none;
+  }
+  
+  .navbar-links {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    order: 2;
+    margin-top: 0;
+    gap: 30px;
+    align-items: center;
+  }
+  
+  .navbar-links li {
+    margin: 0;
+  }
+  
+  .navbar-links a {
+    padding: 5px 10px;
+  }
+  
+  .btn-container {
+    order: 3;
+    gap: 8px;
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner {
+    width: 140px;
+  }
+  
+  .btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+    width: 70px;
+  }
+  
+  .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after {
+    left: 68px;
+  }
+  
+  .profile-container {
+    order: 4;
+  }
+  
+  .profile-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .profile-dropdown {
+    width: 200px;
+  }
+}
+
+/* For very large screens */
+@media screen and (min-width: 1200px) {
+  .navbar {
+    padding: 20px 40px;
+  }
+  
+  .navbar-links {
+    gap: 60px;
+  }
+}
+
+/* Base hide/show for mobile/desktop elements */
+.desktop-only {
+  display: none;
+}
+
+.mobile-only {
+  display: flex;
+}
+
+/* Desktop styles (769px and up) */
+@media screen and (min-width: 769px) {
+  /* Show desktop elements, hide mobile elements */
+  .desktop-only {
+    display: flex;
+  }
+  
+  .mobile-only {
+    display: none;
+  }
+}
+
+/* Base hide/show for mobile/desktop elements */
+.desktop-only {
+  display: none;
+}
+
+.mobile-only {
+  display: flex;
+}
+
+/* Desktop styles (769px and up) */
+@media screen and (min-width: 769px) {
+  /* Show desktop elements, hide mobile elements */
+  .desktop-only {
+    display: flex;
+  }
+  
+  .mobile-only {
+    display: none;
+  }
+}

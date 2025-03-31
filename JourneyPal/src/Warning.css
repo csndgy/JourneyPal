@@ -1,0 +1,29 @@
+.popup {
+    box-shadow: 4px 4px 10px -10px rgba(0, 0, 0, 1);
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    display: flex;
+    border-radius: 4px;
+    padding: 5px 0;
+    font-weight: 300;
+  }
+  .popup svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .popup-icon svg {
+    margin: 5px;
+    display: flex;
+    align-items: center;
+  }
+  .alert-popup {
+    background-color: #fefce8;
+    border: solid 1px #facc15;
+  }
+  .alert-icon path {
+    fill: #facc15;
+  }
+  .alert-message {
+    color: #ca8a04;
+  }
