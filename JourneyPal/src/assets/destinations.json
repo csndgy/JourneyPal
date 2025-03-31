@@ -4,48 +4,76 @@
       "image": "/images/faroe-islands.jpg",
       "alt": "Faroe Islands",
       "title": "Faroe Islands",
-      "description": "Dramatic Cliffs • Nordic Villages • Múlafossur Waterfall"
+      "description": "Dramatic Cliffs • Nordic Villages • Múlafossur Waterfall",
+      "coordinates": { 
+        "lat": 62.007864, 
+        "lng": -6.790982 
+      }
     },
     {
       "id": 2,
       "image": "/images/tokyo.jpeg",
       "alt": "Tokyo",
       "title": "Tokyo",
-      "description": "Tokyo Tower • Senso-ji Temple • Shibuya Crossing"
+      "description": "Tokyo Tower • Senso-ji Temple • Shibuya Crossing",
+      "coordinates": { 
+        "lat": 35.6895, 
+        "lng": 139.6917 
+      }
     },
     {
       "id": 3,
       "image": "/images/plitvice-lakes.jpg",
       "alt": "Plitvice Lakes",
       "title": "Plitvice Lakes",
-      "description": "Waterfalls • Natural Lakes • Ancient Forests"
+      "description": "Waterfalls • Natural Lakes • Ancient Forests",
+      "coordinates": { 
+        "lat": 44.8654, 
+        "lng": 15.5820 
+      }
     },
     {
       "id": 4,
       "image": "/images/santorini.jpg",
       "alt": "Santorini",
       "title": "Santorini",
-      "description": "White Villages • Aegean Sea • Sunset Views"
+      "description": "White Villages • Aegean Sea • Sunset Views",
+      "coordinates": { 
+        "lat": 36.3932, 
+        "lng": 25.4615 
+      }
     },
     {
       "id": 5,
       "image": "/images/egypt.jpg",
       "alt": "Egypt",
       "title": "The Great Pyramids",
-      "description": "Desert • Ancient Ruins • Temples and Pyramids"
+      "description": "Desert • Ancient Ruins • Temples and Pyramids",
+      "coordinates": { 
+        "lat": 29.9792, 
+        "lng": 31.1342 
+      }
     },
     {
       "id": 6,
       "image": "/images/cappadocia.jpg",
       "alt": "Cappadocia",
       "title": "Cappadocia",
-      "description": "Hot Air Balloons • Cave Hotels • Rock Churches"
+      "description": "Hot Air Balloons • Cave Hotels • Rock Churches",
+      "coordinates": { 
+        "lat": 38.6431, 
+        "lng": 34.8307 
+      }
     },
     {
       "id": 7,
       "image": "/images/machu-picchu.jpg",
       "alt": "Machu Picchu",
       "title": "Machu Picchu",
-      "description": "Inca Ruins • Andes Mountains • Sacred Valley"
+      "description": "Inca Ruins • Andes Mountains • Sacred Valley",
+      "coordinates": { 
+        "lat": -13.1631, 
+        "lng": -72.5450 
+      }
     }
   ]

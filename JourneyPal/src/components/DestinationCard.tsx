@@ -10,7 +10,15 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ destination })
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/plan/${destination.id}`);
+    navigate('/trip/new', {  // Changed to a dedicated new trip route
+      state: {
+        destination: destination.title,
+        coordinates: destination.coordinates,
+        image: destination.image,
+        alt: destination.alt,
+        description: destination.description
+      }
+    });
   };
 
   return (

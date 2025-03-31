@@ -1,23 +1,30 @@
-import React, { forwardRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+import { forwardRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import destinations from '../assets/destinations.json';
 import { Destination } from '../assets/destinations';
 
 interface PopularDestinationsProps {}
 
-const PopularDestinations = forwardRef<HTMLDivElement, PopularDestinationsProps>((props, ref) => {
+const PopularDestinations = forwardRef<HTMLDivElement, PopularDestinationsProps>((_props, ref) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleClick = (destinationId: number) => {
+  const handleClick = (destination: Destination) => {
     setIsLoading(true);
-    setTimeout(() => {
-      navigate(`/plan/${destinationId}`);
-    }, 2000);
+    navigate('/trip/new', {  // Changed to dedicated new trip route
+      state: {
+        destination: destination.title,
+        coordinates: destination.coordinates,
+        image: destination.image,
+        alt: destination.alt,
+        description: destination.description,
+      }
+    });
   };
 
   return (
-    <section className="destinations-section" id="popular-destinations" ref={ref}>
+    <section className="destinations-section" id="popular-destinations" ref={ref as React.Ref<HTMLDivElement>}>
       {isLoading && (
         <div className="loading-screen">
           <img 
@@ -34,17 +41,15 @@ const PopularDestinations = forwardRef<HTMLDivElement, PopularDestinationsProps>
           <div
             key={destination.id}
             className="destination-card"
-            onClick={() => handleClick(destination.id)}
+            onClick={() => handleClick(destination)}
           >
-            <Link to="#" className="destination-card-link">
-              <div className="card-image">
-                <img src={destination.image} alt={destination.alt} />
-              </div>
-              <div className="card-content">
-                <h3 className="card-title">{destination.title}</h3>
-                <p className="card-description">{destination.description}</p>
-              </div>
-            </Link>
+            <div className="card-image">
+              <img src={destination.image} alt={destination.alt} />
+            </div>
+            <div className="card-content">
+              <h3 className="card-title">{destination.title}</h3>
+              <p className="card-description">{destination.description}</p>
+            </div>
           </div>
         ))}
       </div>

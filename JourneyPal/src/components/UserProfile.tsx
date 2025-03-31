@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import '../UserProfile.css';
+import api, { handleFullLogout } from '../Services/Interceptor';
 
 interface User {
   username: string;
   email: string;
-  phoneNumber?: string;
+  telephone?: string;
 }
 
 interface PasswordForm {
@@ -22,10 +23,11 @@ const UserProfile: React.FC = () => {
   const [user, setUser] = useState<User>({
     username: "",
     email: "",
-    phoneNumber: ""
+    telephone: ""
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const [isEditingPhone, setIsEditingPhone] = useState<boolean>(false);
   const [isChangingPassword, setIsChangingPassword] = useState<boolean>(false);
@@ -43,32 +45,36 @@ const UserProfile: React.FC = () => {
   });
 
   useEffect(() => {
-    fetchUserData();
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        handleFullLogout();
+        return;
+      }
+      await fetchUserData();
+    };
+    checkAuth();
   }, []);
 
   useEffect(() => {
-    if (user.phoneNumber) {
-      setTempPhone(user.phoneNumber);
+    if (user.telephone) {
+      setTempPhone(user.telephone);
     }
-  }, [user.phoneNumber]);
+  }, [user.telephone]);
 
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('token');
-      console.log("Token:", token); // Add this to verify token exists
 
-      const response = await fetch('https://localhost:7193/api/AccountDetails/me', {
+      const response = await fetch(`https://localhost:7193/api/AccountDetails/profile?nameId=${localStorage.getItem("identifier")}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
       });
-
       console.log("Response status:", response.status);
 
       if (response.status === 401) {
-        // Token expired or invalid - redirect to login
-        // window.location.href = '/login';
         throw new Error('Unauthorized - please log in again');
       }
 
@@ -81,7 +87,7 @@ const UserProfile: React.FC = () => {
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-      console.error("Error fetching user data:", err); // Add detailed error logging
+      console.error("Error fetching user data:", err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
@@ -95,26 +101,65 @@ const UserProfile: React.FC = () => {
     }));
   };
 
-  const handlePhoneSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setUser({ ...user, phoneNumber: tempPhone });
-    setIsEditingPhone(false);
+  const validatePhoneNumber = (phone: string): boolean => {
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+    return phoneRegex.test(phone);
   };
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordForm.newPassword === passwordForm.confirmPassword) {
-      // Handle password update (e.g., API call)
-      setIsChangingPassword(false);
-      setPasswordForm({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: ""
+    setPhoneError(null);
+
+    if (!validatePhoneNumber(tempPhone)) {
+      setPhoneError('Please enter a valid phone number (e.g., +1234567890)');
+      return;
+    }
+
+    try {
+      await api.patch(`/api/AccountDetails/update-phone?nameId=${localStorage.getItem("identifier")}`, {
+        phoneNumber: tempPhone
       });
-    } else {
-      alert("New passwords do not match!");
+
+      setUser({ ...user, telephone: tempPhone });
+      setIsEditingPhone(false);
+    } catch (err) {
+      setPhoneError('Failed to update phone number. Please try again.');
+      console.error("Error updating phone number:", err);
     }
   };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+        alert("New passwords do not match!");
+        return;
+    }
+
+    try {
+        await api.patch(`/api/AccountDetails/change-password?nameId=${localStorage.getItem("identifier")}`, {
+            currentPassword: passwordForm.currentPassword,
+            newPassword: passwordForm.newPassword,
+            confirmPassword: passwordForm.confirmPassword
+        });
+
+        setIsChangingPassword(false);
+        setPasswordForm({
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: ""
+        });
+        alert("Password changed successfully!");
+    } catch (err) {
+        console.error("Error changing password:", err);
+        if (err instanceof Error) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          alert((err as any).response?.data || "Failed to change password. Please try again.");
+        } else {
+          alert("Failed to change password. Please try again.");
+        }
+    }
+};
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -189,15 +234,19 @@ const UserProfile: React.FC = () => {
                 type="tel"
                 value={tempPhone}
                 onChange={(e) => setTempPhone(e.target.value)}
-                placeholder="Enter phone number"
+                placeholder="Enter phone number (e.g., +1234567890)"
                 className="phone-input"
               />
+              {phoneError && <div className="error-message">{phoneError}</div>}
               <div className="button-group">
                 <button type="submit" className="save-button">Save</button>
                 <button
                   type="button"
                   className="cancel-button"
-                  onClick={() => setIsEditingPhone(false)}
+                  onClick={() => {
+                    setIsEditingPhone(false);
+                    setPhoneError(null);
+                  }}
                 >
                   Cancel
                 </button>
@@ -205,12 +254,12 @@ const UserProfile: React.FC = () => {
             </form>
           ) : (
             <div className="phone-display">
-              <span>{user.phoneNumber || 'Not set'}</span>
+              <span>{user.telephone || 'Not set'}</span>
               <button
                 className="edit-button"
                 onClick={() => setIsEditingPhone(true)}
               >
-                {user.phoneNumber ? 'Change' : 'Add'}
+                {user.telephone ? 'Change' : 'Add'}
               </button>
             </div>
           )}
