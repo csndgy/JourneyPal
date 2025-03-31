@@ -72,7 +72,6 @@ const YourTrips: React.FC = () => {
       day: '2-digit'
     });
   };
-
   if (loading) {
     return (
       <div className="your-trips-container">
@@ -90,7 +89,6 @@ const YourTrips: React.FC = () => {
       </div>
     );
   }
-
   return (
     <div className="your-trips-container">
       <h1>Your Trips</h1>

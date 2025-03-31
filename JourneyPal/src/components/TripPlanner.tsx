@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { destinations } from '../assets/destinations.ts';
 import { TripPlan, TripDay, Destination, Event } from '../types';
 import Checklist from './Checklist.tsx';
@@ -26,6 +26,7 @@ const TripPlanner = () => {
       destinations[0]
     );
 
+  // ... existing state declarations remain the same ...
   const [tripPlan, setTripPlan] = useState<TripPlan>({
     startDate: '',
     endDate: '',
@@ -43,6 +44,7 @@ const TripPlanner = () => {
   const [notes, setNotes] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
   const [showEventForm, setShowEventForm] = useState(false);
+  const navigate = useNavigate();
   const [newEvent, setNewEvent] = useState<Event>({
     id: '',
     name: '',
@@ -129,6 +131,7 @@ const TripPlanner = () => {
       };
 
       if (state.startDate && state.endDate) {
+        // Fix: Use proper date handling to avoid timezone issues
         const start = new Date(state.startDate);
         const end = new Date(state.endDate);
 
@@ -141,7 +144,6 @@ const TripPlanner = () => {
         currentDate.setHours(0, 0, 0, 0);
         const endDate = new Date(end);
         endDate.setHours(0, 0, 0, 0);
-
         while (currentDate <= endDate) {
           const dateString = currentDate.toISOString().split('T')[0];
           const dayEvents = (state.existingEvents || [])
@@ -156,7 +158,6 @@ const TripPlanner = () => {
           });
           currentDate.setDate(currentDate.getDate() + 1);
         }
-
         setTripPlan({
           startDate: start.toISOString().split('T')[0],
           endDate: end.toISOString().split('T')[0],
@@ -167,8 +168,16 @@ const TripPlanner = () => {
       }
     }
   }, [location.state]);
+  
+  if (!destination) return <div className="error-message">Invalid destination</div>;
 
-  if (!destination) return <div>Destination not found</div>;
+  // Helper function to format dates correctly without timezone issues
+  const formatDateToLocalISOString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const generateDays = () => {
     if (!startDate || !endDate) return;
@@ -177,8 +186,10 @@ const TripPlanner = () => {
     const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
+      // Fix: Use our helper function to get consistent date strings
+      const dateString = formatDateToLocalISOString(currentDate);
       days.push({
-        date: currentDate.toISOString().split('T')[0],
+        date: dateString,
         activities: [],
         images: [],
         notes: [],
@@ -186,7 +197,6 @@ const TripPlanner = () => {
       });
       currentDate.setDate(currentDate.getDate() + 1);
     }
-
     setTripPlan({
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate.toISOString().split('T')[0],
@@ -417,22 +427,76 @@ const TripPlanner = () => {
               }}>Places to visit</li>
             </ul>
           </div>
+          <div 
+            className="overview-card"
+            onClick={() => {
+              setShowNotes(true);
+              setShowMap(false);
+              setShowChecklist(false);
+              setShowPlacesToVisit(false);
+              setSelectedDay(null);
+              setIsMenuOpen(false);
+            }}
+          >
+            <div className="card-icon">📝</div>
+            <h3>Travel Notes</h3>
+            <p>Capture your thoughts and ideas</p>
+          </div>
 
+          <div 
+            className="overview-card"
+            onClick={() => {
+              setShowChecklist(true);
+              setShowNotes(false);
+              setShowMap(false);
+              setShowPlacesToVisit(false);
+              setSelectedDay(null);
+              setIsMenuOpen(false);
+            }}
+          >
+            <div className="card-icon">✅</div>
+            <h3>Packing List</h3>
+            <p>Manage your travel essentials</p>
+          </div>
+
+          <div 
+            className="overview-card"
+            onClick={() => {
+              setShowPlacesToVisit(true);
+              setShowMap(false);
+              setShowNotes(false);
+              setShowChecklist(false);
+              setSelectedDay(null);
+              setIsMenuOpen(false);
+            }}
+          >
+            <div className="card-icon">🏛️</div>
+            <h3>Destinations</h3>
+            <p>Recommended places to visit</p>
+          </div>
+        </div>
+
+        {isDateSelected && (
           <div className="sidebar-section">
             <div className="section-header">
               <h2>Itinerary</h2>
             </div>
-            <ul className="section-items">
-              {displayedDays.map((day, index) => (
-                <li
-                  key={day.date}
-                  onClick={() => handleDayClick(day)}
-                  className={selectedDay?.date === day.date ? 'selected-day' : ''}
-                >
-                  Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
-                </li>
-              ))}
-            </ul>
+            <div className="section-items-container">
+              <ul className="section-items">
+                {displayedDays.map((day, index) => (
+                  <li
+                    key={day.date}
+                    onClick={() => {
+                      handleDayClick(day);
+                      setIsMenuOpen(false);
+                    }}
+                    className={selectedDay?.date === day.date ? 'selected-day' : ''}
+                  >
+                    Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
+                  </li>
+                ))}
+              </ul>
+            </div>
             <div className="pagination-container">
               <button
                 className="btn-prev"
@@ -451,8 +515,8 @@ const TripPlanner = () => {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="main-content">
         {!isDateSelected ? (
@@ -672,9 +736,22 @@ const TripPlanner = () => {
                       {event.links && (
                         <div className="event-detail">
                           <span className="detail-label">Links:</span>
-                          <a href={event.links} target="_blank" rel="noopener noreferrer">
-                            {event.links}
-                          </a>
+                          {event.links && (
+                            <a 
+                              href={event.links.startsWith('http') ? event.links : `https://${event.links}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              onClick={(e) => {
+                                // Prevent navigation for invalid links
+                                if (!/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/.test(event.links)) {
+                                  e.preventDefault();
+                                  alert('Please enter a valid URL');
+                                }
+                              }}
+                            >
+                              {event.links}
+                            </a>
+                          )}
                         </div>
                       )}
                     </div>

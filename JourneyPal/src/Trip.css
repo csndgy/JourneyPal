@@ -313,9 +313,9 @@
   }
 
   .plan-your-trip-container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 2rem auto;
-    padding: 2rem;
+    padding: 3rem;
     background: var(--card-background);
     border-radius: 15px;
     box-shadow: var(--card-shadow);
@@ -508,3 +508,937 @@
     color: #666;
     font-weight: 500;
   }
+
+
+  /*mobile first*/
+  /* Base styles for mobile */
+.create-event-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  margin: 15px 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 90%; /* Reduced width on mobile */
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.create-event-btn:hover {
+  background-color: var(--primary-final-color);
+}
+
+.event-form {
+  background-color: var(--card-background);
+  padding: 15px; /* Smaller padding on mobile */
+  border-radius: 12px;
+  margin: 15px 0; /* Smaller margin on mobile */
+  box-shadow: var(--card-shadow);
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.event-form h3 {
+  margin-top: 0;
+  color: var(--text-color);
+  font-size: 1.2rem; /* Smaller font on mobile */
+}
+
+.form-group {
+  margin-bottom: 12px; /* Smaller margin on mobile */
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.form-group input,
+.form-group textarea {
+  width: 90%; /* Reduced width on mobile */
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--input-background);
+  color: var(--text-color);
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.form-group textarea {
+  min-height: 70px; /* Smaller on mobile */
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column; /* Stack buttons on mobile */
+  gap: 8px;
+  margin-top: 12px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cancel-btn,
+.save-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 90%; /* Reduced width on mobile */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cancel-btn {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.save-btn {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.save-btn:disabled {
+  background-color: var(--secondary-color);
+  cursor: not-allowed;
+}
+
+.events-list {
+  margin: 20px 0; /* Smaller margin on mobile */
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.event-card {
+  background-color: var(--card-background);
+  border-radius: 12px;
+  padding: 12px; /* Smaller padding on mobile */
+  margin-bottom: 12px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column; /* Stack on mobile */
+  gap: 10px;
+}
+
+.event-time {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  align-self: flex-start;
+  width: 90%; /* Reduced width on mobile */
+}
+
+.event-content {
+  flex: 1;
+}
+
+.event-content h4 {
+  margin: 0 0 5px 0;
+  color: var(--text-color);
+  font-size: 1.1rem; /* Smaller font on mobile */
+}
+
+.event-detail {
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+
+.detail-label {
+  font-weight: 600;
+  margin-right: 5px;
+  color: var(--secondary-color);
+}
+
+.day-date {
+  color: var(--secondary-color);
+  margin-top: -8px; /* Smaller margin on mobile */
+  margin-bottom: 15px; /* Smaller margin on mobile */
+}
+
+.day-notes-input {
+  width: 90%; /* Reduced width on mobile */
+  min-height: 80px; /* Smaller on mobile */
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--input-background);
+  color: var(--text-color);
+  resize: vertical;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+/* Your Trips Page */
+.your-trips-container {
+  max-width: 90%; /* Reduced width on mobile */
+  margin: 0 auto;
+  padding: 1rem; /* Smaller padding on mobile */
+}
+
+.empty-state {
+  text-align: center;
+  padding: 1.5rem; /* Smaller padding on mobile */
+  background: var(--card-background);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  margin-top: 1.5rem; /* Smaller margin on mobile */
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.empty-state button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 90%; /* Reduced width on mobile */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.trips-list {
+  display: grid;
+  grid-template-columns: 1fr; /* Single column on mobile */
+  gap: 1rem; /* Smaller gap on mobile */
+  margin-top: 1.5rem; /* Smaller margin on mobile */
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.trip-card {
+  background: var(--card-background);
+  padding: 1.2rem; /* Smaller padding on mobile */
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  transition: transform 0.3s;
+  position: relative;
+}
+
+.trip-card:hover {
+  transform: translateY(-5px);
+}
+
+.trip-card h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+  font-size: 1.2rem; /* Smaller font on mobile */
+}
+
+.delete-btn {
+  position: absolute;
+  top: 0.8rem; /* Adjust for mobile */
+  right: 0.8rem; /* Adjust for mobile */
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem; /* Smaller padding on mobile */
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #ff6b81;
+}
+
+/* Radio group styles */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.plan-your-trip-container {
+  max-width: 90%; /* Reduced width on mobile */
+  margin: 1rem auto; /* Smaller margin on mobile */
+  padding: 1.2rem; /* Smaller padding on mobile */
+  background: var(--card-background);
+  border-radius: 15px;
+  box-shadow: var(--card-shadow);
+}
+
+.trip-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem; /* Smaller gap on mobile */
+  margin-bottom: 2rem; /* Smaller margin on mobile */
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem; /* Smaller gap on mobile */
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.75rem; /* Smaller padding on mobile */
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--input-background);
+  color: var(--text-color);
+  font-size: 1rem;
+  width: 90%; /* Reduced width on mobile */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column; /* Stack on mobile */
+  gap: 1rem;
+  padding: 0.8rem 0; /* Smaller padding on mobile */
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--secondary-text-color);
+}
+
+input[type="radio"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: var(--primary-color);
+}
+
+.date-range-container {
+  position: relative;
+  z-index: 1000;
+  flex-direction: column; /* Stack on mobile */
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.react-datepicker-popper {
+  z-index: 1001 !important;
+}
+
+.date-range-separator {
+  color: var(--text-color);
+  font-weight: 500;
+  padding: 0.5rem; /* Adjusted for mobile */
+  margin: 0.5rem 0; /* Vertical margin for mobile */
+  background: var(--input-background);
+  border-radius: 6px;
+  text-align: center;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.react-datepicker__input-container {
+  position: relative;
+  z-index: 1000;
+}
+
+.react-datepicker-popper {
+  z-index: 1001 !important;
+}
+
+.date-range-container {
+  position: relative;
+  z-index: 999;
+}
+
+.destinations-grid {
+  position: relative;
+  z-index: 1;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.success-message {
+  background: #4CAF50;
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem auto;
+  animation: slideIn 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 90%;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Error handling */
+.error-message {
+  background: #ffebee;
+  border: 2px solid #ff1744;
+  color: #d32f2f;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 90%;
+}
+
+.error-text {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+  display: block;
+}
+
+.has-error {
+  border-color: #ff1744 !important;
+  background: #fff5f5 !important;
+}
+
+/* Success message */
+.success-message {
+  background: #e8f5e9;
+  border: 2px solid #4caf50;
+  color: #2e7d32;
+  padding: 1.5rem; /* Smaller padding on mobile */
+  border-radius: 12px;
+  margin: 1.5rem auto;
+  text-align: center;
+  animation: slideIn 0.5s ease-out;
+  width: 90%;
+}
+
+.success-icon {
+  font-size: 2.5rem; /* Smaller on mobile */
+  margin-bottom: 0.8rem; /* Smaller margin on mobile */
+}
+
+.trip-dates {
+  font-size: 1.1rem; /* Smaller font on mobile */
+  color: #1b5e20;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Date picker corrections */
+.react-datepicker-wrapper {
+  flex: 1;
+  width: 90%; /* Reduced width on mobile */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+.date-range-container {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem; /* Smaller gap on mobile */
+}
+
+.date-separator {
+  color: #666;
+  font-weight: 500;
+}
+
+/* Media queries for tablet and desktop */
+@media (min-width: 768px) {
+  .create-event-btn {
+    width: auto; /* Reset to original */
+    margin-left: unset;
+    margin-right: unset;
+    display: inline-block;
+  }
+
+  .event-form {
+    padding: 20px; /* Original padding */
+    margin: 20px 0; /* Original margin */
+  }
+
+  .event-form h3 {
+    font-size: initial; /* Reset to original */
+  }
+
+  .form-group {
+    margin-bottom: 15px; /* Original margin */
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%; /* Reset to original */
+    margin-left: unset;
+    margin-right: unset;
+    display: block;
+  }
+
+  .form-group textarea {
+    min-height: 80px; /* Original height */
+  }
+
+  .form-actions {
+    flex-direction: row; /* Horizontal layout for desktop */
+    justify-content: flex-end; /* Original alignment */
+    gap: 10px; /* Original gap */
+    margin-top: 15px; /* Original margin */
+    width: 100%;
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    width: auto; /* Reset to original */
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .events-list {
+    margin: 25px 0; /* Original margin */
+    width: 100%;
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .event-card {
+    padding: 15px; /* Original padding */
+    margin-bottom: 15px; /* Original margin */
+    flex-direction: row; /* Original direction */
+    gap: 15px; /* Original gap */
+  }
+
+  .event-time {
+    min-width: 70px; /* Original width */
+    width: auto; /* Reset to original */
+  }
+
+  .event-content h4 {
+    font-size: initial; /* Reset to original */
+  }
+
+  .day-date {
+    margin-top: -10px; /* Original margin */
+    margin-bottom: 20px; /* Original margin */
+  }
+
+  .day-notes-input {
+    min-height: 100px; /* Original height */
+    width: 100%; /* Reset to original */
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  /* Your Trips Page */
+  .your-trips-container {
+    max-width: 1200px; /* Original max-width */
+    padding: 2rem; /* Original padding */
+  }
+
+  .empty-state {
+    padding: 2rem; /* Original padding */
+    margin-top: 2rem; /* Original margin */
+    width: 100%;
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .empty-state button {
+    width: auto; /* Reset to original */
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .trips-list {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Original grid */
+    gap: 1.5rem; /* Original gap */
+    margin-top: 2rem; /* Original margin */
+    width: 100%;
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .trip-card {
+    padding: 1.5rem; /* Original padding */
+  }
+
+  .trip-card h3 {
+    font-size: initial; /* Reset to original */
+  }
+
+  .delete-btn {
+    top: 1rem; /* Original position */
+    right: 1rem; /* Original position */
+    padding: 0.5rem; /* Original padding */
+  }
+
+  .radio-group {
+    width: 100%;
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .plan-your-trip-container {
+    max-width: 800px; /* Original max-width */
+    margin: 2rem auto; /* Original margin */
+    padding: 4rem; /* Original padding */
+  }
+
+  .trip-form {
+    gap: 1.5rem; /* Original gap */
+    margin-bottom: 3rem; /* Original margin */
+    width: 100%;
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .form-group {
+    gap: 0.5rem; /* Original gap */
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 0.875rem; /* Original padding */
+    width: 100%; /* Reset to original */
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .radio-group {
+    flex-direction: row; /* Original direction */
+    gap: 1.5rem; /* Original gap */
+    padding: 1rem 0; /* Original padding */
+  }
+
+  .date-range-container {
+    flex-direction: row; /* Original direction */
+    width: 100%;
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .date-range-separator {
+    padding: 0 1rem; /* Original padding */
+    margin: 0 0.5rem; /* Original margin */
+    width: auto;
+  }
+
+  .destinations-grid {
+    width: 100%;
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .success-message {
+    padding: 2rem; /* Original padding */
+    margin: 2rem 0; /* Original margin */
+    width: 100%;
+  }
+
+  .success-icon {
+    font-size: 3rem; /* Original size */
+    margin-bottom: 1rem; /* Original margin */
+  }
+
+  .trip-dates {
+    font-size: 1.2rem; /* Original size */
+  }
+
+  .date-range-container {
+    gap: 1rem; /* Original gap */
+  }
+
+  .react-datepicker-wrapper {
+    width: 100%; /* Reset to original */
+    margin-left: unset;
+    margin-right: unset;
+  }
+
+  .error-message {
+    margin: 1rem 0;
+    width: 100%;
+  }
+}
+
+/* Modified radio group styles for mobile first view */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%; /* Changed from 90% to ensure full width */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding-left: 10px; /* Add padding to align labels properly */
+}
+
+.radio-group input[type="radio"] {
+  margin: 0; /* Reset browser default margins */
+}
+
+/* Make sure the mobile view stacks properly */
+@media (max-width: 767px) {
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    width: 100%;
+  }
+  
+  .radio-group label {
+    padding-left: 10px;
+    margin-left: 0;
+  }
+}
+
+/* Ensure desktop view maintains proper alignment */
+@media (min-width: 768px) {
+  .radio-group {
+    flex-direction: row;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    width: 100%;
+    margin-left: unset;
+    margin-right: unset;
+  }
+  
+  .radio-group label {
+    padding-left: 0;
+  }
+}
+
+
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 1000;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+}
+
+.sidebar {
+  position: fixed;
+  left: -100%;
+  top: 0;
+  bottom: 0;
+  width: 280px;
+  background: var(--card-background);
+  transition: left 0.3s ease;
+  z-index: 999;
+  overflow-y: auto;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  
+  &.active {
+    left: 0;
+  }
+}
+
+.overview-cards {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.overview-card {
+  background: var(--card-background);
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  border: 1px solid var(--border-color);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+  }
+  
+  .card-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+  }
+  
+  h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color);
+  }
+  
+  p {
+    margin: 0;
+    color: var(--secondary-text-color);
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+  
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .sidebar {
+    position: relative;
+    left: 0;
+  }
+  
+  .menu-toggle {
+    display: none;
+  }
+  
+}
+
+/* Add to your CSS */
+.navbar-spacer {
+  height: 64px; /* Adjust based on your navbar height */
+  width: 100%;
+}
+
+.menu-toggle {
+  top: 150px !important; /* 64px navbar + 16px margin */
+}
+
+.sidebar {
+  top: 64px; /* Start below navbar */
+  height: calc(100vh - 64px);
+}
+
+.main-content {
+  padding-top: 64px; /* Push content below navbar */
+  min-height: calc(100vh - 64px);
+}
+
+/* Adjust date picker container */
+.ios-date-picker-container {
+  padding-top: 2rem; /* Reduced from previous */
+  min-height: calc(100vh - 64px);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .menu-toggle {
+    top: 150px !important; /* Slightly reduced for mobile */
+  }
+  
+  .sidebar {
+    top: 75px;
+    height: calc(100vh - 64px);
+  }
+}
+
+/* Mobile-first enhancements */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .sidebar.active {
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .section-items-container {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  
+  .recommended-places-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .recommended-place-card {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .menu-toggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+  }
+}

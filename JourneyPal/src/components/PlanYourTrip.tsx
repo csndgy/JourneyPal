@@ -14,6 +14,7 @@ interface TripFormData {
   customDestination: string;
   startDate: Date | null;
   endDate: Date | null;
+  editingTripId?: number;
 }
 
 const PlanYourTrip: React.FC = () => {
@@ -60,7 +61,8 @@ const PlanYourTrip: React.FC = () => {
         predefinedDestination: !state.isCustom ? state.destination || '' : '',
         customDestination: state.isCustom ? state.destination || '' : '',
         startDate: state.startDate ? new Date(state.startDate) : null,
-        endDate: state.endDate ? new Date(state.endDate) : null
+        endDate: state.endDate ? new Date(state.endDate) : null,
+        editingTripId: state.tripId
       }));
     }
   }, [location.state]);
@@ -104,12 +106,10 @@ const PlanYourTrip: React.FC = () => {
     setErrors(newErrors);
     return !Object.values(newErrors).some(error => error !== '');
   };
-
   const handleSaveTrip = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) return;
-
     try {
       const destination = formData.destinationType === 'custom' 
         ? formData.customDestination.trim() 
@@ -174,6 +174,11 @@ const PlanYourTrip: React.FC = () => {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const handleCancel = () => {
+    // Navigate back to trips page
+    navigate('/trips');
   };
 
   return (
@@ -270,7 +275,6 @@ const PlanYourTrip: React.FC = () => {
           </div>
           {errors.dates && <span className="error-text">{errors.dates}</span>}
         </div>
-
         <button 
           type="submit" 
           className="save-btn"
