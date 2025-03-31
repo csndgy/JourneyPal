@@ -18,7 +18,7 @@ const ForgotPassword: React.FC = () => {
       setMessage(response.data.message); 
       setError('');
     } catch (err) {
-      setError('Failed to send password reset link. Please try again.');
+      setError('Failed to send password reset link. Please try again.' + err);
       setMessage('');
     } finally {
       setIsSubmitting(false);

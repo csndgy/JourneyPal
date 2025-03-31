@@ -60,7 +60,7 @@ const NewTripPage = () => {
             selectsEnd
             startDate={startDate}
             endDate={endDate}
-            minDate={startDate}
+            minDate={startDate || undefined}
             placeholderText="End Date"
             className="ios-date-input"
             dateFormat="MMMM d, yyyy"

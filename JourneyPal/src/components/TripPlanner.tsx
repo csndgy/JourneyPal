@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
@@ -58,7 +59,9 @@ const TripPlanner = () => {
         id: 'custom',
         title: location.state.destination,
         description: `Your trip to ${location.state.destination}`,
-        coordinates: { lat: 0, lng: 0 },
+        coordinates: destinationsFromJson.find(d => 
+          d.title.toLowerCase() === location.state.destination.toLowerCase()
+        )?.coordinates || { lat: 0, lng: 0 },
         image: '/images/custom-destination.jpg',
         alt: 'Custom Destination'
       } :
@@ -712,7 +715,7 @@ const TripPlanner = () => {
             <iframe
               width="100%"
               height="600"
-              src={`https://www.google.com/maps?q=${destination.coordinates.lat},${destination.coordinates.lng}&z=12&output=embed`}
+              src={destination.coordinates ? `https://www.google.com/maps?q=${destination.coordinates.lat},${destination.coordinates.lng}&z=12&output=embed` : ''}
               style={{ border: 0 }}
               loading="lazy"
               allowFullScreen

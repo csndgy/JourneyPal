@@ -1,11 +1,12 @@
-import React, { forwardRef, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+import { forwardRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import destinations from '../assets/destinations.json';
 import { Destination } from '../assets/destinations';
 
 interface PopularDestinationsProps {}
 
-const PopularDestinations = forwardRef<HTMLDivElement, PopularDestinationsProps>((props, ref) => {
+const PopularDestinations = forwardRef<HTMLDivElement, PopularDestinationsProps>((_props, ref) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -17,13 +18,13 @@ const PopularDestinations = forwardRef<HTMLDivElement, PopularDestinationsProps>
         coordinates: destination.coordinates,
         image: destination.image,
         alt: destination.alt,
-        description: destination.description
+        description: destination.description,
       }
     });
   };
 
   return (
-    <section className="destinations-section" id="popular-destinations" ref={ref}>
+    <section className="destinations-section" id="popular-destinations" ref={ref as React.Ref<HTMLDivElement>}>
       {isLoading && (
         <div className="loading-screen">
           <img 

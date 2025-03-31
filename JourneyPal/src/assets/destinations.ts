@@ -1,10 +1,13 @@
-export interface Destination {
+export interface JsonDestination {
   id: number;
   image: string;
   alt: string;
   title: string;
   description: string;
-  coordinates: { lat: number; lng: number }; // Új mező a koordinátáknak
+}
+
+export interface Destination extends JsonDestination {
+  coordinates?: { lat: number; lng: number };
 }
 
 export const destinations: Destination[] = [

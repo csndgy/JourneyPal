@@ -140,19 +140,6 @@ const PlanYourTrip: React.FC = () => {
   };
 
   const navigateToNextStep = () => {
-    const destination = formData.destinationType === 'custom'
-      ? { 
-          id: 'custom', 
-          title: formData.customDestination,
-          description: 'Custom Destination',
-          image: '/images/custom-destination.jpg'
-        }
-      : { 
-          id: 'predefined', // This will be replaced with actual ID from API
-          title: formData.predefinedDestination,
-          description: formData.predefinedDestination,
-          image: '/images/default-destination.jpg'
-        };
 
     // Navigate to trip planner with trip details
     navigate(`/trips`, { 
@@ -176,10 +163,6 @@ const PlanYourTrip: React.FC = () => {
     });
   };
 
-  const handleCancel = () => {
-    // Navigate back to trips page
-    navigate('/trips');
-  };
 
   return (
     <div className="plan-your-trip-container">
