@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -129,6 +128,7 @@ const PlanYourTrip: React.FC = () => {
       } else {
         // Create new trip
         response = await api.post('/api/trips', tripData);
+        return response.data;
       }
       
       setShowSuccess(true);
