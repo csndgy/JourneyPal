@@ -86,7 +86,7 @@ Ez a dokumentum a JourneyPalAdmin alkalmazás InputValidator és UserHelper seg�
 
 **InputValidator tesztek**
 
-> - Az `InputValidator` statikus osztály tesztei, amely sztringek, email címek, telefonszámok és jelszavak validálását végzi. 
+ - Az `InputValidator` statikus osztály tesztei, amely sztringek, email címek, telefonszámok és jelszavak validálását végzi. 
 
 #### `IsStringValid` tesztek
 ```csharp
@@ -104,9 +104,9 @@ public void IsStringValid_ShouldValidateCorrectly(string input, bool allowNullOr
 ```
 - **Cél:** A sztring bemenet validálása a null/üres engedélyezés, valamint minimális és maximális hossz alapján.
 - **Tesztesetek:**
-    > - Null vagy üres sztringek `false` értéket adnak vissza, kivéve ha explicit engedélyezett.
-    > - A megfelelő hosszúságú sztringek `true` értéket adnak vissza.
-    > - A `minLength`-nél rövidebb vagy `maxLength`-nél hosszabb sztringek `false` értéket adnak vissza.
+     - Null vagy üres sztringek `false` értéket adnak vissza, kivéve ha explicit engedélyezett.
+     - A megfelelő hosszúságú sztringek `true` értéket adnak vissza.
+     - A `minLength`-nél rövidebb vagy `maxLength`-nél hosszabb sztringek `false` értéket adnak vissza.
 
 #### `IsEmailValid` tesztek
 ```csharp
@@ -128,8 +128,8 @@ public void IsEmailValid_InvalidEmail_ReturnsFalse()
 ```
 - **Cél:** Email cím formátum ellenőrzése a `.NET MailAddress` osztályával.
 - **Tesztesetek:**
-    > - Helyes formátumú email címek (pl. `test@example.com`) `true` értéket adnak vissza.
-    > - Helytelen formátumú email címek (pl. `invalid-email`) `false` értéket adnak vissza.
+     - Helyes formátumú email címek (pl. `test@example.com`) `true` értéket adnak vissza.
+     - Helytelen formátumú email címek (pl. `invalid-email`) `false` értéket adnak vissza.
 
 #### `IsPhoneNumberValid` tesztek
 ```csharp
@@ -151,8 +151,8 @@ public void IsPhoneNumberValid_InvalidPhoneNumber_ReturnsFalse()
 ```
 - **Cél:** Telefonszám formátum ellenőrzése regex segítségével.
 - **Tesztesetek:**
-    > - Helyes formátumú telefonszámok (pl. `+1234567890`) `true` értéket adnak vissza.
-    > - Helytelen formátumú telefonszámok (pl. `abc123`) `false` értéket adnak vissza.
+     - Helyes formátumú telefonszámok (pl. `+1234567890`) `true` értéket adnak vissza.
+     - Helytelen formátumú telefonszámok (pl. `abc123`) `false` értéket adnak vissza.
 
 #### `IsPasswordValid` tesztek
 ```csharp
@@ -174,13 +174,13 @@ public void IsPasswordValid_TooShortPassword_ReturnsFalse()
 ```
 - **Cél:** Jelszó hosszának ellenőrzése.
 - **Tesztesetek:**
-    > - A `minLength` követelménynek megfelelő jelszavak `true` értéket adnak vissza.
-    > - A `minLength`-nél rövidebb jelszavak `false` értéket adnak vissza.
+     - A `minLength` követelménynek megfelelő jelszavak `true` értéket adnak vissza.
+     - A `minLength`-nél rövidebb jelszavak `false` értéket adnak vissza.
 
 #
 
 **UserHelper tesztek**
-> - Az `UserHelper` statikus osztály tesztei, amely felhasználó validálást és összehasonlítást végez.
+ - Az `UserHelper` statikus osztály tesztei, amely felhasználó validálást és összehasonlítást végez.
 
 #### `IsUserValid` tesztek
 ```csharp
@@ -205,9 +205,9 @@ public void IsUserValid_NullUser_ReturnsFalse()
 ```
 - **Cél:** Egy `User` objektum validálása a `UserName`, `Email` és `PhoneNumber` tulajdonságok alapján.
 - **Tesztesetek:**
-    > - Érvényes felhasználók (minden mező helyes) `true` értéket adnak vissza.
-    > - Érvénytelen felhasználók (bármely mező helytelen) `false` értéket adnak vissza.
-    > - Null felhasználók `false` értéket adnak vissza.
+     - Érvényes felhasználók (minden mező helyes) `true` értéket adnak vissza.
+     - Érvénytelen felhasználók (bármely mező helytelen) `false` értéket adnak vissza.
+     - Null felhasználók `false` értéket adnak vissza.
 
 #### `AreUsersEqual` tesztek
 ```csharp
@@ -231,8 +231,8 @@ public void AreUsersEqual_DifferentUsers_ReturnsFalse()
 ```
 - **Cél:** Két `User` objektum összehasonlítása a tulajdonságaik alapján.
 - **Tesztesetek:**
-    > - Azonos tulajdonságokkal rendelkező felhasználók `true` értéket adnak vissza.
-    > - Különböző tulajdonságokkal rendelkező felhasználók `false` értéket adnak vissza.
+     - Azonos tulajdonságokkal rendelkező felhasználók `true` értéket adnak vissza.
+     - Különböző tulajdonságokkal rendelkező felhasználók `false` értéket adnak vissza.
 
 ### Összefoglalás
 Ezek a unit tesztek lefedik az InputValidator és UserHelper osztályok alapvető funkcionalitását, biztosítva a megbízható validálást és összehasonlítást. A tesztek tartalmaznak szélsőséges eseteket is (pl. null bemenet, helytelen formátumok), hogy a valós felhasználási esetekben is megbízhatóan működjenek.
