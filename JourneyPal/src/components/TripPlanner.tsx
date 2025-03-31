@@ -8,6 +8,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../Trip.css'
 import api from '../Services/Interceptor.ts';
+import destinationsFromJson from '../assets/destinations.json';
 
 const TripPlanner = () => {
   const { tripId } = useParams<{ tripId: string }>();
@@ -32,6 +33,9 @@ const TripPlanner = () => {
     endDate: '',
     days: [],
   });
+
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [isDateSelected, setIsDateSelected] = useState(false);
@@ -44,7 +48,6 @@ const TripPlanner = () => {
   const [notes, setNotes] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
   const [showEventForm, setShowEventForm] = useState(false);
-  const navigate = useNavigate();
   const [newEvent, setNewEvent] = useState<Event>({
     id: '',
     name: '',
@@ -168,7 +171,7 @@ const TripPlanner = () => {
       }
     }
   }, [location.state]);
-  
+
   if (!destination) return <div className="error-message">Invalid destination</div>;
 
   // Helper function to format dates correctly without timezone issues
@@ -370,16 +373,67 @@ const TripPlanner = () => {
     setShowEventForm(false);
   };
 
-  const recommendPlaces = (destination: Destination) => {
-    return destination.description.split('•')
-      .slice(0, 4)
-      .map((place, index) => ({
-        name: place.trim(),
-        image: `/images/${destination.title.toLowerCase().replace(/ /g, '-')}-${index + 1}.jpg`
+  const recommendPlaces = (destination: { title: string; description: string }, allDestinations: Destination[] = []) => {
+    console.log('===== recommendPlaces Debug Start =====');
+    console.log('Input destination:', destination);
+    console.log('All destinations available:', allDestinations);
+  
+    // Check if this destination exists in the provided data
+    const matchedDestination = allDestinations.find(dest => {
+      const isMatch = dest.title.toLowerCase() === destination.title.toLowerCase();
+      console.log(`Comparing "${dest.title}" with "${destination.title}":`, isMatch);
+      return isMatch;
+    });
+  
+    console.log('Matched destination:', matchedDestination);
+  
+    // Split the description into places
+    const rawPlaces = destination.description.split(/[•-]/);
+    console.log('Raw places from description:', rawPlaces);
+  
+    const places = rawPlaces
+      .map(place => {
+        const trimmed = place.trim();
+        console.log(`Place before trim: "${place}", after trim: "${trimmed}"`);
+        return trimmed;
+      })
+      .filter(place => {
+        const isValid = !!place;
+        console.log(`Is place "${place}" valid?`, isValid);
+        return isValid;
+      })
+      .slice(0, 4);
+  
+    console.log('Final places array:', places);
+  
+    // If we found a matching destination, use its image for all recommendations
+    if (matchedDestination) {
+      console.log('Using matched destination image:', matchedDestination.image);
+      const result = places.map(place => ({
+        name: place,
+        image: matchedDestination.image
       }));
+      console.log('Final result (matched destination):', result);
+      console.log('===== recommendPlaces Debug End =====');
+      return result;
+    }
+  
+    // Fallback to original behavior with numbered images
+    const generatedImages = places.map((place, index) => {
+      const generatedPath = `/images/${destination.title.toLowerCase().replace(/ /g, '-')}-${index + 1}.jpg`;
+      console.log(`Generated image path for "${place}":`, generatedPath);
+      return {
+        name: place,
+        image: generatedPath
+      };
+    });
+  
+    console.log('Final result (generated images):', generatedImages);
+    console.log('===== recommendPlaces Debug End =====');
+    return generatedImages;
   };
 
-  const recommendedPlaces = recommendPlaces(destination);
+  const recommendedPlaces = recommendPlaces(destination, destinationsFromJson);
 
   const daysPerPage = 7;
   const totalPages = Math.ceil(tripPlan.days.length / daysPerPage);
@@ -392,42 +446,22 @@ const TripPlanner = () => {
     <div className="app-layout">
       {isDateSelected && (
         <div className="sidebar">
-          <div className="sidebar-section">
-            <div className="section-header">
-              <h2>Overview</h2>
-            </div>
-            <ul className="section-items">
-              <li onClick={() => {
-                setShowMap(true);
-                setShowNotes(false);
-                setShowChecklist(false);
-                setShowPlacesToVisit(false);
-                setSelectedDay(null);
-              }}>Explore</li>
-              <li onClick={() => {
-                setShowNotes(true);
-                setShowMap(false);
-                setShowChecklist(false);
-                setShowPlacesToVisit(false);
-                setSelectedDay(null);
-              }}>Notes</li>
-              <li onClick={() => {
-                setShowChecklist(true);
-                setShowNotes(false);
-                setShowMap(false);
-                setShowPlacesToVisit(false);
-                setSelectedDay(null);
-              }}>Checklist</li>
-              <li onClick={() => {
-                setShowPlacesToVisit(true);
-                setShowMap(false);
-                setShowNotes(false);
-                setShowChecklist(false);
-                setSelectedDay(null);
-              }}>Places to visit</li>
-            </ul>
+          <div
+            className="overview-card"
+            onClick={() => {
+              setShowMap(true);
+              setShowNotes(false);
+              setShowChecklist(false);
+              setShowPlacesToVisit(false);
+              setSelectedDay(null);
+              setIsMenuOpen(false);
+            }}
+          >
+            <div className="card-icon">🗺️</div>
+            <h3>Explore Map</h3>
+            <p>Discover locations and plan routes</p>
           </div>
-          <div 
+          <div
             className="overview-card"
             onClick={() => {
               setShowNotes(true);
@@ -443,7 +477,7 @@ const TripPlanner = () => {
             <p>Capture your thoughts and ideas</p>
           </div>
 
-          <div 
+          <div
             className="overview-card"
             onClick={() => {
               setShowChecklist(true);
@@ -459,7 +493,7 @@ const TripPlanner = () => {
             <p>Manage your travel essentials</p>
           </div>
 
-          <div 
+          <div
             className="overview-card"
             onClick={() => {
               setShowPlacesToVisit(true);
@@ -474,50 +508,48 @@ const TripPlanner = () => {
             <h3>Destinations</h3>
             <p>Recommended places to visit</p>
           </div>
-        </div>
+        </div>)}
 
-        {isDateSelected && (
-          <div className="sidebar-section">
-            <div className="section-header">
-              <h2>Itinerary</h2>
-            </div>
-            <div className="section-items-container">
-              <ul className="section-items">
-                {displayedDays.map((day, index) => (
-                  <li
-                    key={day.date}
-                    onClick={() => {
-                      handleDayClick(day);
-                      setIsMenuOpen(false);
-                    }}
-                    className={selectedDay?.date === day.date ? 'selected-day' : ''}
-                  >
-                    Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="pagination-container">
-              <button
-                className="btn-prev"
-                onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-                disabled={currentPage === 0}
-              >
-                ➜
-              </button>
-              <span className="page-info">Page {currentPage + 1} of {totalPages}</span>
-              <button
-                className="btn-next"
-                onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
-                disabled={currentPage === totalPages - 1}
-              >
-                ➜
-              </button>
-            </div>
+      {isDateSelected && (
+        <div className="sidebar-section">
+          <div className="section-header">
+            <h2>Itinerary</h2>
           </div>
-        )}
-      </div>
-
+          <div className="section-items-container">
+            <ul className="section-items">
+              {displayedDays.map((day, index) => (
+                <li
+                  key={day.date}
+                  onClick={() => {
+                    handleDayClick(day);
+                    setIsMenuOpen(false);
+                  }}
+                  className={selectedDay?.date === day.date ? 'selected-day' : ''}
+                >
+                  Day {(currentPage * daysPerPage) + index + 1} - {new Date(day.date).toLocaleDateString()}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="pagination-container">
+            <button
+              className="btn-prev"
+              onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+              disabled={currentPage === 0}
+            >
+              ➜
+            </button>
+            <span className="page-info">Page {currentPage + 1} of {totalPages}</span>
+            <button
+              className="btn-next"
+              onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+              disabled={currentPage === totalPages - 1}
+            >
+              ➜
+            </button>
+          </div>
+        </div>
+      )}
       <div className="main-content">
         {!isDateSelected ? (
           <div className="ios-date-picker-container">
@@ -535,8 +567,7 @@ const TripPlanner = () => {
                   className="ios-date-input"
                   dateFormat="MMMM d, yyyy"
                   calendarClassName="ios-calendar"
-                  popperPlacement="bottom-start"
-                />
+                  popperPlacement="bottom-start" />
                 <span className="date-range-separator">to</span>
                 <DatePicker
                   selected={endDate}
@@ -549,8 +580,7 @@ const TripPlanner = () => {
                   className="ios-date-input"
                   dateFormat="MMMM d, yyyy"
                   calendarClassName="ios-calendar"
-                  popperPlacement="bottom-start"
-                />
+                  popperPlacement="bottom-start" />
               </div>
               <button
                 onClick={generateDays}
@@ -601,8 +631,7 @@ const TripPlanner = () => {
                 className="notes-input"
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
-                placeholder="Write your travel notes here..."
-              />
+                placeholder="Write your travel notes here..." />
               <button className="add-note-btn" onClick={handleAddNote}>
                 Add Note
               </button>
@@ -625,9 +654,9 @@ const TripPlanner = () => {
           <div className="day-details">
             <h2>Day {tripPlan.days.findIndex(d => d.date === selectedDay.date) + 1}</h2>
             <p className="day-date">{new Date(selectedDay.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-        
+
             {!showEventForm && (
-              <button 
+              <button
                 className="create-event-btn"
                 onClick={() => {
                   setShowEventForm(true);
@@ -656,8 +685,7 @@ const TripPlanner = () => {
                     name="name"
                     value={newEvent.name}
                     onChange={handleEventChange}
-                    placeholder="Enter event name"
-                  />
+                    placeholder="Enter event name" />
                   {formErrors.name && <span className="error-message">{formErrors.name}</span>}
                 </div>
                 <div className="form-group">
@@ -666,8 +694,7 @@ const TripPlanner = () => {
                     type="time"
                     name="time"
                     value={newEvent.time}
-                    onChange={handleEventChange}
-                  />
+                    onChange={handleEventChange} />
                   {formErrors.time && <span className="error-message">{formErrors.time}</span>}
                 </div>
                 <div className="form-group">
@@ -676,8 +703,7 @@ const TripPlanner = () => {
                     name="description"
                     value={newEvent.description}
                     onChange={handleEventChange}
-                    placeholder="Enter event description"
-                  />
+                    placeholder="Enter event description" />
                   {formErrors.description && <span className="error-message">{formErrors.description}</span>}
                 </div>
                 <div className="form-group">
@@ -687,8 +713,7 @@ const TripPlanner = () => {
                     name="location"
                     value={newEvent.location}
                     onChange={handleEventChange}
-                    placeholder="Enter location"
-                  />
+                    placeholder="Enter location" />
                   {formErrors.location && <span className="error-message">{formErrors.location}</span>}
                 </div>
                 <div className="form-group">
@@ -698,8 +723,7 @@ const TripPlanner = () => {
                     name="links"
                     value={newEvent.links}
                     onChange={handleEventChange}
-                    placeholder="Enter relevant links (comma separated)"
-                  />
+                    placeholder="Enter relevant links (comma separated)" />
                 </div>
                 <div className="form-actions">
                   <button
@@ -737,9 +761,9 @@ const TripPlanner = () => {
                         <div className="event-detail">
                           <span className="detail-label">Links:</span>
                           {event.links && (
-                            <a 
-                              href={event.links.startsWith('http') ? event.links : `https://${event.links}`} 
-                              target="_blank" 
+                            <a
+                              href={event.links.startsWith('http') ? event.links : `https://${event.links}`}
+                              target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => {
                                 // Prevent navigation for invalid links
@@ -781,7 +805,7 @@ const TripPlanner = () => {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 };
 

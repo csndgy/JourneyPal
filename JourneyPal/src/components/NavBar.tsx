@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../JourneyPal.css';
 import '../Navbar.css';
 import api from '../Services/Interceptor'
