@@ -101,8 +101,8 @@ namespace JourneyPalBackend.Controllers
                 Destination = createTripDto.Destination,
                 //StartDate = DateTime.ParseExact(dateOnlyStart, "dd/MM/yyyy", CultureInfo.InvariantCulture),
                 //EndDate = DateTime.ParseExact(dateOnlyEnd, "dd/MM/yyyy", CultureInfo.InvariantCulture),
-                StartDate = createTripDto.StartDate,
-                EndDate = createTripDto.EndDate,
+                StartDate = createTripDto.StartDate.AddDays(1),
+                EndDate = createTripDto.EndDate.AddDays(1),
                 UserId = userId
             };
 
@@ -230,12 +230,6 @@ namespace JourneyPalBackend.Controllers
             if (dto.Content != null)
             {
                 note.Content = dto.Content;
-            }
-
-            // Validate the updated note
-            if (!TryValidateModel(note))
-            {
-                return ValidationProblem(ModelState);
             }
 
             await _context.SaveChangesAsync();

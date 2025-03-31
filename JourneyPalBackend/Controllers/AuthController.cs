@@ -61,11 +61,19 @@ namespace JourneyPalBackend.Controllers
             {
                 UserName = user.UserName,
                 Email = user.Email,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                Role = "User"
             };
 
             var result = await _userManager.CreateAsync(newUser, user.Password);
-            await _userManager.AddToRoleAsync(newUser, "User");
+            try
+            {
+                await _userManager.AddToRoleAsync(newUser, "User");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}\nInner exception: {ex.InnerException}");
+            }
 
             if (!result.Succeeded)
             {
@@ -290,7 +298,7 @@ namespace JourneyPalBackend.Controllers
                     new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(ClaimTypes.Role, user.Role)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(15),
+                Expires = DateTime.UtcNow.AddMinutes(60),
                 SigningCredentials = new SigningCredentials(securityKey,
                 SecurityAlgorithms.HmacSha256Signature),
                 Issuer = "localhost",
