@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../Services/Interceptor';
+import '../ForgotPassword.css'; // We'll create this CSS file next
 
 const ResetPassword: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
@@ -49,46 +49,45 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
-      <h1>Reset Password</h1>
-      <form onSubmit={handleResetPassword}>
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>New Password:</label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-            style={{ width: '100%', padding: '8px' }}
-          />
+    <div className="reset-password-container">
+      <div className="reset-card">
+        <h1 className="reset-title">Reset Password</h1>
+        <form className="reset-form" onSubmit={handleResetPassword}>
+          <div className="form-group">
+            <label htmlFor="newPassword">New Password</label>
+            <input
+              id="newPassword"
+              type="password"
+              className="password-input"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              placeholder="Enter your new password"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              className="password-input"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              placeholder="Confirm your new password"
+            />
+          </div>
+          {message && <div className="message success-message">{message}</div>}
+          {error && <div className="message error-message">{error}</div>}
+          <button type="submit" className="reset-button">
+            Reset Password
+          </button>
+        </form>
+        <div className="login-link">
+          <span>Remember your password?</span>
+          <a href="/login">Log in</a>
         </div>
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Confirm Password:</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            style={{ width: '100%', padding: '8px' }}
-          />
-        </div>
-        {message && <p style={{ color: 'green' }}>{message}</p>}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button 
-          type="submit" 
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          Reset Password
-        </button>
-      </form>
+      </div>
     </div>
   );
 };
