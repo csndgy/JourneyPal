@@ -1,110 +1,98 @@
-import React, { useState } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../Trip.css';
-import { Trip, Event } from '../types';
-import { destinations } from '../assets/destinations';
+import { Trip } from '../types';
+import api from '../Services/Interceptor';
 
 const YourTrips: React.FC = () => {
   const navigate = useNavigate();
-  const [trips, setTrips] = useState<Trip[]>(
-    JSON.parse(localStorage.getItem('trips') || '[]')
-  );
-  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
-  const [newEvent, setNewEvent] = useState<Event>({
-    id: '',
-    name: '',
-    description: '',
-    location: '',
-    duration: '',
-    links: '',
-    time: ''
-  });
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const handleTripClick = (trip: Trip) => {
-    // Find the destination ID for predefined destinations
-    const destination = trip.isCustom 
-      ? { id: 'custom' } 
-      : destinations.find(d => d.title === trip.destination);
-
-    // Navigate to trip planner with trip details
-    navigate(`/plan/${destination?.id || 'custom'}`, {
-      state: {
-        tripName: trip.name,
-        destination: trip.destination,
-        startDate: trip.startDate,
-        endDate: trip.endDate,
-        isCustom: trip.isCustom,
-        existingEvents: trip.events || []
-      }
-    });
-  };
-
-  const handleDeleteTrip = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const updatedTrips = trips.filter(trip => trip.id !== id);
-    setTrips(updatedTrips);
-    localStorage.setItem('trips', JSON.stringify(updatedTrips));
-  };
-
-  const handleEventChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewEvent(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleAddEvent = () => {
-    if (!selectedTrip || !newEvent.name.trim()) return;
+  useEffect(() => {
+    const fetchTrips = async () => {
+      try {
+        const response = await api.get('/api/trips');
+        
+        const tripsData = response.data.map((trip: any) => {
+          // Debug raw trip data
+          
+          // Use the correct property names (camelCase as shown in API response)
+          const tripData = {
+            id: trip.id || 0,
+            name: trip.tripName || 'Unnamed Trip',
+            destination: trip.destination || 'Unknown Destination',
+            startDate: trip.startDate ? new Date(trip.startDate).toISOString() : new Date().toISOString(),
+            endDate: trip.endDate ? new Date(trip.endDate).toISOString() : new Date().toISOString(),
+            isCustom: true
+          };
+          
+          return tripData;
+        });
     
-    const eventWithId: Event = {
-      ...newEvent,
-      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        setTrips(tripsData);
+      } catch (err) {
+        console.error('Error fetching trips:', err);
+        setError('Failed to load trips. Please try again.');
+      } finally {
+        setLoading(false);
+      }
     };
-    
-    const updatedTrips = trips.map(trip => {
-      if (trip.id === selectedTrip.id) {
-        // If trip doesn't have events array, initialize it
-        const existingEvents = trip.events || [];
-        return {
-          ...trip,
-          events: [...existingEvents, eventWithId]
-        };
-      }
-      return trip;
-    });
 
-    setTrips(updatedTrips);
-    localStorage.setItem('trips', JSON.stringify(updatedTrips));
-    setSelectedTrip(updatedTrips.find(t => t.id === selectedTrip.id) || null);
-    
-    // Reset event form
-    setNewEvent({
-      id: '',
-      name: '',
-      description: '',
-      location: '',
-      duration: '',
-      links: '',
-      time: ''
-    });
+    fetchTrips();
+  }, []);
+
+  const handleDeleteTrip = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await api.delete(`/api/trips/${id}`);
+      setTrips(prevTrips => prevTrips.filter(trip => trip.id !== id));
+    } catch (err) {
+      console.error('Error deleting trip:', err);
+      setError('Failed to delete trip. Please try again.');
+    }
   };
 
-  const handleEditTrip = (trip: Trip) => {
-    navigate('/plan-your-trip', {
-      state: {
-        destination: trip.destination,
-        startDate: trip.startDate,
-        endDate: trip.endDate,
-        isCustom: trip.isCustom,
-        tripName: trip.name,
-        tripId: trip.id  // Pass the trip ID to identify which trip is being edited
-      }
+
+  const formatDate = (dateInput: string | Date) => {
+    // If it's already a Date object, use it directly
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date:', dateInput);
+      return 'Invalid date';
+    }
+  
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
     });
   };
+  if (loading) {
+    return (
+      <div className="your-trips-container">
+        <h1>Your Trips</h1>
+        <div className="empty-state">Loading your trips...</div>
+      </div>
+    );
+  }
 
+  if (error) {
+    return (
+      <div className="your-trips-container">
+        <h1>Your Trips</h1>
+        <div className="error-state">{error}</div>
+      </div>
+    );
+  }
   return (
     <div className="your-trips-container">
       <h1>Your Trips</h1>
-      
+
       {trips.length === 0 ? (
         <div className="empty-state">
           <p>You don't have any trips yet.</p>
@@ -113,25 +101,24 @@ const YourTrips: React.FC = () => {
       ) : (
         <div className="trips-list">
           {trips.map(trip => (
-            <div 
-              key={trip.id} 
-              className={`trip-card ${selectedTrip?.id === trip.id ? 'selected' : ''}`}
-              onClick={() => handleTripClick(trip)}
+            <div
+              key={trip.id}
+              className="trip-card"
+              onClick={() => navigate(`/plan/${trip.id}`, {
+                state: {
+                  tripId: trip.id,
+                  destination: trip.destination,
+                  startDate: trip.startDate,
+                  endDate: trip.endDate,
+                  isCustom: true
+                }
+              })}
             >
               <h3>{trip.name}</h3>
               <p>Destination: {trip.destination}</p>
-              <p>Dates: {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}</p>
+              <p>Dates: {formatDate(trip.startDate)} - {formatDate(trip.endDate)}</p>
               <div className="trip-card-actions">
-                <button 
-                  className="edit-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditTrip(trip);
-                  }}
-                >
-                  Edit
-                </button>
-                <button 
+                <button
                   className="delete-btn"
                   onClick={(e) => handleDeleteTrip(trip.id, e)}
                 >
@@ -140,103 +127,6 @@ const YourTrips: React.FC = () => {
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {selectedTrip && (
-        <div className="trip-details">
-          <h2>{selectedTrip.name} Details</h2>
-          
-          <div className="events-section">
-            <h3>Add Event</h3>
-            <div className="event-form">
-              <div className="form-group">
-                <label>Event Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={newEvent.name}
-                  onChange={handleEventChange}
-                  placeholder="Enter event name"
-                />
-              </div>
-              <div className="form-group">
-                <label>Start Time</label>
-                <input
-                  type="time"
-                  name="time"
-                  value={newEvent.time}
-                  onChange={handleEventChange}
-                />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  name="description"
-                  value={newEvent.description}
-                  onChange={handleEventChange}
-                  placeholder="Enter event description"
-                />
-              </div>
-              <div className="form-group">
-                <label>Location</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={newEvent.location}
-                  onChange={handleEventChange}
-                  placeholder="Enter location"
-                />
-              </div>
-              <div className="form-group">
-                <label>Duration</label>
-                <input
-                  type="text"
-                  name="duration"
-                  value={newEvent.duration}
-                  onChange={handleEventChange}
-                  placeholder="e.g. 2 hours"
-                />
-              </div>
-              <div className="form-group">
-                <label>Links</label>
-                <input
-                  type="text"
-                  name="links"
-                  value={newEvent.links}
-                  onChange={handleEventChange}
-                  placeholder="Enter relevant links"
-                />
-              </div>
-              <button 
-                className="save-event-btn"
-                onClick={handleAddEvent}
-                disabled={!newEvent.name.trim()}
-              >
-                Add Event
-              </button>
-            </div>
-
-            {selectedTrip.events && selectedTrip.events.length > 0 && (
-              <div className="existing-events">
-                <h3>Scheduled Events</h3>
-                {selectedTrip.events.map((event, index) => (
-                  <div key={index} className="event-card">
-                    <h4>{event.name}</h4>
-                    {event.time && <p>Time: {event.time}</p>}
-                    {event.description && <p>{event.description}</p>}
-                    {event.location && <p>Location: {event.location}</p>}
-                    {event.duration && <p>Duration: {event.duration}</p>}
-                    {event.links && (
-                      <a href={event.links} target="_blank" rel="noopener noreferrer">
-                        Additional Info
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       )}
     </div>

@@ -5,7 +5,6 @@ import HeroSection from './components/HeroSection';
 import PressRecommendations from './components/PressRecommendations';
 import Stats from './components/Stats';
 import Footer from './components/Footer';
-import Checklist from './components/Checklist';
 import SignUp from './components/SignUp';
 import './JourneyPal.css';
 import Login from './components/Login';
@@ -14,6 +13,10 @@ import UserProfile from './components/UserProfile';
 import TripPlanner from './components/TripPlanner';
 import PlanYourTrip from './components/PlanYourTrip';
 import YourTrips from './components/YourTrips';
+import ProtectedRoute from './Services/ProtectedRoute';
+import NewTripPage from './components/NewTripPage';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 const App: React.FC = () => {
   // Alapértelmezett érték: light mode, kivéve ha a localStorage-ban dark mode van
@@ -22,6 +25,19 @@ const App: React.FC = () => {
     return savedMode === 'true'; // Ha 'true', akkor dark mode, különben light mode
   });
 
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const token = localStorage.getItem('token');
+    const refreshToken = localStorage.getItem('refreshToken');
+    return !!(token && refreshToken);
+  });
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+  };
   // Ref a PopularDestinations szekcióhoz
   const popularDestinationsRef = useRef<HTMLDivElement>(null);
 
@@ -32,6 +48,17 @@ const App: React.FC = () => {
     localStorage.setItem('darkMode', newMode.toString());
     document.body.classList.toggle('dark-mode', newMode);
   };
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('token');
+      const refreshToken = localStorage.getItem('refreshToken');
+      setIsAuthenticated(!!(token && refreshToken));
+    };
+  
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode');
@@ -45,7 +72,8 @@ const App: React.FC = () => {
   return (
     <Router>
       <div className={`journey-pal-container ${isDarkMode ? 'dark-mode' : ''}`}>
-        <NavBar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+        <NavBar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} isAuthenticated={isAuthenticated}
+          onLogout={handleLogout}/>
         <Routes>
           <Route
             path="/"
@@ -63,13 +91,18 @@ const App: React.FC = () => {
               </>
             }
           />
-          <Route path="/checklist" element={<Checklist />} />
+          {/* <Route path="/checklist" element={<Checklist />} /> */}
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/plan/:destinationId" element={<TripPlanner />} />
-          <Route path="/plan-your-trip" element={<PlanYourTrip />} />
-          <Route path="/trips" element={<YourTrips />} />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path='/forgot-password' element={<ForgotPassword />} />
+          <Route path='/reset-password' element={<ResetPassword />} />
+          <Route element={<ProtectedRoute isAllowed={isAuthenticated} />}>
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/plan/:tripId" element={<TripPlanner />} />
+            <Route path="/plan-your-trip" element={<PlanYourTrip />} />
+            <Route path="/trips" element={<YourTrips />} />
+            <Route path="/trip/new" element={<NewTripPage />} />
+          </Route>
         </Routes>
       </div>
     </Router>

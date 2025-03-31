@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { destinations } from '../assets/destinations.ts';
@@ -5,23 +6,25 @@ import { TripPlan, TripDay, Destination, Event } from '../types';
 import Checklist from './Checklist.tsx';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../Trip.css';
+import '../Trip.css'
+import api from '../Services/Interceptor.ts';
 
 const TripPlanner = () => {
-  const { destinationId } = useParams<{ destinationId: string }>();
+  const { tripId } = useParams<{ tripId: string }>();
   const location = useLocation();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-  const destination = destinationId === 'custom' 
-  ? {
-      id: 'custom',
-      title: location.state?.destination || 'Custom Destination',
-      description: 'Custom Destination Description',
-      coordinates: { lat: 0, lng: 0 },
-      image: '/images/custom-destination.jpg',
-      alt: 'Custom Destination'
-    }
-  : destinations.find(d => d.id === Number(destinationId));
+
+  const destination = destinations.find(d => d.id === Number(tripId)) ||
+    (location.state?.destination ?
+      {
+        id: 'custom',
+        title: location.state.destination,
+        description: `Your trip to ${location.state.destination}`,
+        coordinates: { lat: 0, lng: 0 },
+        image: '/images/custom-destination.jpg',
+        alt: 'Custom Destination'
+      } :
+      destinations[0]
+    );
 
   // ... existing state declarations remain the same ...
   const [tripPlan, setTripPlan] = useState<TripPlan>({
@@ -43,46 +46,106 @@ const TripPlanner = () => {
   const [showEventForm, setShowEventForm] = useState(false);
   const navigate = useNavigate();
   const [newEvent, setNewEvent] = useState<Event>({
-    id: '', 
+    id: '',
     name: '',
     description: '',
     location: '',
-    duration: '',
     links: '',
     time: ''
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Load events for the trip when component mounts or tripId changes
   useEffect(() => {
-    if (!location.state?.startDate || !location.state?.endDate) {
-      console.error('Missing required trip dates in state');
-      navigate('/trips');
+    const loadEvents = async () => {
+      try {
+        if (!tripId) return;
+
+        const response = await api.get(`/api/events/trip/${tripId}`);
+        const events = response.data;
+
+        if (events.length > 0 && tripPlan.days.length > 0) {
+          const updatedDays = tripPlan.days.map(day => {
+            const dayEvents = events
+              .filter((event: any) => new Date(event.eventDate).toISOString().split('T')[0] === day.date)
+              .map((event: any) => ({
+                id: event.id.toString(),
+                name: event.eventName,
+                description: event.eventDescription,
+                location: event.eventLocation,
+                links: event.eventLinks?.join(', ') || '',
+                time: event.eventDate ? new Date(event.eventDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+                date: day.date
+              }));
+
+            return {
+              ...day,
+              events: dayEvents
+            };
+          });
+
+          setTripPlan(prev => ({ ...prev, days: updatedDays }));
+        }
+      } catch (error) {
+        console.error('Failed to load events:', error);
+      }
+    };
+
+    loadEvents();
+  }, [tripId, tripPlan.days.length]);
+
+  const validateEventForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!newEvent.name.trim()) {
+      errors.name = 'Event name is required';
     }
-  }, [location.state]);
+
+    if (!newEvent.description.trim()) {
+      errors.description = 'Description is required';
+    }
+
+    if (!newEvent.location.trim()) {
+      errors.location = 'Location is required';
+    }
+
+    if (!newEvent.time.trim()) {
+      errors.time = 'Time is required';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   // Check if trip details are passed from Your Trips page
   useEffect(() => {
     if (location.state) {
-      const state = location.state as { 
-        startDate?: string, 
+      const state = location.state as {
+        tripId?: string,
+        startDate?: string,
         endDate?: string,
         existingEvents?: Event[],
-        tripName?: string
+        tripName?: string,
+        destination?: string
       };
 
       if (state.startDate && state.endDate) {
         // Fix: Use proper date handling to avoid timezone issues
         const start = new Date(state.startDate);
         const end = new Date(state.endDate);
-        
+
         setStartDate(start);
         setEndDate(end);
-        
-        // Generate days and pre-populate with existing events if any
-        const days: TripDay[] = [];
-        let currentDate = new Date(start);
 
-        while (currentDate <= end) {
-          // Fix: Format date properly to avoid timezone shifts
-          const dateString = formatDateToLocalISOString(currentDate);
+        // Generate days for the entire duration
+        const days: TripDay[] = [];
+        const currentDate = new Date(start);
+        currentDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(end);
+        endDate.setHours(0, 0, 0, 0);
+        while (currentDate <= endDate) {
+          const dateString = currentDate.toISOString().split('T')[0];
           const dayEvents = (state.existingEvents || [])
             .filter(event => event.date === dateString);
 
@@ -95,11 +158,10 @@ const TripPlanner = () => {
           });
           currentDate.setDate(currentDate.getDate() + 1);
         }
-
-        setTripPlan({ 
-          startDate: formatDateToLocalISOString(start), 
-          endDate: formatDateToLocalISOString(end), 
-          days 
+        setTripPlan({
+          startDate: start.toISOString().split('T')[0],
+          endDate: end.toISOString().split('T')[0],
+          days
         });
         setIsDateSelected(true);
         setCurrentPage(0);
@@ -119,9 +181,9 @@ const TripPlanner = () => {
 
   const generateDays = () => {
     if (!startDate || !endDate) return;
-    
+
     const days: TripDay[] = [];
-    let currentDate = new Date(startDate);
+    const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
       // Fix: Use our helper function to get consistent date strings
@@ -135,11 +197,10 @@ const TripPlanner = () => {
       });
       currentDate.setDate(currentDate.getDate() + 1);
     }
-
-    setTripPlan({ 
-      startDate: formatDateToLocalISOString(startDate), 
-      endDate: formatDateToLocalISOString(endDate), 
-      days 
+    setTripPlan({
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      days
     });
     setIsDateSelected(true);
     setCurrentPage(0);
@@ -162,7 +223,7 @@ const TripPlanner = () => {
     setShowNotes(false);
     setShowChecklist(false);
     setShowPlacesToVisit(false);
-    
+
     setSelectedDay(day);
     setShowEventForm(false);
   };
@@ -172,37 +233,140 @@ const TripPlanner = () => {
     setNewEvent(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAddEvent = () => {
-    if (!selectedDay || !newEvent.name.trim()) return;
-    
-    // Generate a unique ID for the new event
-    const eventWithId: Event = {
-      ...newEvent,
-      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      date: selectedDay.date  // Add date to the event
-    };
-    
-    const updatedDays = tripPlan.days.map(day => {
-      if (day.date === selectedDay.date) {
-        return {
-          ...day,
-          events: [...(day.events || []), eventWithId]
-        };
-      }
-      return day;
-    });
+  const handleAddEvent = async () => {
+    if (!selectedDay || !tripId || !validateEventForm()) return;
 
-    setTripPlan(prev => ({ ...prev, days: updatedDays }));
-    setSelectedDay(updatedDays.find(d => d.date === selectedDay.date) || null);
+    try {
+      const eventData = {
+        EventName: newEvent.name.trim(),
+        EventDescription: newEvent.description.trim(),
+        EventLocation: newEvent.location.trim(),
+        EventLinks: newEvent.links ? newEvent.links.split(',').map(link => link.trim()).filter(link => link) : [],
+        EventDate: new Date(`${selectedDay.date}T${newEvent.time}`),
+        TripId: parseInt(tripId)
+      };
+
+      const response = await api.post('/api/events', eventData);
+      const createdEvent = response.data;
+
+      const eventWithId: Event = {
+        id: createdEvent.id.toString(),
+        name: createdEvent.eventName,
+        description: createdEvent.eventDescription,
+        location: createdEvent.eventLocation,
+        links: createdEvent.eventLinks?.join(', ') || '',
+        time: newEvent.time,
+        date: selectedDay.date
+      };
+
+      const updatedDays = tripPlan.days.map(day => {
+        if (day.date === selectedDay.date) {
+          return {
+            ...day,
+            events: [...(day.events || []), eventWithId]
+          };
+        }
+        return day;
+      });
+
+      setTripPlan(prev => ({ ...prev, days: updatedDays }));
+      setSelectedDay(updatedDays.find(d => d.date === selectedDay.date) || null);
+      resetEventForm();
+    } catch (error) {
+      console.error('Failed to create event:', error);
+    }
+  };
+
+  const handleEditEvent = async () => {
+    if (!selectedDay || !newEvent.id || !tripId || !validateEventForm()) return;
+
+    try {
+      const eventData = {
+        EventName: newEvent.name.trim(),
+        EventDescription: newEvent.description.trim(),
+        EventLocation: newEvent.location.trim(),
+        EventLinks: newEvent.links ? newEvent.links.split(',').map(link => link.trim()).filter(link => link) : [],
+        EventDate: new Date(`${selectedDay.date}T${newEvent.time}`)
+      };
+
+      await api.patch(`/api/events/${newEvent.id}`, eventData);
+
+      const updatedDays = tripPlan.days.map(day => {
+        if (day.date === selectedDay.date) {
+          return {
+            ...day,
+            events: day.events.map(event =>
+              event.id === newEvent.id ? {
+                ...event,
+                name: newEvent.name.trim(),
+                description: newEvent.description.trim(),
+                location: newEvent.location.trim(),
+                links: newEvent.links.trim(),
+                time: newEvent.time
+              } : event
+            )
+          };
+        }
+        return day;
+      });
+
+      setTripPlan(prev => ({ ...prev, days: updatedDays }));
+      setSelectedDay(updatedDays.find(d => d.date === selectedDay.date) || null);
+      resetEventForm();
+    } catch (error) {
+      console.error('Failed to update event:', error);
+    }
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!window.confirm('Are you sure you want to delete this event?')) return;
+
+    try {
+      await api.delete(`/api/events/${eventId}`);
+
+      const updatedDays = tripPlan.days.map(day => {
+        if (day.date === selectedDay?.date) {
+          return {
+            ...day,
+            events: day.events.filter(event => event.id !== eventId)
+          };
+        }
+        return day;
+      });
+
+      setTripPlan(prev => ({ ...prev, days: updatedDays }));
+      if (selectedDay) {
+        setSelectedDay(updatedDays.find(d => d.date === selectedDay.date) || null);
+      }
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
+  };
+
+  const startEditingEvent = (event: Event) => {
     setNewEvent({
-      id: '', 
+      id: event.id,
+      name: event.name,
+      description: event.description,
+      location: event.location,
+      links: event.links,
+      time: event.time
+    });
+    setIsEditing(true);
+    setShowEventForm(true);
+  };
+
+  const resetEventForm = () => {
+    setNewEvent({
+      id: '',
       name: '',
       description: '',
       location: '',
-      duration: '',
       links: '',
       time: ''
     });
+    setFormErrors({});
+    setIsEditing(false);
     setShowEventForm(false);
   };
 
@@ -226,31 +390,43 @@ const TripPlanner = () => {
 
   return (
     <div className="app-layout">
-      <button 
-        className="menu-toggle"
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-      >
-        ☰
-      </button>
-      
-      <div className={`sidebar ${isMenuOpen ? 'active' : ''}`}>
-        <div className="overview-cards">
-          <div 
-            className="overview-card"
-            onClick={() => {
-              setShowMap(true);
-              setShowNotes(false);
-              setShowChecklist(false);
-              setShowPlacesToVisit(false);
-              setSelectedDay(null);
-              setIsMenuOpen(false);
-            }}
-          >
-            <div className="card-icon">🗺️</div>
-            <h3>Explore Map</h3>
-            <p>Discover locations and plan routes</p>
+      {isDateSelected && (
+        <div className="sidebar">
+          <div className="sidebar-section">
+            <div className="section-header">
+              <h2>Overview</h2>
+            </div>
+            <ul className="section-items">
+              <li onClick={() => {
+                setShowMap(true);
+                setShowNotes(false);
+                setShowChecklist(false);
+                setShowPlacesToVisit(false);
+                setSelectedDay(null);
+              }}>Explore</li>
+              <li onClick={() => {
+                setShowNotes(true);
+                setShowMap(false);
+                setShowChecklist(false);
+                setShowPlacesToVisit(false);
+                setSelectedDay(null);
+              }}>Notes</li>
+              <li onClick={() => {
+                setShowChecklist(true);
+                setShowNotes(false);
+                setShowMap(false);
+                setShowPlacesToVisit(false);
+                setSelectedDay(null);
+              }}>Checklist</li>
+              <li onClick={() => {
+                setShowPlacesToVisit(true);
+                setShowMap(false);
+                setShowNotes(false);
+                setShowChecklist(false);
+                setSelectedDay(null);
+              }}>Places to visit</li>
+            </ul>
           </div>
-
           <div 
             className="overview-card"
             onClick={() => {
@@ -322,16 +498,16 @@ const TripPlanner = () => {
               </ul>
             </div>
             <div className="pagination-container">
-              <button 
-                className="btn-prev" 
+              <button
+                className="btn-prev"
                 onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
                 disabled={currentPage === 0}
               >
                 ➜
               </button>
               <span className="page-info">Page {currentPage + 1} of {totalPages}</span>
-              <button 
-                className="btn-next" 
+              <button
+                className="btn-next"
                 onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
                 disabled={currentPage === totalPages - 1}
               >
@@ -376,8 +552,8 @@ const TripPlanner = () => {
                   popperPlacement="bottom-start"
                 />
               </div>
-              <button 
-                onClick={generateDays} 
+              <button
+                onClick={generateDays}
                 className="generate-btn"
                 disabled={!startDate || !endDate}
               >
@@ -435,7 +611,7 @@ const TripPlanner = () => {
               {notes.map((note, index) => (
                 <div key={index} className="note-card">
                   <p>{note}</p>
-                  <button 
+                  <button
                     className="delete-note-btn"
                     onClick={() => handleDeleteNote(index)}
                   >
@@ -449,19 +625,32 @@ const TripPlanner = () => {
           <div className="day-details">
             <h2>Day {tripPlan.days.findIndex(d => d.date === selectedDay.date) + 1}</h2>
             <p className="day-date">{new Date(selectedDay.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-            
-            {!showEventForm ? (
+        
+            {!showEventForm && (
               <button 
                 className="create-event-btn"
-                onClick={() => setShowEventForm(true)}
+                onClick={() => {
+                  setShowEventForm(true);
+                  setIsEditing(false);
+                  setNewEvent({
+                    id: '',
+                    name: '',
+                    description: '',
+                    location: '',
+                    links: '',
+                    time: ''
+                  });
+                }}
               >
                 + Create Event
               </button>
-            ) : (
+            )}
+
+            {showEventForm && (
               <div className="event-form">
-                <h3>Create New Event</h3>
+                <h3>{isEditing ? 'Edit Event' : 'Create New Event'}</h3>
                 <div className="form-group">
-                  <label>Event Name</label>
+                  <label>Event Name *</label>
                   <input
                     type="text"
                     name="name"
@@ -469,27 +658,30 @@ const TripPlanner = () => {
                     onChange={handleEventChange}
                     placeholder="Enter event name"
                   />
+                  {formErrors.name && <span className="error-message">{formErrors.name}</span>}
                 </div>
                 <div className="form-group">
-                  <label>Start Time</label>
+                  <label>Start Time *</label>
                   <input
                     type="time"
                     name="time"
                     value={newEvent.time}
                     onChange={handleEventChange}
                   />
+                  {formErrors.time && <span className="error-message">{formErrors.time}</span>}
                 </div>
                 <div className="form-group">
-                  <label>Description</label>
+                  <label>Description *</label>
                   <textarea
                     name="description"
                     value={newEvent.description}
                     onChange={handleEventChange}
                     placeholder="Enter event description"
                   />
+                  {formErrors.description && <span className="error-message">{formErrors.description}</span>}
                 </div>
                 <div className="form-group">
-                  <label>Location</label>
+                  <label>Location *</label>
                   <input
                     type="text"
                     name="location"
@@ -497,16 +689,7 @@ const TripPlanner = () => {
                     onChange={handleEventChange}
                     placeholder="Enter location"
                   />
-                </div>
-                <div className="form-group">
-                  <label>Duration</label>
-                  <input
-                    type="text"
-                    name="duration"
-                    value={newEvent.duration}
-                    onChange={handleEventChange}
-                    placeholder="e.g. 2 hours"
-                  />
+                  {formErrors.location && <span className="error-message">{formErrors.location}</span>}
                 </div>
                 <div className="form-group">
                   <label>Links</label>
@@ -515,22 +698,21 @@ const TripPlanner = () => {
                     name="links"
                     value={newEvent.links}
                     onChange={handleEventChange}
-                    placeholder="Enter relevant links"
+                    placeholder="Enter relevant links (comma separated)"
                   />
                 </div>
                 <div className="form-actions">
-                  <button 
+                  <button
                     className="cancel-btn"
-                    onClick={() => setShowEventForm(false)}
+                    onClick={resetEventForm}
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     className="save-btn"
-                    onClick={handleAddEvent}
-                    disabled={!newEvent.name.trim()}
+                    onClick={isEditing ? handleEditEvent : handleAddEvent}
                   >
-                    Save Event
+                    {isEditing ? 'Update Event' : 'Save Event'}
                   </button>
                 </div>
               </div>
@@ -549,12 +731,6 @@ const TripPlanner = () => {
                         <div className="event-detail">
                           <span className="detail-label">Location:</span>
                           <span>{event.location}</span>
-                        </div>
-                      )}
-                      {event.duration && (
-                        <div className="event-detail">
-                          <span className="detail-label">Duration:</span>
-                          <span>{event.duration}</span>
                         </div>
                       )}
                       {event.links && (
@@ -578,6 +754,20 @@ const TripPlanner = () => {
                           )}
                         </div>
                       )}
+                    </div>
+                    <div className="event-actions">
+                      <button
+                        className="edit-event-btn"
+                        onClick={() => startEditingEvent(event)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="delete-event-btn"
+                        onClick={() => handleDeleteEvent(event.id)}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 ))}

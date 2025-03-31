@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { destinations } from '../assets/destinations';
-import { Trip } from '../types';
+import { CreateTripDto } from '../types';
+import api from '../Services/Interceptor';
 
 interface TripFormData {
   tripName: string;
@@ -34,6 +36,8 @@ const PlanYourTrip: React.FC = () => {
     dates: '',
     general: ''
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentTripId, setCurrentTripId] = useState<number | null>(null);
 
   // Use pre-filled data if passed from Your Trips page for editing
   useEffect(() => {
@@ -47,6 +51,9 @@ const PlanYourTrip: React.FC = () => {
     };
 
     if (state) {
+      setIsEditing(!!state.tripId);
+      setCurrentTripId(state.tripId || null);
+      
       setFormData(prev => ({
         ...prev,
         tripName: state.tripName || '',
@@ -77,12 +84,10 @@ const PlanYourTrip: React.FC = () => {
       general: ''
     };
 
-    // Name validation
     if (!formData.tripName.trim()) {
       newErrors.tripName = 'Please provide a trip name!';
     }
 
-    // Destination validation
     if (formData.destinationType === 'predefined' && !formData.predefinedDestination) {
       newErrors.destination = 'Please select a destination from the list!';
     }
@@ -90,7 +95,6 @@ const PlanYourTrip: React.FC = () => {
       newErrors.destination = 'Please provide a custom destination!';
     }
 
-    // Date validation
     if (!formData.startDate || !formData.endDate) {
       newErrors.dates = 'Both dates are required!';
     } else if (formData.startDate > formData.endDate) {
@@ -102,79 +106,66 @@ const PlanYourTrip: React.FC = () => {
     setErrors(newErrors);
     return !Object.values(newErrors).some(error => error !== '');
   };
-
-  const checkDuplicateTrip = () => {
-    // If we're editing an existing trip, don't check for duplicates
-    if (formData.editingTripId) {
-      return false;
-    }
-
-    const existingTrips: Trip[] = JSON.parse(localStorage.getItem('trips') || '[]');
-    return existingTrips.some(trip => 
-      trip.name.toLowerCase() === formData.tripName.toLowerCase() &&
-      new Date(trip.startDate).getTime() === formData.startDate?.getTime() &&
-      new Date(trip.endDate).getTime() === formData.endDate?.getTime()
-    );
-  };
-
-  const handleSaveTrip = (e: React.FormEvent) => {
+  const handleSaveTrip = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) return;
+    try {
+      const destination = formData.destinationType === 'custom' 
+        ? formData.customDestination.trim() 
+        : formData.predefinedDestination;
 
-    if (checkDuplicateTrip()) {
-      setErrors({ ...errors, general: 'A trip with this name and dates already exists!' });
-      return;
-    }
-
-    // Get existing trips
-    const existingTrips: Trip[] = JSON.parse(localStorage.getItem('trips') || '[]');
-    
-    // Check if we're updating an existing trip
-    if (formData.editingTripId) {
-      // Find the trip to update
-      const updatedTrips = existingTrips.map(trip => {
-        if (trip.id === formData.editingTripId) {
-          // Update the trip with new values
-          return {
-            ...trip,
-            name: formData.tripName.trim(),
-            destination: formData.destinationType === 'custom' 
-              ? formData.customDestination.trim() 
-              : formData.predefinedDestination,
-            startDate: formData.startDate!.toISOString(),
-            endDate: formData.endDate!.toISOString(),
-            isCustom: formData.destinationType === 'custom'
-          };
-        }
-        return trip;
-      });
-      
-      localStorage.setItem('trips', JSON.stringify(updatedTrips));
-    } else {
-      // Create a new trip
-      const newTrip: Trip = {
-        id: Date.now(),
-        name: formData.tripName.trim(),
-        destination: formData.destinationType === 'custom' 
-          ? formData.customDestination.trim() 
-          : formData.predefinedDestination,
-        startDate: formData.startDate!.toISOString(),
-        endDate: formData.endDate!.toISOString(),
-        isCustom: formData.destinationType === 'custom'
+      const tripData: CreateTripDto = {
+        TripName: formData.tripName.trim(),
+        Destination: destination,
+        StartDate: formData.startDate!,
+        EndDate: formData.endDate!
       };
+      let response;
 
-      const updatedTrips = [...existingTrips, newTrip];
-      localStorage.setItem('trips', JSON.stringify(updatedTrips));
+      if (isEditing && currentTripId) {
+        // Update existing trip
+          response = await api.put(`/api/trips/${currentTripId}`, tripData);
+      } else {
+        // Create new trip
+        response = await api.post('/api/trips', tripData);
+      }
+      
+      setShowSuccess(true);
+      setErrors({ tripName: '', destination: '', dates: '', general: '' });
+    } catch (error) {
+      console.error('Error saving trip:', error);
+      setErrors({ ...errors, general: 'Failed to save trip. Please try again.' });
     }
-    
-    setShowSuccess(true);
-    setErrors({ tripName: '', destination: '', dates: '', general: '' });
   };
 
   const navigateToNextStep = () => {
-    // Modified function: Always navigate to /trips instead of /plan/{id}
-    navigate('/trips');
+    const destination = formData.destinationType === 'custom'
+      ? { 
+          id: 'custom', 
+          title: formData.customDestination,
+          description: 'Custom Destination',
+          image: '/images/custom-destination.jpg'
+        }
+      : { 
+          id: 'predefined', // This will be replaced with actual ID from API
+          title: formData.predefinedDestination,
+          description: formData.predefinedDestination,
+          image: '/images/default-destination.jpg'
+        };
+
+    // Navigate to trip planner with trip details
+    navigate(`/plan/${destination.id}`, { 
+      state: {
+        tripName: formData.tripName,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        isCustom: formData.destinationType === 'custom',
+        destination: formData.destinationType === 'custom' 
+          ? formData.customDestination 
+          : formData.predefinedDestination
+      }
+    });
   };
 
   const formatDate = (date: Date) => {
@@ -192,7 +183,7 @@ const PlanYourTrip: React.FC = () => {
 
   return (
     <div className="plan-your-trip-container">
-      <h1 className="page-title">{formData.editingTripId ? 'Edit Trip' : 'Plan a New Trip'}</h1>
+      <h1 className="page-title">{isEditing ? 'Edit Trip' : 'Plan a New Trip'}</h1>
 
       {errors.general && (
         <div className="error-message">
@@ -203,7 +194,7 @@ const PlanYourTrip: React.FC = () => {
       {showSuccess && (
         <div className="success-message">
           <div className="success-icon">✅</div>
-          <h3>Booking Successful!</h3>
+          <h3>{isEditing ? 'Trip Updated!' : 'Booking Successful!'}</h3>
           <p>
             {formData.tripName} trip to 
             <strong> {formData.destinationType === 'custom' 
@@ -229,45 +220,16 @@ const PlanYourTrip: React.FC = () => {
           {errors.tripName && <span className="error-text">{errors.tripName}</span>}
         </div>
 
-        <div className="form-group">
-          <label>Destination Type *</label>
-          <div className="radio-group">
-            <label>
-              <input
-                type="radio"
-                name="destinationType"
-                value="predefined"
-                checked={formData.destinationType === 'predefined'}
-                onChange={() => setFormData({...formData, destinationType: 'predefined'})}
-              />
-              Select City
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="destinationType"
-                value="custom"
-                checked={formData.destinationType === 'custom'}
-                onChange={() => setFormData({...formData, destinationType: 'custom'})}
-              />
-              Custom Destination
-            </label>
-          </div>
-        </div>
-
         {formData.destinationType === 'predefined' ? (
           <div className="form-group">
             <label>Select City *</label>
-            <select
+            <input
+              type="text"
               value={formData.predefinedDestination}
               onChange={(e) => setFormData({...formData, predefinedDestination: e.target.value})}
               className={errors.destination ? 'has-error' : ''}
-            >
-              <option value="">-- Select a Destination --</option>
-              {destinations.map((dest) => (
-                <option key={dest.id} value={dest.title}>{dest.title}</option>
-              ))}
-            </select>
+              placeholder="Enter destination name"
+            />
             {errors.destination && <span className="error-text">{errors.destination}</span>}
           </div>
         ) : (
@@ -313,23 +275,13 @@ const PlanYourTrip: React.FC = () => {
           </div>
           {errors.dates && <span className="error-text">{errors.dates}</span>}
         </div>
-
-        <div className="form-buttons">
-          <button
-            type="button"
-            className="cancel-btn"
-            onClick={handleCancel}
-          >
-            Cancel
-          </button>
-          <button 
-            type="submit" 
-            className="save-btn"
-            disabled={showSuccess}
-          >
-            {showSuccess ? 'Redirecting...' : formData.editingTripId ? 'Update Trip' : 'Save Trip'}
-          </button>
-        </div>
+        <button 
+          type="submit" 
+          className="save-btn"
+          disabled={showSuccess}
+        >
+          {showSuccess ? 'Redirecting...' : isEditing ? 'Update Trip' : 'Save Trip'}
+        </button>
       </form>
     </div>
   );
