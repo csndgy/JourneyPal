@@ -92,18 +92,6 @@ namespace JourneyPalBackend
                 });
             });
 
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-                options.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie()
-            .AddGoogleOpenIdConnect(options =>
-            {
-                options.ClientId = "657605945054-cqvc0348b99aijcf5f2oet9ud7n4efkj.apps.googleusercontent.com";
-                options.ClientSecret = "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";
-            });
-
             builder.Services.AddCors(o =>
             {
                 o.AddPolicy("AllowAll", builder =>
