@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 
 namespace JourneyPalAdmin
@@ -95,6 +96,19 @@ namespace JourneyPalAdmin
             var mainWindow = new MainWindow(_apiService);
             mainWindow.Show();
             this.Close();
+        }
+        private void PasswordReveal_Checked(object sender, RoutedEventArgs e)
+        {
+            VisiblePassword.Text = PasswordBox.Password;
+            VisiblePassword.Visibility = Visibility.Visible;
+            PasswordBox.Visibility = Visibility.Collapsed;
+        }
+
+        private void PasswordReveal_Unchecked(object sender, RoutedEventArgs e)
+        {
+            PasswordBox.Password = VisiblePassword.Text;
+            PasswordBox.Visibility = Visibility.Visible;
+            VisiblePassword.Visibility = Visibility.Collapsed;
         }
     }
 

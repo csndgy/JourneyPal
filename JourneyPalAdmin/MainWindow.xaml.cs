@@ -352,5 +352,12 @@ namespace JourneyPalAdmin
             loginWindow.Show();
             this.Close();
         }
+
+        private void UsersDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UserIdTextBox.Text = (UsersDataGrid.SelectedItem as User)?.Id;
+            UsernameTextBox.Text = (UsersDataGrid.SelectedItem as User)?.UserName;
+            EmailTextBox.Text = (UsersDataGrid.SelectedItem as User)?.Email;
+        }
     }
 }

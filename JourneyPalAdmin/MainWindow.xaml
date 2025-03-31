@@ -163,7 +163,7 @@
                           Margin="0 20 0 0"
                           AutoGenerateColumns="False"
                           SelectionMode="Single"
-                          ContextMenu="{StaticResource DataGridContextMenu}" ClipboardCopyMode="ExcludeHeader" IsReadOnly="True">
+                          ContextMenu="{StaticResource DataGridContextMenu}" ClipboardCopyMode="ExcludeHeader" IsReadOnly="True" SelectionChanged="UsersDataGrid_SelectionChanged">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*"/>
                         <DataGridTextColumn Header="Username" Binding="{Binding UserName}" Width="*"/>
