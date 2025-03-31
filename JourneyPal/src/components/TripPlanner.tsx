@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { destinations } from '../assets/destinations.ts';
 import { TripPlan, TripDay, Destination, Event } from '../types';
 import Checklist from './Checklist.tsx';
@@ -43,6 +43,11 @@ const IMAGE_MANIFEST = new Set([
   '/images/tokyo.jpeg'
 ]);
 
+interface Note {
+  id: number;
+  content: string;
+}
+
 const TripPlanner = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const location = useLocation();
@@ -67,7 +72,8 @@ const TripPlanner = () => {
     days: [],
   });
 
-  const navigate = useNavigate();
+  const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
+  const [editingNoteContent, setEditingNoteContent] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -78,7 +84,7 @@ const TripPlanner = () => {
   const [showNotes, setShowNotes] = useState(false);
   const [showChecklist, setShowChecklist] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [notes, setNotes] = useState<string[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [newNote, setNewNote] = useState('');
   const [showEventForm, setShowEventForm] = useState(false);
   const [newEvent, setNewEvent] = useState<Event>({
@@ -91,6 +97,24 @@ const TripPlanner = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const loadNotes = async () => {
+      try {
+        if (!tripId) return;
+
+        const response = await api.get(`/api/trips/${tripId}/notes`);
+        setNotes(response.data.map((note: any) => ({
+          id: note.id,
+          content: note.content
+        })));
+      } catch (error) {
+        console.error('Failed to load notes:', error);
+      }
+    };
+
+    loadNotes();
+  }, [tripId]);
 
   // Load events for the trip when component mounts or tripId changes
   useEffect(() => {
@@ -181,7 +205,7 @@ const TripPlanner = () => {
         const endDate = new Date(end);
         endDate.setHours(0, 0, 0, 0);
         while (currentDate <= endDate) {
-          const dateString = currentDate.toISOString().split('T')[0];
+          const dateString = formatDateToLocalISOString(currentDate);
           const dayEvents = (state.existingEvents || [])
             .filter(event => event.date === dateString);
 
@@ -195,8 +219,8 @@ const TripPlanner = () => {
           currentDate.setDate(currentDate.getDate() + 1);
         }
         setTripPlan({
-          startDate: start.toISOString().split('T')[0],
-          endDate: end.toISOString().split('T')[0],
+          startDate: formatDateToLocalISOString(start),
+          endDate: formatDateToLocalISOString(end),
           days
         });
         setIsDateSelected(true);
@@ -222,7 +246,6 @@ const TripPlanner = () => {
     const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
-      // Fix: Use our helper function to get consistent date strings
       const dateString = formatDateToLocalISOString(currentDate);
       days.push({
         date: dateString,
@@ -234,23 +257,71 @@ const TripPlanner = () => {
       currentDate.setDate(currentDate.getDate() + 1);
     }
     setTripPlan({
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
+      startDate: formatDateToLocalISOString(startDate),
+      endDate: formatDateToLocalISOString(endDate),
       days
     });
     setIsDateSelected(true);
     setCurrentPage(0);
   };
 
-  const handleAddNote = () => {
-    if (newNote.trim()) {
-      setNotes([...notes, newNote]);
+  const handleAddNote = async () => {
+    if (!newNote.trim() || !tripId) return;
+
+    try {
+      const response = await api.post(`/api/trips/${tripId}/notes`, {
+        content: newNote.trim()
+      });
+
+      setNotes([...notes, {
+        id: response.data.id,
+        content: newNote.trim()
+      }]);
       setNewNote('');
+    } catch (error) {
+      console.error('Failed to add note:', error);
     }
   };
 
-  const handleDeleteNote = (index: number) => {
-    setNotes(notes.filter((_, i) => i !== index));
+  const handleDeleteNote = async (noteId: number) => {
+    if (!tripId) return;
+
+    try {
+      await api.delete(`/api/trips/${tripId}/notes/${noteId}`);
+      setNotes(notes.filter(note => note.id !== noteId));
+    } catch (error) {
+      console.error('Failed to delete note:', error);
+    }
+  };
+
+  const startEditingNote = (note: Note) => {
+    setEditingNoteId(note.id);
+    setEditingNoteContent(note.content);
+  };
+
+  const handleUpdateNote = async () => {
+    if (editingNoteId === null || !tripId || !editingNoteContent.trim()) return;
+
+    try {
+      console.log(`/api/trips/${tripId}/notes/${editingNoteId}`);
+      await api.patch(`/api/trips/${tripId}/notes/${editingNoteId}`, {
+        content: editingNoteContent.trim(),
+      });
+
+      setNotes(notes.map(note =>
+        note.id === editingNoteId
+          ? { ...note, content: editingNoteContent.trim() }
+          : note
+      ));
+      cancelEditingNote();
+    } catch (error) {
+      console.error('Failed to update note:', error);
+    }
+  };
+
+  const cancelEditingNote = () => {
+    setEditingNoteId(null);
+    setEditingNoteContent('');
   };
 
   const handleDayClick = (day: TripDay) => {
@@ -515,6 +586,8 @@ const TripPlanner = () => {
               <div className="card-icon">✅</div>
               <h3>Packing List</h3>
               <p>Manage your travel essentials</p>
+
+
             </div>
 
             <div
@@ -661,15 +734,49 @@ const TripPlanner = () => {
               </button>
             </div>
             <div className="notes-list">
-              {notes.map((note, index) => (
-                <div key={index} className="note-card">
-                  <p>{note}</p>
-                  <button
-                    className="delete-note-btn"
-                    onClick={() => handleDeleteNote(index)}
-                  >
-                    Delete
-                  </button>
+              {notes.map((note) => (
+                <div key={note.id} className="note-card">
+                  {editingNoteId === note.id ? (
+                    <>
+                      <textarea
+                        className="notes-input"
+                        value={editingNoteContent}
+                        onChange={(e) => setEditingNoteContent(e.target.value)}
+                      />
+                      <div className="note-actions">
+                        <button
+                          className="save-note-btn"
+                          onClick={handleUpdateNote}
+                        >
+                          Save
+                        </button>
+                        <button
+                          className="cancel-note-btn"
+                          onClick={cancelEditingNote}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p>{note.content}</p>
+                      <div className="note-actions">
+                        <button
+                          className="edit-note-btn"
+                          onClick={() => startEditingNote(note)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="delete-note-btn"
+                          onClick={() => handleDeleteNote(note.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

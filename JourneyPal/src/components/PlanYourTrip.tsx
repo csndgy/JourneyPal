@@ -155,7 +155,7 @@ const PlanYourTrip: React.FC = () => {
         };
 
     // Navigate to trip planner with trip details
-    navigate(`/plan/${destination.id}`, { 
+    navigate(`/trips`, { 
       state: {
         tripName: formData.tripName,
         startDate: formData.startDate,
@@ -222,7 +222,7 @@ const PlanYourTrip: React.FC = () => {
 
         {formData.destinationType === 'predefined' ? (
           <div className="form-group">
-            <label>Select City *</label>
+            <label>Destination *</label>
             <input
               type="text"
               value={formData.predefinedDestination}
