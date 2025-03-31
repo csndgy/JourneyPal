@@ -27,7 +27,7 @@ A **JourneyPal** egy innovatív alkalmazás, amely segít a felhasználóknak ut
    cd JourneyPalBackend
    dotnet run
    ```
-   2. **Admin felület telepítése és futtatása:**
+2. **Admin felület telepítése és futtatása:**
    ```sh
    git clone https://github.com/csndgy/JourneyPal.git
    cd JourneyPalAdmin
