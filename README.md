@@ -1,4 +1,4 @@
-# A JourneyPal Dokumentációja
+# JourneyPal
 
 ## Bevezetés
 A **JourneyPal** egy innovatív alkalmazás, amely segít a felhasználóknak utazásaik megtervezésében és szervezésében. Célja, hogy átlátható és felhasználóbarát módon kezelje az utazási információkat.
