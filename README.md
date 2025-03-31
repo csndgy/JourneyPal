@@ -24,13 +24,19 @@ A **JourneyPal** egy innovatív alkalmazás, amely segít a felhasználóknak ut
 1. **Backend telepítése és futtatása:**
    ```sh
    git clone https://github.com/csndgy/JourneyPal.git
-   cd JourneyPal
+   cd JourneyPalBackend
+   dotnet run
+   ```
+   2. **Admin felület telepítése és futtatása:**
+   ```sh
+   git clone https://github.com/csndgy/JourneyPal.git
+   cd JourneyPalAdmin
    dotnet run
    ```
 
-2. **React frontend telepítése és futtatása:**
+3. **React frontend telepítése és futtatása:**
    ```sh
-   cd JourneyPal/JourneyPal
+   cd JourneyPal
    npm install
    npm run dev
    ```
@@ -59,6 +65,12 @@ git clone https://github.com/csndgy/JourneyPal.git
 cd JourneyPal
 dotnet build
 ```
+ **Admin felület fejlesztéséhez:**
+ ```sh
+ git clone https://github.com/csndgy/JourneyPal.git
+ cd JourneyPalAdmin
+ dotnet build
+ ```
 A React frontend fejlesztéséhez:
 ```sh
 cd JourneyPal/JourneyPal
